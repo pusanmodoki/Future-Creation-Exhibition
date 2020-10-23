@@ -127,9 +127,9 @@ namespace Editor
 		void Save()
 		{
 			//パス取得
-			string path = TimeManager.LayerSavePath(), name = TimeManager.LayerSaveFileName();
+			string path = TimeManager.savePath, name = TimeManager.cSaveFileName;
 			//セーブ
-			FileAccessor.SaveObject(path, name, ref m_saveLayers);
+			FileAccessor.SaveObject(path, name, ref m_saveLayers, TimeManager.cFileBeginMark);
 		}
 		/// <summary>EditorApplication用コールバック</summary>
 		static void SaveCallaback(PlayModeStateChange change)
@@ -144,9 +144,9 @@ namespace Editor
 		void Load()
 		{
 			//ウィンドウサイズを求める
-			m_windowBlockLeftSize = (new GUIStyle().CalcSize(new GUIContent("Time scale: ")));
-			m_windowBlockRightSize = (new GUIStyle().CalcSize(new GUIContent("FFFFFFFFFFFFFFFFFFFF")));
-			m_windowBlockRightSize2 = (new GUIStyle().CalcSize(new GUIContent("value->0.00000")));
+			m_windowBlockLeftSize = EditorStyles.label.GetSize("Time scale: ");
+			m_windowBlockRightSize = EditorStyles.label.GetSize("FFFFFFFFFFFFFFFFFFFF");;
+			m_windowBlockRightSize2 = EditorStyles.label.GetSize("value->0.00000"); 
 			m_windowBlockLeftSize.y = m_windowBlockRightSize.y += 5;
 			m_windowSize = new Vector2(m_windowBlockLeftSize.x + m_windowBlockRightSize.x + 20,
 				m_windowBlockLeftSize.y * 6);
@@ -166,15 +166,18 @@ namespace Editor
 			m_windowRects.Clear();
 			
 			//パス取得
-			string path = TimeManager.LayerSavePath(), name = TimeManager.LayerSaveFileName();
+			string path = TimeManager.savePath, name = TimeManager.cSaveFileName;
 			//ロードを行う, ファイルがなかった場合初期状態のものをセーブしそれを使う
 			if (FileAccessor.IsExistsFile(path, name))
-				FileAccessor.LoadObject(path, name, out m_saveLayers);
+			{
+				try { FileAccessor.LoadObject(path, name, out m_saveLayers, TimeManager.cFileBeginMark); }
+				catch(System.Exception e) { Debug.LogError(e.Message); throw; }
+			}
 			else
 			{
 				m_saveLayers = new List<SaveTimeLayer>();
 				m_saveLayers.Add(new SaveTimeLayer("root", "", new List<string>(), 1.0f));
-				FileAccessor.SaveObject(path, name, ref m_saveLayers);
+				FileAccessor.SaveObject(path, name, ref m_saveLayers, TimeManager.cFileBeginMark);
 			}
 
 			//レイヤー追加ループ

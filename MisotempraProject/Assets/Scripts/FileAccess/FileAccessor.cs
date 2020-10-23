@@ -10,11 +10,11 @@ namespace FileAccess
 {
 	public static class FileAccessor
 	{
-		static readonly string m_cExtension = "dat";
+		public static readonly string cExtension = "dat";
 
 		public static bool IsExistsFile(string filePath, string fileName)
 		{
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 
 			return File.Exists(fullFilePath);
 		}
@@ -28,7 +28,7 @@ namespace FileAccess
 			if (data == null)
 				throw new System.ArgumentNullException("data", "Invalid data. (null)");
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string linkageData = "";
 			byte[] saveData = null;
 
@@ -60,7 +60,7 @@ namespace FileAccess
 			if (data == null)
 				throw new System.ArgumentNullException("data", "Invalid data. (null)");
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string linkageData = "";
 			byte[] saveData = null;
 
@@ -91,7 +91,7 @@ namespace FileAccess
 			if (data == null)
 				throw new System.ArgumentNullException("data", "Invalid data. (null)");
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string linkageData = "";
 			byte[] saveData = null;
 
@@ -117,7 +117,7 @@ namespace FileAccess
 			if (data == null)
 				throw new System.ArgumentNullException("data", "Invalid data. (null)");
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			byte[] saveData = null;
 
 			saveData = Encoding.UTF8.GetBytes(data);
@@ -145,7 +145,7 @@ namespace FileAccess
 				throw new System.ArgumentNullException("fileName", "Invalid filePath. (null)");
 			}
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] readData = null;
 
@@ -180,7 +180,7 @@ namespace FileAccess
 				throw new System.ArgumentNullException("fileName", "Invalid filePath. (null)");
 			}
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] readData = null;
 
@@ -215,7 +215,7 @@ namespace FileAccess
 				throw new System.ArgumentNullException("fileName", "Invalid filePath. (null)");
 			}
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] readData = null;
 
@@ -250,7 +250,7 @@ namespace FileAccess
 				throw new System.ArgumentNullException("fileName", "Invalid filePath. (null)");
 			}
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			byte[] readData = null;
 
 			if (!File.Exists(fullFilePath))
@@ -274,7 +274,7 @@ namespace FileAccess
 
 
 
-		public static void SaveObject<DataType>(string filePath, string fileName, ref DataType data)
+		public static void SaveObject<DataType>(string filePath, string fileName, ref DataType data, string beginMark = null)
 		{
 			if (fileName == null || fileName.Length == 0)
 				throw new System.ArgumentNullException("fileName", "Invalid fileName. (null)");
@@ -283,11 +283,17 @@ namespace FileAccess
 			if (data == null)
 				throw new System.ArgumentNullException("data", "Invalid data. (null)");
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] saveData = null;
 
-			convertData = JsonUtility.ToJson(data);
+			if (beginMark != null)
+			{
+				while (beginMark.Length > 0 && beginMark[beginMark.Length - 1] == '\n')
+					beginMark.Remove(beginMark.Length - 1);
+				convertData = beginMark + "\n";
+			}
+			convertData += JsonUtility.ToJson(data);
 
 			saveData = Encoding.UTF8.GetBytes(convertData);
 			saveData = ByteCompressor.Compress(saveData);
@@ -299,7 +305,7 @@ namespace FileAccess
 			using (FileStream fileStream = File.Create(fullFilePath))
 				fileStream.Write(saveData, 0, saveData.Length);
 		}
-		public static void SaveObject<DataType>(string filePath, string fileName, ref List<DataType> data)
+		public static void SaveObject<DataType>(string filePath, string fileName, ref List<DataType> data, string beginMark = null)
 		{
 			if (fileName == null || fileName.Length == 0)
 				throw new System.ArgumentNullException("fileName", "Invalid fileName. (null)");
@@ -308,11 +314,18 @@ namespace FileAccess
 			if (data == null)
 				throw new System.ArgumentNullException("data", "Invalid data. (null)");
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] saveData = null;
 
-			foreach(var e in data)
+			if (beginMark != null)
+			{
+				while (beginMark.Length > 0 && beginMark[beginMark.Length - 1] == '\n')
+					beginMark.Remove(beginMark.Length - 1);
+				convertData = beginMark + "\n";
+			}
+
+			foreach (var e in data)
 				convertData += JsonUtility.ToJson(e) + "\n";
 
 			saveData = Encoding.UTF8.GetBytes(convertData);
@@ -325,7 +338,7 @@ namespace FileAccess
 			using (FileStream fileStream = File.Create(fullFilePath))
 				fileStream.Write(saveData, 0, saveData.Length);
 		}
-		public static void LoadObject<DataType>(string filePath, string fileName, out DataType data)
+		public static void LoadObject<DataType>(string filePath, string fileName, out DataType data, string beginMark = null)
 		{
 			if (fileName == null || fileName.Length == 0)
 			{
@@ -338,9 +351,10 @@ namespace FileAccess
 				throw new System.ArgumentNullException("fileName", "Invalid filePath. (null)");
 			}
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] readData = null;
+			int readIndex = 0;
 
 			if (!File.Exists(fullFilePath))
 			{
@@ -357,9 +371,26 @@ namespace FileAccess
 			readData = ByteCompressor.Uncompress(readData);
 
 			convertData = Encoding.UTF8.GetString(readData);
-			data = JsonUtility.FromJson<DataType>(convertData);
+			string[] split = convertData.Split('\n');
+
+			if (beginMark != null)
+			{
+				while (beginMark.Length > 0 && beginMark[beginMark.Length - 1] == '\n')
+					beginMark.Remove(beginMark.Length - 1);
+				if (split[0] == beginMark)
+					readIndex = 1;
+				else
+				{
+					data = default;
+					throw new System.SystemException("BeginMark not found. file path: " + fullFilePath);
+				}
+			}
+			if (split.Length > readIndex && split[readIndex].Length > 0)
+				data = JsonUtility.FromJson<DataType>(split[readIndex]);
+			else
+				data = default;
 		}
-		public static void LoadObject<DataType>(string filePath, string fileName, out List<DataType> data)
+		public static void LoadObject<DataType>(string filePath, string fileName, out List<DataType> data, string beginMark = null)
 		{
 			if (fileName == null || fileName.Length == 0)
 			{
@@ -372,9 +403,10 @@ namespace FileAccess
 				throw new System.ArgumentNullException("fileName", "Invalid filePath. (null)");
 			}
 
-			string fullFilePath = $"{filePath}/{fileName}.{m_cExtension}";
+			string fullFilePath = $"{filePath}/{fileName}.{cExtension}";
 			string convertData = "";
 			byte[] readData = null;
+			int readIndex = 0;
 
 			if (!File.Exists(fullFilePath))
 			{
@@ -395,7 +427,54 @@ namespace FileAccess
 			data = new List<DataType>();
 
 			string[] split = convertData.Split('\n');
-			foreach(var e in split) if (e.Length > 0) data.Add(JsonUtility.FromJson<DataType>(e));
+
+			if (beginMark != null)
+			{
+				while (beginMark.Length > 0 && beginMark[beginMark.Length - 1] == '\n')
+					beginMark.Remove(beginMark.Length - 1);
+				if (split[0] == beginMark)
+					readIndex = 1;
+				else
+					throw new System.SystemException("BeginMark not found. file path: " + fullFilePath);
+			}
+
+			for (; readIndex < split.Length; ++readIndex)
+			{
+				if (split[readIndex].Length > 0)
+					data.Add(JsonUtility.FromJson<DataType>(split[readIndex]));
+			}
+		}
+
+		public static bool IsExistMark(string fullFilePath, string beginMark)
+		{
+			if (fullFilePath == null || fullFilePath.Length == 0)
+				throw new System.ArgumentNullException("fullFilePath", "Invalid fileName. (null)");
+			if (beginMark == null || beginMark.Length == 0)
+				throw new System.ArgumentNullException("beginMark", "Invalid beginMark. (null)");
+
+			string[] convertData = null;
+			byte[] readData = null;
+
+			using (FileStream fileStream = File.OpenRead(fullFilePath))
+			{
+				readData = new byte[fileStream.Length];
+				fileStream.Read(readData, 0, readData.Length);
+			}
+
+			try
+			{
+				readData = ByteEncryptor.UnencryptAuto(readData);
+				readData = ByteCompressor.Uncompress(readData);
+
+				convertData = Encoding.UTF8.GetString(readData).Split('\n');
+				if (convertData.Length == 0)
+					throw new System.SystemException("Load failed. file path: " + fullFilePath);
+
+				while (beginMark.Length > 0 && beginMark[beginMark.Length - 1] == '\n')
+					beginMark.Remove(beginMark.Length - 1);
+			}
+			catch(System.Exception) { return false; }
+			return beginMark == convertData[0];
 		}
 
 		static void SplitData(string data, out List<List<string>> read)

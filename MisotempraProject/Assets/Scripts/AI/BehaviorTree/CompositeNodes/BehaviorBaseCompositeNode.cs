@@ -8,25 +8,17 @@ namespace AI
 	{
 		public abstract class BehaviorBaseCompositeNode : BehaviorBaseNode
 		{
-			//public enum CompositeMode
-			//{
-			//	Sequence,
-			//	Selector,
-			//	Random,
-			//	SimpleParallel,
-			//}
-			public enum SimpleParallelFinishMode
+			public enum ParallelFinishMode
 			{
 				Immediate,
 				Delayed,
 				Null,
 			}
 			
-			public SimpleParallelFinishMode simpleParallelFinishMode { get; private set; } = SimpleParallelFinishMode.Null;
+			public ParallelFinishMode parallelFinishMode { get; private set; } = ParallelFinishMode.Null;
 
 			public List<BaseService> services { get; private set; } = new List<BaseService>();
 			public List<BehaviorBaseNode> nodes { get; private set; } = new List<BehaviorBaseNode>();
-
 		}
 	}
 }

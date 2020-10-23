@@ -14,9 +14,11 @@ namespace TimeManagement
 	public class TimeManager : SingletonMonoBehaviour<TimeManager>
 	{
 		/// <summary>Layer data save path</summary>
-		public static string LayerSavePath() { return Application.streamingAssetsPath + "/Time"; }
+		public static string savePath { get { return Application.streamingAssetsPath + "/Time"; } }
+		/// <summary>Layer data file begin mark</summary>
+		public static readonly string cFileBeginMark = "<<B>>TimeLayerDataBeginMark";
 		/// <summary>Layer data file name</summary>
-		public static string LayerSaveFileName() { return "TimeLayerData.bin"; }
+		public static readonly string cSaveFileName = "TimeLayerData"; 
 
 		/// <summary>root time layer</summary>
 		public TimeLayer rootLayer { get; private set; } = null;
@@ -41,17 +43,26 @@ namespace TimeManagement
 			layerIndexes = new ReadOnlyDictionary<string, int>(m_layerIndexes);
 
 			//パス取得
-			string path = LayerSavePath(), name = LayerSaveFileName();
+			string path = savePath, name = cSaveFileName;
 			//セーブ用レイヤー
 			List<SaveTimeLayer> loadLayer;
 			//ロードを行う, ファイルがなかった場合初期状態のものをセーブしそれを使う
 			if (FileAccessor.IsExistsFile(path, name))
-				FileAccessor.LoadObject(path, name, out loadLayer);
+			{
+				try { FileAccessor.LoadObject(path, name, out loadLayer, cFileBeginMark); }
+				catch (System.Exception e)
+				{
+#if UNITY_EDITOR
+					Debug.LogError(e.Message);
+#endif
+					throw;
+				}
+			}
 			else
 			{
 				loadLayer = new List<SaveTimeLayer>();
 				loadLayer.Add(new SaveTimeLayer("root", "", new List<string>(), 1.0f));
-				FileAccessor.SaveObject(path, name, ref loadLayer);
+				FileAccessor.SaveObject(path, name, ref loadLayer, cFileBeginMark);
 			}
 
 			//各レイヤーリストに追加

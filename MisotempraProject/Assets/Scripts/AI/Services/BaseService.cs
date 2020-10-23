@@ -6,19 +6,28 @@ namespace AI
 {
 	namespace BehaviorTree
 	{
-		public class BaseService
+		public abstract class BaseService
 		{
-			// Start is called before the first frame update
-			void Start()
+			public enum CallMode
 			{
-
+				TimeInterval,
+				
 			}
 
-			// Update is called once per frame
-			void Update()
-			{
+			public float callInterval { get; private set; } = 0.0f;
+			Timer m_timer = new Timer();
 
+			public void OnEnable() { m_timer.Start(); }
+			public void Update()
+			{
+				if (m_timer.elapasedTime >= callInterval)
+				{
+					m_timer.Start();
+					ServiceFunction();
+				}
 			}
+
+			public abstract void ServiceFunction();
 		}
 	}
 }

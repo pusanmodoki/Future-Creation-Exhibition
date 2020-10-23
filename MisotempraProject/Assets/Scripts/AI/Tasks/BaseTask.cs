@@ -8,9 +8,9 @@ namespace AI
 	{
 		public abstract class BaseTask
 		{
-			public abstract void Start();
-			public abstract void Update();
-			public abstract void Quit();
+			public abstract EnableResult OnEnale();
+			public abstract UpdateResult Update();
+			public abstract void OnQuit(UpdateResult result);
 		}
 	}
 }

@@ -32,19 +32,16 @@ namespace Editor
 				// UIElements上でのドラッグ操作などの検知
 				this.AddManipulator(new SelectionDragger());
 				this.AddManipulator(new ContentDragger());
-
-				// SampleGraphViewのメニュー周りのイベントを設定する処理
-				nodeCreationRequest += context =>
-				{
-					// GraphViewの子要素として追加する
-					AddElement(new BaseNode("null"));
-				};
-
-				AddElement(new BaseNode("null"));
 			}
 			public override List<Port> GetCompatiblePorts(Port startAnchor, NodeAdapter nodeAdapter)
 			{
 				return ports.ToList();
+			}
+
+			private void ClearGraph()
+			{
+				nodes.ToList().ForEach(RemoveElement);
+				edges.ToList().ForEach(RemoveElement);
 			}
 		}
 	}

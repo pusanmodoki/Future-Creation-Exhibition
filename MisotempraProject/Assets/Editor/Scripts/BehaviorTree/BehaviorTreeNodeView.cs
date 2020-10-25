@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
-using System;
+using Editor.BehaviorTree.FileAccessWindow;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor
@@ -15,12 +15,26 @@ namespace Editor
 		public class BehaviorTreeNodeView : NodeView.BaseNodeView
 		{
 			BehaviorTreeWindow m_thisWindow = null;
+			SearchWindow m_searchWindow = null;
+
+			double m_createCallbackSetTime = 0;
+			bool m_isDelayCallCreateCallback = false;
 
 			//protected override bool canDuplicateSelection => false;
 
 			public BehaviorTreeNodeView(BehaviorTreeWindow thisWindow) : base("BehaviorTreeUSS")
 			{
 				m_thisWindow = thisWindow;
+				EditorApplication.update += Update;
+
+				// SampleGraphViewのメニュー周りのイベントを設定する処理
+				nodeCreationRequest += context =>
+				{
+					// GraphViewの子要素として追加する
+					AddElement(new BehaviorTreeBaseNode(this));
+				};
+				
+				AddElement(new BehaviorTreeRootNode(this));
 			}
 			public override List<Port> GetCompatiblePorts(Port startAnchor, NodeAdapter nodeAdapter)
 			{
@@ -32,33 +46,63 @@ namespace Editor
 				base.BuildContextualMenu(evt);
 				
 				evt.menu.AppendAction("Save", SaveCallback,
-					(Func<DropdownMenuAction, DropdownMenuAction.Status>)(a => true ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled),
+					action => !false ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
 					evt.mousePosition);
 
-				evt.menu.AppendAction("Load", LoadCallback, 
-					(Func<DropdownMenuAction, DropdownMenuAction.Status>)(a => true ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled),
+				evt.menu.AppendAction("Load", LoadCallback,
+					action => System.IO.Directory.GetFiles(AI.BehaviorTree.BehaviorTree.dataSavePath).Length > 0 
+						? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
 					evt.mousePosition);
 
-				evt.menu.AppendAction("Create", SaveCallback,
-					(Func<DropdownMenuAction, DropdownMenuAction.Status>)(a => true ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled),
-					evt.mousePosition);
+				evt.menu.AppendAction("Create", CreateCallback, action => DropdownMenuAction.Status.Normal, evt.mousePosition);
 			}
 
-			void LoadCallback(DropdownMenuAction action)
+			public void LoadCallback(DropdownMenuAction action)
 			{
-
+				var searchWindowProvider = ScriptableObject.CreateInstance<BehaviorTreeLoadWindowProvider>();
+				searchWindowProvider.Initialize(this);
+				SearchWindow.Open(new SearchWindowContext((Vector2)action.userData), searchWindowProvider);
 			}
-			void SaveCallback(DropdownMenuAction action)
+			public void SaveCallback(DropdownMenuAction action)
 			{
-				// クリックした位置を視点とするRectを作る
-				// 本来のポップアップの用途として使う場合はボタンのRectを渡す
-				var mouseRect = new Rect((Vector2)action.userData, Vector2.one);
-				// PopupWindowContentを生成
+			}
+			public void CreateCallback(DropdownMenuAction action)
+			{
 				var content = new BehaviorTreeCreateWindow();
+				content.Initialize(this);
 
 				// 開く
-				content.SetParentWindow(m_thisWindow);
-				UnityEditor.PopupWindow.Show(mouseRect, content);
+				UnityEditor.PopupWindow.Show(Rect.zero, content);
+			}
+
+			public void DoLoadCallback(string path)
+			{
+				if (path == null)
+				{
+					m_createCallbackSetTime = EditorApplication.timeSinceStartup;
+					m_isDelayCallCreateCallback = true;
+				}
+				else
+				{
+
+				}
+			}
+			public void DoSaveCallback()
+			{
+			}
+			public void DoCreateCallback(string name)
+			{
+				if (name == null) return;
+			}
+
+			void Update()
+			{
+				if (m_isDelayCallCreateCallback && 
+					EditorApplication.timeSinceStartup - m_createCallbackSetTime > 0.1f)
+				{
+					m_isDelayCallCreateCallback = false;
+					CreateCallback(null);
+				}
 			}
 		}	
 	}

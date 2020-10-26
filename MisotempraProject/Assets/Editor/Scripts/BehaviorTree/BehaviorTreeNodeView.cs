@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using Editor.BehaviorTree.FileAccessWindow;
+using Editor.BehaviorTree.CashContainer.Detail;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor
@@ -14,6 +15,11 @@ namespace Editor
 	{
 		public class BehaviorTreeNodeView : NodeView.BaseNodeView
 		{
+			public List<BaseCashContainer> cashContainers { get; private set; } = new List<BaseCashContainer>();
+			public Dictionary<string, BaseCashContainer> cashContainersKeyGuid { get; private set; } = new Dictionary<string, BaseCashContainer>();
+
+			static readonly Vector2 m_cRootPosition = Vector2.zero;
+
 			BehaviorTreeWindow m_thisWindow = null;
 			SearchWindow m_searchWindow = null;
 
@@ -34,7 +40,7 @@ namespace Editor
 					AddElement(new BehaviorTreeBaseNode(this));
 				};
 				
-				AddElement(new BehaviorTreeRootNode(this));
+				//AddElement(new BehaviorTreeRootNode(this));
 			}
 			public override List<Port> GetCompatiblePorts(Port startAnchor, NodeAdapter nodeAdapter)
 			{
@@ -93,6 +99,8 @@ namespace Editor
 			public void DoCreateCallback(string name)
 			{
 				if (name == null) return;
+
+				this.CreateEmptyFile(name, m_cRootPosition);
 			}
 
 			void Update()

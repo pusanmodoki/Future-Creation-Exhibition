@@ -98,14 +98,14 @@ namespace AI
 
 		public class BehaviorCompositeRandomSelectorNode : BehaviorBaseCompositeNode
 		{
-			HashSet<int> randomIndexes = new HashSet<int>();
+			HashSet<int> m_randomIndexes = new HashSet<int>();
 			int m_selectIndex = 0;
 
 
 			public override EnableResult OnEnable()
 			{
 				if (nodes.Count == 0) return EnableResult.Failed;
-				randomIndexes.Clear();
+				m_randomIndexes.Clear();
 				m_selectIndex = 0;
 				foreach (var e in services) e.OnEnable();
 
@@ -114,8 +114,8 @@ namespace AI
 					do
 					{
 						index = Random.Range(0, nodes.Count);
-					} while (!randomIndexes.Contains(m_selectIndex));
-					randomIndexes.Add(m_selectIndex);
+					} while (!m_randomIndexes.Contains(m_selectIndex));
+					m_randomIndexes.Add(m_selectIndex);
 				}
 
 				if (nodes[m_selectIndex].isAllTrueDecorators && nodes[m_selectIndex].OnEnable() == EnableResult.Success)

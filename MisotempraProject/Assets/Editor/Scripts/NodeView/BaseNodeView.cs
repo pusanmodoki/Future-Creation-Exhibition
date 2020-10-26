@@ -38,9 +38,10 @@ namespace Editor
 				return ports.ToList();
 			}
 
-			private void ClearGraph()
+			public void ClearGraph()
 			{
 				nodes.ToList().ForEach(RemoveElement);
+				ports.ToList().ForEach(RemoveElement);
 				edges.ToList().ForEach(RemoveElement);
 			}
 		}

@@ -1,0 +1,103 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine.UIElements;
+using CashContainer = AI.BehaviorTree.CashContainer;
+
+/// <summary>MisoTempra editor</summary>
+namespace Editor
+{
+	/// <summary>Behavior tree editor</summary>
+	namespace BehaviorTree
+	{
+		public static class BTClassMediator
+		{
+			public enum NodeType
+			{
+				Sequence,
+				Selector,
+				RandomSelector,
+				Parallel,
+				SimpleParallel,
+				Task
+			}
+
+			public static readonly string cTaskNodeName = "Task";
+			public static string[] compositeNodeNames
+			{
+				get
+				{
+					if (m_compositeNodeNames == null)
+					{
+						m_compositeNodeNames = new string[5];
+						m_compositeNodeNames[0] = "Sequence";
+						m_compositeNodeNames[1] = "Selector";
+						m_compositeNodeNames[2] = "Random selector";
+						m_compositeNodeNames[3] = "Parallel";
+						m_compositeNodeNames[4] = "Simple parallel";
+					}
+					return m_compositeNodeNames;
+				}
+			}
+			static string[] m_compositeNodeNames = null;
+
+			public static Dictionary<string, System.Type> cashTypes
+			{
+				get
+				{
+					if (m_cashTypes == null)
+					{
+						m_cashTypes = new Dictionary<string, System.Type>();
+						m_cashTypes.Add(compositeNodeNames[0], typeof(CashContainer.CompositeCashContainer));
+						m_cashTypes.Add(compositeNodeNames[1], typeof(CashContainer.CompositeCashContainer));
+						m_cashTypes.Add(compositeNodeNames[2], typeof(CashContainer.RandomCashContainer));
+						m_cashTypes.Add(compositeNodeNames[3], typeof(CashContainer.ParallelCashContainer));
+						m_cashTypes.Add(compositeNodeNames[4], typeof(CashContainer.ParallelCashContainer));
+						m_cashTypes.Add(cTaskNodeName, typeof(CashContainer.TaskCashContainer));
+					}
+					return m_cashTypes;
+				}
+			}
+			static Dictionary<string, System.Type> m_cashTypes = null;
+
+			public static Dictionary<string, System.Type> nodeTypes
+			{
+				get
+				{
+					if (m_nodeTypes == null)
+					{
+						m_nodeTypes = new Dictionary<string, System.Type>();
+						m_nodeTypes.Add(compositeNodeNames[0], typeof(EditNode.BTEditSequenceNode));
+						m_nodeTypes.Add(compositeNodeNames[1], typeof(EditNode.BTEditSelectorNode));
+						m_nodeTypes.Add(compositeNodeNames[2], typeof(EditNode.BTEditRandomSelectorNode));
+						m_nodeTypes.Add(compositeNodeNames[3], typeof(EditNode.BTEditParallelNode));
+						m_nodeTypes.Add(compositeNodeNames[4], typeof(EditNode.BTEditSimpleParallelNode));
+						m_nodeTypes.Add(cTaskNodeName, typeof(EditNode.BTEditTaskNode));
+					}
+					return m_nodeTypes;
+				}
+			}
+			static Dictionary<string, System.Type> m_nodeTypes = null;
+
+			public static Dictionary<string, System.Type> classTypes
+			{
+				get
+				{
+					if (m_classTypes == null)
+					{
+						m_classTypes = new Dictionary<string, System.Type>();
+						m_classTypes.Add(compositeNodeNames[0], typeof(AI.BehaviorTree.BehaviorCompositeSequenceNode));
+						m_classTypes.Add(compositeNodeNames[1], typeof(AI.BehaviorTree.BehaviorCompositeSelectorNode));
+						m_classTypes.Add(compositeNodeNames[2], typeof(AI.BehaviorTree.BehaviorCompositeRandomSelectorNode));
+						m_classTypes.Add(compositeNodeNames[3], typeof(AI.BehaviorTree.BehaviorCompositeParallelNode));
+						m_classTypes.Add(compositeNodeNames[4], typeof(AI.BehaviorTree.BehaviorCompositeSimpleParallelNode));
+						m_classTypes.Add(cTaskNodeName, typeof(AI.BehaviorTree.BaseTask));
+					}
+					return m_classTypes;
+				}
+			}
+			static Dictionary<string, System.Type> m_classTypes = null;
+		}
+	}
+}

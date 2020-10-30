@@ -14,38 +14,19 @@ namespace Editor
 			static void OnPostprocessAllAssets(string[] importedAssets,
 				string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 			{
-				foreach (var path in importedAssets)
-				{
-					if (path.IndexOf(AI.BehaviorTree.BehaviorTree.cDUseEditorDataSavePath) == 0 &&
-						path.IndexOf(FileAccess.FileAccessor.cExtension) == path.Length - FileAccess.FileAccessor.cExtension.Length)
-					{
-						BehaviorTreeWindow.ReloadFileInfomations();
-						return;
-					}
-				}
-				foreach (var path in movedAssets)
-				{
-					if (path.IndexOf(AI.BehaviorTree.BehaviorTree.cDUseEditorDataSavePath) == 0 &&
-						path.IndexOf(FileAccess.FileAccessor.cExtension) == path.Length - FileAccess.FileAccessor.cExtension.Length)
-					{
-						BehaviorTreeWindow.ReloadFileInfomations();
-						return;
-					}
-				}
 				foreach (var path in deletedAssets)
 				{
 					if (path.IndexOf(AI.BehaviorTree.BehaviorTree.cDUseEditorDataSavePath) == 0 &&
 						path.IndexOf(FileAccess.FileAccessor.cExtension) == path.Length - FileAccess.FileAccessor.cExtension.Length)
 					{
-						BehaviorTreeWindow.ReloadFileInfomations();
-
 						foreach (var e in BehaviorTreeWindow.instances)
 						{
-							int find = e.fileName.IndexOf(path);
-							if (find == e.fileName.Length - path.Length)
+							string findPath = "/" + e.fileName + "." + FileAccess.FileAccessor.cExtension;
+							int find = path.IndexOf(findPath);
+							if (find == path.Length - findPath.Length)
 							{
-								e.SetDeleteFileFile();
-								EditorWindow.Destroy(e);
+								e.SetTrueIsDeleteFile();
+								e.Close();
 								break;
 							}
 						}

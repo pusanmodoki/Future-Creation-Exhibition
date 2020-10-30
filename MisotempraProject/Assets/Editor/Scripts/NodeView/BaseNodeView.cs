@@ -30,8 +30,10 @@ namespace Editor
 				gridBackground.StretchToParentSize();
 
 				// UIElements上でのドラッグ操作などの検知
+				this.AddManipulator(new ContentZoomer());
 				this.AddManipulator(new SelectionDragger());
 				this.AddManipulator(new ContentDragger());
+				this.AddManipulator(new RectangleSelector());
 			}
 			public override List<Port> GetCompatiblePorts(Port startAnchor, NodeAdapter nodeAdapter)
 			{

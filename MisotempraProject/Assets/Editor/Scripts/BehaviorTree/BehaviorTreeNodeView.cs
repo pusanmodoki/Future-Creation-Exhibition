@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
-using Editor.BehaviorTree.FileAccessWindow;
-using Editor.BehaviorTree.CashContainer.Detail;
+using Editor.BehaviorTree.SubWindow;
+using AI.BehaviorTree.CashContainer;
+using AI.BehaviorTree.CashContainer.Detail;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor
@@ -17,34 +19,131 @@ namespace Editor
 		{
 			public List<BaseCashContainer> cashContainers { get; private set; } = new List<BaseCashContainer>();
 			public Dictionary<string, BaseCashContainer> cashContainersKeyGuid { get; private set; } = new Dictionary<string, BaseCashContainer>();
+			public Dictionary<Node, BaseCashContainer> cashContainersKeyNode { get; private set; } = new Dictionary<Node, BaseCashContainer>();
+			public string fileName { get { return m_thisWindow.fileName; } set { m_thisWindow.fileName = value; } } 
 
 			static readonly Vector2 m_cRootPosition = Vector2.zero;
 
 			BehaviorTreeWindow m_thisWindow = null;
-			SearchWindow m_searchWindow = null;
 
 			double m_createCallbackSetTime = 0;
 			bool m_isDelayCallCreateCallback = false;
 
 			//protected override bool canDuplicateSelection => false;
 
+			public void AddCash(BaseCashContainer cash, Node node)
+			{
+				cashContainers.Add(cash);
+				cashContainersKeyGuid.Add(cash.guid, cash);
+				cashContainersKeyNode.Add(node, cash);
+			}
+
+			public Rect LocalMousePositionToNodePosition(SearchWindowContext context, Rect rect)
+			{
+				var worldMousePosition = m_thisWindow.rootVisualElement.ChangeCoordinatesTo(
+					m_thisWindow.rootVisualElement.parent, context.screenMousePosition - m_thisWindow.position.position);
+				rect.position = contentViewContainer.WorldToLocal(worldMousePosition);
+				return rect;
+			}
+
 			public BehaviorTreeNodeView(BehaviorTreeWindow thisWindow) : base("BehaviorTreeUSS")
 			{
 				m_thisWindow = thisWindow;
 				EditorApplication.update += Update;
 
-				// SampleGraphViewのメニュー周りのイベントを設定する処理
 				nodeCreationRequest += context =>
-				{
-					// GraphViewの子要素として追加する
-					AddElement(new BehaviorTreeBaseNode(this));
+				{	
+					var searchWindowProvider = ScriptableObject.CreateInstance<BTNewNodeWindowProvider>();
+					searchWindowProvider.Initialize(this);
+					SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindowProvider);
 				};
-				
-				//AddElement(new BehaviorTreeRootNode(this));
+
+				graphViewChanged += GraphViewChangeCallback;
+
+
+				if (fileName != null && fileName.Length > 0)
+					this.Load(fileName);
 			}
+			GraphViewChange GraphViewChangeCallback(GraphViewChange graphViewChange)
+			{
+				if (graphViewChange.edgesToCreate != null)
+				{
+					foreach(var edge in graphViewChange.edgesToCreate)
+					{
+						var root = cashContainersKeyNode[edge.output.node] as RootCashContainer;
+						if (root != null)
+							root.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
+						var composite = cashContainersKeyNode[edge.output.node] as CompositeCashContainer;
+						if (composite != null)
+							composite.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
+					}
+				}
+
+				if (graphViewChange.elementsToRemove != null)
+				{
+					foreach(var element in graphViewChange.elementsToRemove)
+					{
+						if (element == null) continue;
+
+						var node = element as Node;
+						if (node != null)
+						{
+							cashContainersKeyGuid.Remove(cashContainersKeyNode[node].guid);
+							cashContainers.Remove(cashContainersKeyNode[node]);
+							cashContainersKeyNode.Remove(node);
+						}
+
+						var edge = element as Edge;
+						if (edge != null)
+						{
+							var root = cashContainersKeyNode[edge.input.node] as RootCashContainer;
+							if (root != null)
+								root.childrenNodesGuid.Remove(cashContainersKeyNode[edge.output.node].guid);
+							var composite = cashContainersKeyNode[edge.input.node] as CompositeCashContainer;
+							if (composite != null)
+								composite.childrenNodesGuid.Remove(cashContainersKeyNode[edge.output.node].guid);
+						}
+					}
+				}
+
+				if (graphViewChange.movedElements != null)
+				{
+					foreach (var element in graphViewChange.movedElements)
+					{
+						if (element == null) continue;
+
+						var node = element as Node;
+						if (node != null) cashContainersKeyNode[node].position = node.GetPosition().position;
+					}
+				}
+				return graphViewChange;
+			}
+
 			public override List<Port> GetCompatiblePorts(Port startAnchor, NodeAdapter nodeAdapter)
 			{
-				return ports.ToList();
+				var compatiblePorts = new List<Port>();
+
+				compatiblePorts.AddRange(ports.ToList().Where(port =>
+				{
+					if (port == null)
+						return false;
+
+					// 同じノードには繋げない
+					if (startAnchor.node == port.node)
+						return false;
+
+					// Input同士、Output同士は繋げない
+					if (port.direction == startAnchor.direction)
+						return false;
+
+					// ポートの型が一致していない場合は繋げない
+					if (port.portType != startAnchor.portType)
+						return false;
+
+					return true;
+				}));
+
+				return compatiblePorts;
 			}
 
 			public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -52,7 +151,7 @@ namespace Editor
 				base.BuildContextualMenu(evt);
 				
 				evt.menu.AppendAction("Save", SaveCallback,
-					action => !false ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
+					action => fileName != null && fileName.Length > 0 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
 					evt.mousePosition);
 
 				evt.menu.AppendAction("Load", LoadCallback,
@@ -65,36 +164,40 @@ namespace Editor
 
 			public void LoadCallback(DropdownMenuAction action)
 			{
-				var searchWindowProvider = ScriptableObject.CreateInstance<BehaviorTreeLoadWindowProvider>();
+				var searchWindowProvider = ScriptableObject.CreateInstance<BTLoadWindowProvider>();
 				searchWindowProvider.Initialize(this);
 				SearchWindow.Open(new SearchWindowContext((Vector2)action.userData), searchWindowProvider);
 			}
 			public void SaveCallback(DropdownMenuAction action)
 			{
+				try { this.Save(); }
+				catch(System.Exception e)
+				{
+					Debug.LogError(e.Message + "\n" + e.Source);
+					return;
+				}
+				Debug.Log("Behavior tree (" + fileName + ") Save completed.");
 			}
 			public void CreateCallback(DropdownMenuAction action)
 			{
-				var content = new BehaviorTreeCreateWindow();
+				var content = new BTCreateWindow();
 				content.Initialize(this);
 
 				// 開く
 				UnityEditor.PopupWindow.Show(Rect.zero, content);
 			}
 
-			public void DoLoadCallback(string path)
+			public void DoLoadCallback(string name)
 			{
-				if (path == null)
+				if (name == null)
 				{
 					m_createCallbackSetTime = EditorApplication.timeSinceStartup;
 					m_isDelayCallCreateCallback = true;
 				}
 				else
 				{
-
+					this.Load(name);
 				}
-			}
-			public void DoSaveCallback()
-			{
 			}
 			public void DoCreateCallback(string name)
 			{
@@ -110,6 +213,47 @@ namespace Editor
 				{
 					m_isDelayCallCreateCallback = false;
 					CreateCallback(null);
+				}
+			}
+
+			public void BuildNodeView(List<BaseCashContainer> loadList)
+			{
+				Dictionary<string, Node> nodesKeyGuid = new Dictionary<string, Node>();
+
+				foreach(var e in loadList)
+				{
+					Node node = (Node)(System.Activator.CreateInstance(System.Type.GetType(e.editNodeClassName), this));
+					AddElement(node);
+
+					Rect position = node.GetPosition();
+					position.position = e.position;
+					node.SetPosition(position);
+
+					AddCash(e, node);
+					nodesKeyGuid.Add(e.guid, node);
+				}
+
+				foreach(var cash in cashContainers)
+				{
+					var root = cash as RootCashContainer;
+					var composite = cash as CompositeCashContainer;
+					List<string> useChildrensGuid = null;
+
+					if (root != null) useChildrensGuid = root.childrenNodesGuid;
+					else if (composite != null) useChildrensGuid = composite.childrenNodesGuid;
+					else continue;
+
+					foreach (var children in useChildrensGuid)
+					{
+						var edge = new Edge()
+						{
+							output = nodesKeyGuid[cash.guid].outputContainer.ElementAt(0) as Port,
+							input = nodesKeyGuid[children].inputContainer.ElementAt(0) as Port
+						};
+						edge.input.Connect(edge);
+						edge.output.Connect(edge);
+						Add(edge);
+					}
 				}
 			}
 		}	

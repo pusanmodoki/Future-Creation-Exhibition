@@ -293,7 +293,7 @@ namespace FileAccess
 					beginMark.Remove(beginMark.Length - 1);
 				convertData = beginMark + "\n";
 			}
-			convertData += JsonUtility.ToJson(data);
+			convertData += data.GetType().FullName + "/"+ JsonUtility.ToJson(data);
 
 			saveData = Encoding.UTF8.GetBytes(convertData);
 			saveData = ByteCompressor.Compress(saveData);
@@ -326,7 +326,7 @@ namespace FileAccess
 			}
 
 			foreach (var e in data)
-				convertData += JsonUtility.ToJson(e) + "\n";
+				convertData += e.GetType().FullName + "/" + JsonUtility.ToJson(e) + "\n";
 
 			saveData = Encoding.UTF8.GetBytes(convertData);
 			saveData = ByteCompressor.Compress(saveData);
@@ -386,7 +386,11 @@ namespace FileAccess
 				}
 			}
 			if (split.Length > readIndex && split[readIndex].Length > 0)
-				data = JsonUtility.FromJson<DataType>(split[readIndex]);
+			{
+				int find = split[readIndex].IndexOf("/");
+				string[] typeSplit = new string[2] { split[readIndex].Substring(0, find), split[readIndex].Substring(find + 1, split[readIndex].Length - 1) };
+				data = (DataType)JsonUtility.FromJson(typeSplit[1], System.Type.GetType(typeSplit[0]));
+			}
 			else
 				data = default;
 		}
@@ -440,8 +444,11 @@ namespace FileAccess
 
 			for (; readIndex < split.Length; ++readIndex)
 			{
-				if (split[readIndex].Length > 0)
-					data.Add(JsonUtility.FromJson<DataType>(split[readIndex]));
+				if (split[readIndex].Length == 0) continue;
+
+				int find = split[readIndex].IndexOf("/");
+				string[] typeSplit = new string[2] { split[readIndex].Substring(0, find), split[readIndex].Substring(find + 1, (split[readIndex].Length) - (find + 1)) };
+				data.Add((DataType)JsonUtility.FromJson(typeSplit[1], System.Type.GetType(typeSplit[0])));
 			}
 		}
 

@@ -11,10 +11,10 @@ namespace Editor
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree
 	{
-		/// <summary>File access windows</summary>
-		namespace FileAccessWindow
+		/// <summary>Sub windows</summary>
+		namespace SubWindow
 		{
-			public class BehaviorTreeLoadWindowProvider : ScriptableObject, ISearchWindowProvider
+			public class BTLoadWindowProvider : ScriptableObject, ISearchWindowProvider
 			{
 				BehaviorTreeNodeView m_view;
 
@@ -52,7 +52,7 @@ namespace Editor
 				bool ISearchWindowProvider.OnSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
 				{
 					if ((bool)searchTreeEntry.userData)
-						m_view.DoLoadCallback(searchTreeEntry.content.tooltip);
+						m_view.DoLoadCallback(searchTreeEntry.content.text);
 					else
 						m_view.DoLoadCallback(null);
 

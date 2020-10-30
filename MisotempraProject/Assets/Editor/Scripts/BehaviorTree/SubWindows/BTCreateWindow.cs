@@ -11,10 +11,10 @@ namespace Editor
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree
 	{
-		/// <summary>File access windows</summary>
-		namespace FileAccessWindow
+		/// <summary>Sub windows</summary>
+		namespace SubWindow
 		{
-			public class BehaviorTreeCreateWindow : PopupWindowContent
+			public class BTCreateWindow : PopupWindowContent
 			{
 				public static readonly Vector2 cWindowSize = new Vector2(700, 160);
 

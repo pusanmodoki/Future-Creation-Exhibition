@@ -24,6 +24,7 @@ namespace Editor
 
 			static readonly Vector2 m_cRootPosition = Vector2.zero;
 
+			Node m_selectNode = null;
 			BehaviorTreeWindow m_thisWindow = null;
 
 			double m_createCallbackSetTime = 0;
@@ -213,6 +214,24 @@ namespace Editor
 				{
 					m_isDelayCallCreateCallback = false;
 					CreateCallback(null);
+				}
+
+				Node oldSelect = m_selectNode;
+				m_selectNode = null;
+				foreach (var node in nodes.ToList())
+					if (node.selected) { m_selectNode = node; break; }
+
+				if (oldSelect != m_selectNode)
+				{
+					if (m_selectNode == null)
+					{
+						Debug.Log("NULL");
+					}
+					else
+					{
+						Debug.Log("NOT NULL");
+
+					}
 				}
 			}
 

@@ -13,7 +13,7 @@ namespace AI
 		{
 			namespace Detail
 			{
-				public class BaseCashContainer
+				public abstract class BaseCashContainer
 				{
 					public string nodeName { get { return m_nodeName; } set { m_nodeName = value; } }
 					public string className { get { return m_className; } }
@@ -21,6 +21,8 @@ namespace AI
 					public string guid { get { return m_guid; } }
 					public List<string> decoratorClasses { get { return m_decoratorClasses; } }
 					public Vector2 position { get { return m_position; } set { m_position = value; } }
+
+					public virtual bool isSaveReady { get { return false; } }
 
 					protected BaseCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
 					{
@@ -51,6 +53,8 @@ namespace AI
 
 				public RootCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
 					: base(nodeName, className, editNodeClassName, position) {}
+
+				public override bool isSaveReady { get { return true; } }
 
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();

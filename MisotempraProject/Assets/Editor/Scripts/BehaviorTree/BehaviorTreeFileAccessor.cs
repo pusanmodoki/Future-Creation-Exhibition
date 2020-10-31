@@ -36,7 +36,7 @@ namespace Editor
 
 			public static void Save(this BehaviorTreeNodeView nodeView)
 			{
-				if (nodeView.fileName == null)
+				if (nodeView.fileName == null || nodeView.cashContainers == null)
 					throw new System.NullReferenceException("File not loaded.");
 
 				var saveList = nodeView.cashContainers;

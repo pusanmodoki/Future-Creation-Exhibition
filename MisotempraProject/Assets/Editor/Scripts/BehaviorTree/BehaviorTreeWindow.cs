@@ -56,20 +56,16 @@ namespace Editor
 				m_nodeView = new BehaviorTreeNodeView(this);
 				rootVisualElement.Add(m_nodeView);
 			}
-			
-			/// <summary>OnDestroy</summary>
-			void OnDestroy()
+
+			private void OnDisable()
 			{
 				//インスタンスがあれば削除
 				if (instances.Contains(this))
 					instances.Remove(this);
-			}
 
-			~BehaviorTreeWindow()
-			{
 				if (isDeleteFile) return;
 
-				try { m_nodeView.Save(); }
+				try { if (m_nodeView != null) m_nodeView.Save(); }
 				catch (System.Exception) { return; }
 				Debug.Log("Behavior tree (" + fileName + ") Save completed.");
 			}

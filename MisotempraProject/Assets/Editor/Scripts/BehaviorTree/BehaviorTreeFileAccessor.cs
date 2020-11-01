@@ -23,9 +23,10 @@ namespace Editor
 				nodeView.ClearGraph();
 
 				var nodeList = new List<BaseCashContainer>();
-				nodeList.Add(new RootCashContainer("Root", 
+				nodeList.Add(new RootCashContainer());
+				nodeList.Back().Initialize("Root",
 					typeof(AI.BehaviorTree.BehaviorCompositeSequenceNode).FullName,
-					typeof(EditNode.BTEditRootNode).FullName, position));
+					typeof(EditNode.BTEditRootNode).FullName, position);
 				nodeView.BuildNodeView(nodeList);
 
 				var saveList = nodeView.cashContainers;
@@ -38,6 +39,10 @@ namespace Editor
 			{
 				if (nodeView.fileName == null || nodeView.cashContainers == null)
 					throw new System.NullReferenceException("File not loaded.");
+
+				foreach(var cash in nodeView.cashContainers)
+					if (!cash.isSaveReady)
+						throw new System.InvalidOperationException("Not save ready. node: " + cash.nodeName);
 
 				var saveList = nodeView.cashContainers;
 				FileAccess.FileAccessor.SaveObject(AI.BehaviorTree.BehaviorTree.dataSavePath, nodeView.fileName, 

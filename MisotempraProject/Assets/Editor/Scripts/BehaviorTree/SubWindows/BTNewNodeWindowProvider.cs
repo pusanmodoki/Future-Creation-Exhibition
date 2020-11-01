@@ -15,7 +15,7 @@ namespace Editor
 		/// <summary>Sub windows</summary>
 		namespace SubWindow
 		{
-			public class BTNewNodeWindowProvider : ScriptableObject, ISearchWindowProvider
+			public class BTNewNodeWindowProvider : UnityEngine.ScriptableObject, ISearchWindowProvider
 			{
 				BehaviorTreeNodeView m_view;
 
@@ -33,7 +33,6 @@ namespace Editor
 						entries.Add(new SearchTreeGroupEntry(new GUIContent("Not loaded…")));
 						return entries;
 					}
-
 
 					entries.Add(new SearchTreeGroupEntry(new GUIContent("Node classes")));
 
@@ -57,12 +56,12 @@ namespace Editor
 
 					m_view.AddElement(node);
 	
-					var cashType = BTClassMediator.cashTypes[searchTreeEntry.content.text];
-					m_view.AddCash((CashContainer.Detail.BaseCashContainer)System.Activator.CreateInstance(
-						cashType, searchTreeEntry.content.text,  
+					var cashType = BTClassMediator.cashTypes[searchTreeEntry.content.text];		
+					m_view.AddCash((CashContainer.Detail.BaseCashContainer)System.Activator.CreateInstance(cashType), 
+						node, searchTreeEntry.content.text,
 						BTClassMediator.classTypes[searchTreeEntry.content.text].FullName,
 						BTClassMediator.nodeTypes[searchTreeEntry.content.text].FullName,
-						m_view.LocalMousePositionToNodePosition(context, node.GetPosition()).position), node);
+						m_view.LocalMousePositionToNodePosition(context, node.GetPosition()).position);
 
 					return true;
 				}

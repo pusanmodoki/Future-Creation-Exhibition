@@ -22,7 +22,13 @@ namespace Editor
 			public Dictionary<Node, BaseCashContainer> cashContainersKeyNode { get; private set; } = new Dictionary<Node, BaseCashContainer>();
 			public string fileName { get { return m_thisWindow.fileName; } set { m_thisWindow.fileName = value; } } 
 
+			public ScriptableObject.Detail.BTBaseScriptableObject scriptableObject { get { return m_scriptableObject; } }
+			public UnityEditor.Editor scriptableEditor { get { return m_scriptableEditor; } }
+
 			static readonly Vector2 m_cRootPosition = Vector2.zero;
+
+			protected ScriptableObject.Detail.BTBaseScriptableObject m_scriptableObject = null;
+			protected UnityEditor.Editor m_scriptableEditor = null;
 
 			Node m_selectNode = null;
 			BehaviorTreeWindow m_thisWindow = null;
@@ -32,9 +38,12 @@ namespace Editor
 
 			//protected override bool canDuplicateSelection => false;
 
-			public void AddCash(BaseCashContainer cash, Node node)
+			public void AddCash(BaseCashContainer cash, Node node,
+				string nodeName, string className, string editNodeClassName, Vector2 position)
 			{
 				cashContainers.Add(cash);
+				cashContainers.Back().Initialize(nodeName, className, editNodeClassName, position);
+
 				cashContainersKeyGuid.Add(cash.guid, cash);
 				cashContainersKeyNode.Add(node, cash);
 			}
@@ -54,7 +63,7 @@ namespace Editor
 
 				nodeCreationRequest += context =>
 				{	
-					var searchWindowProvider = ScriptableObject.CreateInstance<BTNewNodeWindowProvider>();
+					var searchWindowProvider = UnityEngine.ScriptableObject.CreateInstance<BTNewNodeWindowProvider>();
 					searchWindowProvider.Initialize(this);
 					SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindowProvider);
 				};
@@ -74,9 +83,13 @@ namespace Editor
 						var root = cashContainersKeyNode[edge.output.node] as RootCashContainer;
 						if (root != null)
 							root.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
+
 						var composite = cashContainersKeyNode[edge.output.node] as CompositeCashContainer;
 						if (composite != null)
 							composite.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
+
+						(cashContainersKeyNode[edge.input.node] as NotRootCashContainer).parentGuid 
+							= cashContainersKeyNode[edge.output.node].guid;
 					}
 				}
 
@@ -97,12 +110,15 @@ namespace Editor
 						var edge = element as Edge;
 						if (edge != null)
 						{
-							var root = cashContainersKeyNode[edge.input.node] as RootCashContainer;
+							var root = cashContainersKeyNode[edge.output.node] as RootCashContainer;
 							if (root != null)
-								root.childrenNodesGuid.Remove(cashContainersKeyNode[edge.output.node].guid);
-							var composite = cashContainersKeyNode[edge.input.node] as CompositeCashContainer;
+								root.childrenNodesGuid.Remove(cashContainersKeyNode[edge.input.node].guid);
+
+							var composite = cashContainersKeyNode[edge.output.node] as CompositeCashContainer;
 							if (composite != null)
-								composite.childrenNodesGuid.Remove(cashContainersKeyNode[edge.output.node].guid);
+								composite.childrenNodesGuid.Remove(cashContainersKeyNode[edge.input.node].guid);
+
+							(cashContainersKeyNode[edge.input.node] as NotRootCashContainer).parentGuid = "";
 						}
 					}
 				}
@@ -165,7 +181,7 @@ namespace Editor
 
 			public void LoadCallback(DropdownMenuAction action)
 			{
-				var searchWindowProvider = ScriptableObject.CreateInstance<BTLoadWindowProvider>();
+				var searchWindowProvider = UnityEngine.ScriptableObject.CreateInstance<BTLoadWindowProvider>();
 				searchWindowProvider.Initialize(this);
 				SearchWindow.Open(new SearchWindowContext((Vector2)action.userData), searchWindowProvider);
 			}
@@ -229,8 +245,15 @@ namespace Editor
 					}
 					else
 					{
-						Debug.Log("NOT NULL");
+						m_scriptableObject = UnityEngine.ScriptableObject.CreateInstance(
+							BTClassMediator.scriptableObjects[cashContainersKeyNode[m_selectNode].nodeName]) 
+							as ScriptableObject.Detail.BTBaseScriptableObject;
+						m_scriptableObject.Initialize(cashContainersKeyNode[m_selectNode]);
 
+						m_scriptableEditor = UnityEditor.Editor.CreateEditor(m_scriptableObject);
+
+						m_thisWindow.RegisterGUI();
+						Debug.Log("NOT NULL");
 					}
 				}
 			}
@@ -248,7 +271,10 @@ namespace Editor
 					position.position = e.position;
 					node.SetPosition(position);
 
-					AddCash(e, node);
+					cashContainers.Add(e);
+					cashContainersKeyGuid.Add(e.guid, e);
+					cashContainersKeyNode.Add(node, e);
+
 					nodesKeyGuid.Add(e.guid, node);
 				}
 

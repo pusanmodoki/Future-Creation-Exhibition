@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.Graphs;
 using FileAccess;
@@ -30,6 +31,15 @@ namespace Editor
 
 			BehaviorTreeNodeView m_nodeView = null;
 
+			public void RegisterGUI()
+			{
+				if (rootVisualElement.childCount == 2)
+					rootVisualElement.RemoveAt(1);
+
+				IMGUIContainer container = new IMGUIContainer(m_nodeView.scriptableEditor.OnInspectorGUI);
+				rootVisualElement.Add(container);
+			}
+
 			/// <summary>Open</summary>
 			[MenuItem("Window/Misotempra/Behavior tree")]
 			static void Open()
@@ -57,7 +67,7 @@ namespace Editor
 				rootVisualElement.Add(m_nodeView);
 			}
 
-			private void OnDisable()
+			void OnDisable()
 			{
 				//インスタンスがあれば削除
 				if (instances.Contains(this))

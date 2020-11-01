@@ -24,6 +24,8 @@ namespace Editor
 			}
 
 			public static readonly string cTaskNodeName = "Task";
+			public static readonly string cRootNodeName = "Root";
+
 			public static string[] compositeNodeNames
 			{
 				get
@@ -98,6 +100,26 @@ namespace Editor
 				}
 			}
 			static Dictionary<string, System.Type> m_classTypes = null;
+
+			public static Dictionary<string, System.Type> scriptableObjects
+			{
+				get
+				{
+					if (m_scriptableObjects == null)
+					{
+						m_scriptableObjects = new Dictionary<string, System.Type>();
+						m_scriptableObjects.Add(compositeNodeNames[0], typeof(ScriptableObject.BTCompositeScriptableObject));
+						m_scriptableObjects.Add(compositeNodeNames[1], typeof(ScriptableObject.BTCompositeScriptableObject));
+						m_scriptableObjects.Add(compositeNodeNames[2], typeof(ScriptableObject.BTRandomScriptableObject));
+						m_scriptableObjects.Add(compositeNodeNames[3], typeof(ScriptableObject.BTParallelScriptableObject));
+						m_scriptableObjects.Add(compositeNodeNames[4], typeof(ScriptableObject.BTParallelScriptableObject));
+						m_scriptableObjects.Add(cTaskNodeName, typeof(ScriptableObject.BTTaskScriptableObject));
+						m_scriptableObjects.Add(cRootNodeName, typeof(ScriptableObject.BTRootScriptableObject));
+					}
+					return m_scriptableObjects;
+				}
+			}
+			static Dictionary<string, System.Type> m_scriptableObjects = null;
 		}
 	}
 }

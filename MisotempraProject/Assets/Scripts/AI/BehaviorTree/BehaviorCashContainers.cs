@@ -13,7 +13,8 @@ namespace AI
 		{
 			namespace Detail
 			{
-				public abstract class BaseCashContainer
+				[System.Serializable]
+				public class BaseCashContainer
 				{
 					public string nodeName { get { return m_nodeName; } set { m_nodeName = value; } }
 					public string className { get { return m_className; } }
@@ -24,7 +25,7 @@ namespace AI
 
 					public virtual bool isSaveReady { get { return false; } }
 
-					protected BaseCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
+					public void Initialize(string nodeName, string className, string editNodeClassName, Vector2 position)
 					{
 						m_nodeName = nodeName;
 						m_className = className;
@@ -47,64 +48,69 @@ namespace AI
 					protected List<string> m_decoratorClasses = new List<string>();
 				}
 			}
+			[System.Serializable]
 			public class RootCashContainer : Detail.BaseCashContainer
 			{
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
-
-				public RootCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
-					: base(nodeName, className, editNodeClassName, position) {}
-
+				public string parentGuid { get { return m_parentGuid; } set { m_parentGuid = value; } }
+				
 				public override bool isSaveReady { get { return true; } }
 
+				[SerializeField]
+				string m_parentGuid = "";
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
 			}
 
-			public class TaskCashContainer : Detail.BaseCashContainer
+			[System.Serializable]
+			public abstract class NotRootCashContainer : Detail.BaseCashContainer
+			{
+				public string parentGuid { get { return m_parentGuid; } set { m_parentGuid = value; } }
+
+				public override bool isSaveReady { get { return m_parentGuid != null && m_parentGuid.Length > 0; } }
+				
+				[SerializeField]
+				string m_parentGuid = "";
+			}
+
+			[System.Serializable]
+			public class TaskCashContainer : NotRootCashContainer
 			{
 				public string taskClassName { get { return m_taskClassName; } set { m_taskClassName = value; } }
 				public BaseTask task { get { return m_task; } set { m_task = value; } }
-
-				public TaskCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
-					: base(nodeName, className, editNodeClassName, position) { }
-
+				
 				[SerializeField]
 				string m_taskClassName = "";
 				[SerializeField]
 				BaseTask m_task = null;
 			}
 
-			public class CompositeCashContainer : Detail.BaseCashContainer
+			[System.Serializable]
+			public class CompositeCashContainer : NotRootCashContainer
 			{
 				public List<string> serviceClasses { get { return m_serviceClasses; } }
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
-
-				public CompositeCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
-					: base(nodeName, className, editNodeClassName, position) { }
-
+				
 				[SerializeField]
 				List<string> m_serviceClasses = new List<string>();
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
 			}
 
+			[System.Serializable]
 			public class ParallelCashContainer : CompositeCashContainer
 			{
 				public BehaviorBaseCompositeNode.ParallelFinishMode finishMode { get { return m_finishMode; } set { m_finishMode = value; } }
-
-				public ParallelCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
-					: base(nodeName, className, editNodeClassName, position) { }
-
+				
 				[SerializeField]
 				BehaviorBaseCompositeNode.ParallelFinishMode m_finishMode = BehaviorBaseCompositeNode.ParallelFinishMode.Null;
 			}
+
+			[System.Serializable]
 			public class RandomCashContainer : CompositeCashContainer
 			{
 				public List<float> probabilitys { get { return m_probabilitys; } }
-
-				public RandomCashContainer(string nodeName, string className, string editNodeClassName, Vector2 position)
-					: base(nodeName, className, editNodeClassName, position) { }
-
+				
 				[SerializeField]
 				List<float> m_probabilitys = new List<float>();
 			}

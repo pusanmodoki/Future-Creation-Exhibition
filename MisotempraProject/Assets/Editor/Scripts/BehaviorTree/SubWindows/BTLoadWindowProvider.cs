@@ -14,7 +14,7 @@ namespace Editor
 		/// <summary>Sub windows</summary>
 		namespace SubWindow
 		{
-			public class BTLoadWindowProvider : ScriptableObject, ISearchWindowProvider
+			public class BTLoadWindowProvider : UnityEngine.ScriptableObject, ISearchWindowProvider
 			{
 				BehaviorTreeNodeView m_view;
 

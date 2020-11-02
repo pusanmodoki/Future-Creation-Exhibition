@@ -250,7 +250,7 @@ namespace Editor
 							as ScriptableObject.Detail.BTBaseScriptableObject;
 						m_scriptableObject.Initialize(cashContainersKeyNode[m_selectNode]);
 
-						m_scriptableEditor = UnityEditor.Editor.CreateEditor(m_scriptableObject);
+						m_scriptableEditor = BTClassMediator.CreateEditor(m_selectNode);
 
 						m_thisWindow.RegisterGUI();
 						Debug.Log("NOT NULL");

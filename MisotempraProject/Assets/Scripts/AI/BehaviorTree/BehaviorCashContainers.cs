@@ -20,6 +20,7 @@ namespace AI
 					public string className { get { return m_className; } }
 					public string editNodeClassName { get { return m_editNodeClassName; } }
 					public string guid { get { return m_guid; } }
+					public string memo { get { return m_memo; } set { m_memo = value; } }
 					public List<string> decoratorClasses { get { return m_decoratorClasses; } }
 					public Vector2 position { get { return m_position; } set { m_position = value; } }
 
@@ -42,6 +43,8 @@ namespace AI
 					string m_editNodeClassName = "";
 					[SerializeField]
 					string m_guid = "";
+					[SerializeField]
+					string m_memo = "";
 					[SerializeField]
 					Vector2 m_position = Vector2.zero;
 					[SerializeField]

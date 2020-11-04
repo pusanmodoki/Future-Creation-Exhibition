@@ -121,19 +121,27 @@ namespace Editor
 			}
 			static Dictionary<string, System.Type> m_scriptableObjects = null;
 
-			public static UnityEditor.Editor CreateEditor(Node node, ScriptableObject.Detail.BTBaseScriptableObject scriptableObject)
+			public static UnityEditor.Editor CreateEditor(BehaviorTreeNodeView view, Node node, ScriptableObject.Detail.BTBaseScriptableObject scriptableObject)
 			{
-				if (node.title == cRootNodeName)
-					return UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTRootScriptableObject);
-				else if (node.title == cTaskNodeName)
-					return UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTTaskScriptableObject);
-				else if (node.title == m_compositeNodeNames[0] || node.title == m_compositeNodeNames[1])
-					return UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTCompositeScriptableObject);
-				else if (node.title == m_compositeNodeNames[2])
-					return UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTRandomScriptableObject);
-				else if (node.title == m_compositeNodeNames[3] || node.title == m_compositeNodeNames[4])
-					return UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTParallelScriptableObject);
+				UnityEditor.Editor result = null;
+				string title = node.userData as string;
+
+				if (title == cRootNodeName)
+					result = UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTRootScriptableObject);
+				else if (title == cTaskNodeName)
+					result = UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTTaskScriptableObject);
+				else if (title == m_compositeNodeNames[0] || title == m_compositeNodeNames[1])
+					result = UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTCompositeScriptableObject);
+				else if (title == m_compositeNodeNames[2])
+					result = UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTRandomScriptableObject);
+				else if (title == m_compositeNodeNames[3] || title == m_compositeNodeNames[4])
+					result = UnityEditor.Editor.CreateEditor(scriptableObject as ScriptableObject.BTParallelScriptableObject);
 				else return null;
+
+				if (result != null)
+					(result as NodeEditor.BTBaseNodeEditor).Initialize(view);
+
+				return result;
 			}
 		}
 	}

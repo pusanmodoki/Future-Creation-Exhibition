@@ -33,7 +33,7 @@ namespace Editor
 			Node m_selectNode = null;
 			BehaviorTreeWindow m_thisWindow = null;
 
-			double m_createCallbackSetTime = 0;
+			string m_reloadGuid = null;
 			bool m_isDelayCallCreateCallback = false;
 
 			//protected override bool canDuplicateSelection => false;
@@ -46,6 +46,11 @@ namespace Editor
 
 				cashContainersKeyGuid.Add(cash.guid, cash);
 				cashContainersKeyNode.Add(node, cash);
+			}
+
+			public void ChangeChildrenOrder(string parentGuid)
+			{
+				m_reloadGuid = parentGuid;
 			}
 
 			public Rect LocalMousePositionToNodePosition(SearchWindowContext context, Rect rect)
@@ -80,16 +85,24 @@ namespace Editor
 				{
 					foreach(var edge in graphViewChange.edgesToCreate)
 					{
+						int index = 0;
+
 						var root = cashContainersKeyNode[edge.output.node] as RootCashContainer;
 						if (root != null)
+						{
 							root.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
-
+							index = root.childrenNodesGuid.Count;
+						}
 						var composite = cashContainersKeyNode[edge.output.node] as CompositeCashContainer;
 						if (composite != null)
+						{
 							composite.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
+							index = composite.childrenNodesGuid.Count;
+						}
 
 						(cashContainersKeyNode[edge.input.node] as NotRootCashContainer).parentGuid 
 							= cashContainersKeyNode[edge.output.node].guid;
+						edge.input.node.title = index + ": "+ cashContainersKeyNode[edge.input.node].nodeName;
 					}
 				}
 
@@ -102,9 +115,24 @@ namespace Editor
 						var node = element as Node;
 						if (node != null)
 						{
+							string parentGuid = (cashContainersKeyNode[node] as NotRootCashContainer).parentGuid;
+							string deleteGuid = cashContainersKeyNode[node].guid;
 							cashContainersKeyGuid.Remove(cashContainersKeyNode[node].guid);
 							cashContainers.Remove(cashContainersKeyNode[node]);
 							cashContainersKeyNode.Remove(node);
+
+							if (parentGuid == null || parentGuid.Length == 0)
+								continue;
+
+							var root = cashContainersKeyGuid[parentGuid] as RootCashContainer;
+							if (root != null)
+								root.childrenNodesGuid.Remove(deleteGuid);
+
+							var composite = cashContainersKeyGuid[parentGuid] as CompositeCashContainer;
+							if (composite != null)
+								composite.childrenNodesGuid.Remove(deleteGuid);
+
+							ReloadChildrensTitle(parentGuid);
 						}
 
 						var edge = element as Edge;
@@ -119,6 +147,7 @@ namespace Editor
 								composite.childrenNodesGuid.Remove(cashContainersKeyNode[edge.input.node].guid);
 
 							(cashContainersKeyNode[edge.input.node] as NotRootCashContainer).parentGuid = "";
+							ReloadChildrensTitle(cashContainersKeyNode[edge.output.node].guid);
 						}
 					}
 				}
@@ -207,14 +236,9 @@ namespace Editor
 			public void DoLoadCallback(string name)
 			{
 				if (name == null)
-				{
-					m_createCallbackSetTime = EditorApplication.timeSinceStartup;
 					m_isDelayCallCreateCallback = true;
-				}
 				else
-				{
 					this.Load(name);
-				}
 			}
 			public void DoCreateCallback(string name)
 			{
@@ -225,8 +249,7 @@ namespace Editor
 
 			void Update()
 			{
-				if (m_isDelayCallCreateCallback && 
-					EditorApplication.timeSinceStartup - m_createCallbackSetTime > 0.1f)
+				if (m_isDelayCallCreateCallback)
 				{
 					m_isDelayCallCreateCallback = false;
 					CreateCallback(null);
@@ -241,20 +264,25 @@ namespace Editor
 				{
 					if (m_selectNode == null)
 					{
-						Debug.Log("NULL");
+						m_thisWindow.UnregisterEditorGUI();
 					}
 					else
 					{
 						m_scriptableObject = UnityEngine.ScriptableObject.CreateInstance(
 							BTClassMediator.scriptableObjects[cashContainersKeyNode[m_selectNode].nodeName]) 
 							as ScriptableObject.Detail.BTBaseScriptableObject;
-						m_scriptableObject.Initialize(cashContainersKeyNode[m_selectNode]);
+						m_scriptableObject.Initialize(cashContainersKeyNode[m_selectNode], cashContainers);
 
-						m_scriptableEditor = BTClassMediator.CreateEditor(m_selectNode);
+						m_scriptableEditor = BTClassMediator.CreateEditor(this, m_selectNode,  m_scriptableObject);
 
-						m_thisWindow.RegisterGUI();
-						Debug.Log("NOT NULL");
+						m_thisWindow.RegisterEditorGUI();
 					}
+				}
+
+				if (m_reloadGuid != null)
+				{
+					ReloadChildrensTitle(m_reloadGuid);
+					m_reloadGuid = null;
 				}
 			}
 
@@ -262,21 +290,23 @@ namespace Editor
 			{
 				Dictionary<string, Node> nodesKeyGuid = new Dictionary<string, Node>();
 
-				foreach(var e in loadList)
+				for (int i = 0; i < loadList.Count; ++i)
 				{
-					Node node = (Node)(System.Activator.CreateInstance(System.Type.GetType(e.editNodeClassName), this));
+					Node node = (Node)(System.Activator.CreateInstance(System.Type.GetType(loadList[i].editNodeClassName), this));
+					node.userData = loadList[i].nodeName;
 					AddElement(node);
 
 					Rect position = node.GetPosition();
-					position.position = e.position;
+					position.position = loadList[i].position;
 					node.SetPosition(position);
 
-					cashContainers.Add(e);
-					cashContainersKeyGuid.Add(e.guid, e);
-					cashContainersKeyNode.Add(node, e);
+					cashContainers.Add(loadList[i]);
+					cashContainersKeyGuid.Add(loadList[i].guid, loadList[i]);
+					cashContainersKeyNode.Add(node, loadList[i]);
 
-					nodesKeyGuid.Add(e.guid, node);
+					nodesKeyGuid.Add(loadList[i].guid, node);
 				}
+				TitleBuild(nodesKeyGuid, cashContainers[0].guid, 0, true);
 
 				foreach(var cash in cashContainers)
 				{
@@ -299,6 +329,48 @@ namespace Editor
 						edge.output.Connect(edge);
 						Add(edge);
 					}
+				}
+			}
+			void TitleBuild(Dictionary<string, Node> nodesKeyGuid, string guid, int index, bool isRoot)
+			{
+				if (!isRoot)
+					nodesKeyGuid[guid].title = index + ": " + cashContainersKeyGuid[guid].nodeName;
+
+				List<string> childrens = null;
+				{
+					var cast = cashContainersKeyGuid[guid] as RootCashContainer;
+					if (cast != null) childrens = cast.childrenNodesGuid;
+				}
+				if (childrens != null)
+				{
+					var cast = cashContainersKeyGuid[guid] as CompositeCashContainer;
+					if (cast != null) childrens = cast.childrenNodesGuid;
+				}
+
+				if (childrens == null) return;
+
+				for (int i = 0; i < childrens.Count; ++i)
+				{
+					TitleBuild(nodesKeyGuid, childrens[i], i + 1, false);
+				}
+			}
+			void ReloadChildrensTitle(string guid)
+			{
+				List<string> childrens = null;
+				{
+					var cast = cashContainersKeyGuid[guid] as RootCashContainer;
+					if (cast != null) childrens = cast.childrenNodesGuid;
+				}
+				if (childrens != null)
+				{
+					var cast = cashContainersKeyGuid[guid] as CompositeCashContainer;
+					if (cast != null) childrens = cast.childrenNodesGuid;
+				}
+
+				for (int i = 0; i < childrens.Count; ++i)
+				{
+					var key = cashContainersKeyNode.First(x => x.Value.guid == childrens[i]).Key;
+					key.title = (i + 1) + ": " + cashContainersKeyNode[key].nodeName;
 				}
 			}
 		}	

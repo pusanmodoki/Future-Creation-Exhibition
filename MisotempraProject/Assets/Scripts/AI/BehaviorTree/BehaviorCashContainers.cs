@@ -21,7 +21,6 @@ namespace AI
 					public string editNodeClassName { get { return m_editNodeClassName; } }
 					public string guid { get { return m_guid; } }
 					public string memo { get { return m_memo; } set { m_memo = value; } }
-					public List<string> decoratorClasses { get { return m_decoratorClasses; } }
 					public Vector2 position { get { return m_position; } set { m_position = value; } }
 
 					public virtual bool isSaveReady { get { return false; } }
@@ -47,20 +46,15 @@ namespace AI
 					string m_memo = "";
 					[SerializeField]
 					Vector2 m_position = Vector2.zero;
-					[SerializeField]
-					protected List<string> m_decoratorClasses = new List<string>();
 				}
 			}
 			[System.Serializable]
 			public class RootCashContainer : Detail.BaseCashContainer
 			{
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
-				public string parentGuid { get { return m_parentGuid; } set { m_parentGuid = value; } }
 				
 				public override bool isSaveReady { get { return true; } }
-
-				[SerializeField]
-				string m_parentGuid = "";
+				
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
 			}
@@ -68,10 +62,13 @@ namespace AI
 			[System.Serializable]
 			public abstract class NotRootCashContainer : Detail.BaseCashContainer
 			{
+				public List<string> decoratorClasses { get { return m_decoratorClasses; } }
 				public string parentGuid { get { return m_parentGuid; } set { m_parentGuid = value; } }
 
 				public override bool isSaveReady { get { return m_parentGuid != null && m_parentGuid.Length > 0; } }
-				
+
+				[SerializeField]
+				protected List<string> m_decoratorClasses = new List<string>();
 				[SerializeField]
 				string m_parentGuid = "";
 			}
@@ -104,7 +101,10 @@ namespace AI
 			public class ParallelCashContainer : CompositeCashContainer
 			{
 				public BehaviorBaseCompositeNode.ParallelFinishMode finishMode { get { return m_finishMode; } set { m_finishMode = value; } }
-				
+
+				public override bool isSaveReady { get { return parentGuid != null && parentGuid.Length > 0 
+							&& finishMode != BehaviorBaseCompositeNode.ParallelFinishMode.Null; } }
+
 				[SerializeField]
 				BehaviorBaseCompositeNode.ParallelFinishMode m_finishMode = BehaviorBaseCompositeNode.ParallelFinishMode.Null;
 			}

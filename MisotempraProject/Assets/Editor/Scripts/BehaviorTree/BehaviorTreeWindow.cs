@@ -22,6 +22,7 @@ namespace Editor
 			/// <summary>EditorApplication.playModeStateChangedにSaveCallbackを追加したか</summary>
 			static bool m_isAddSaveCallback = false;
 
+			public BehaviorTreeNodeView nodeView { get; private set; } = null;
 			public string fileName { get { return m_fileName; } set { m_fileName = value; titleContent = new GUIContent("BTEditor: " + m_fileName); } }
 			[SerializeField, HideInInspector]
 			string m_fileName = "";
@@ -29,15 +30,18 @@ namespace Editor
 			public bool isDeleteFile { get; private set; } = false;
 			public void SetTrueIsDeleteFile() { isDeleteFile = true; }
 
-			BehaviorTreeNodeView m_nodeView = null;
-
-			public void RegisterGUI()
+			public void RegisterEditorGUI()
 			{
 				if (rootVisualElement.childCount == 2)
 					rootVisualElement.RemoveAt(1);
 
-				IMGUIContainer container = new IMGUIContainer(m_nodeView.scriptableEditor.OnInspectorGUI);
+				IMGUIContainer container = new IMGUIContainer(nodeView.scriptableEditor.OnInspectorGUI);
 				rootVisualElement.Add(container);
+			}
+			public void UnregisterEditorGUI()
+			{
+				if (rootVisualElement.childCount == 2)
+					rootVisualElement.RemoveAt(1);
 			}
 
 			/// <summary>Open</summary>
@@ -63,8 +67,8 @@ namespace Editor
 					m_isAddSaveCallback = true;
 				}
 
-				m_nodeView = new BehaviorTreeNodeView(this);
-				rootVisualElement.Add(m_nodeView);
+				nodeView = new BehaviorTreeNodeView(this);
+				rootVisualElement.Add(nodeView);
 			}
 
 			void OnDisable()
@@ -75,7 +79,7 @@ namespace Editor
 
 				if (isDeleteFile) return;
 
-				try { if (m_nodeView != null) m_nodeView.Save(); }
+				try { if (nodeView != null) nodeView.Save(); }
 				catch (System.Exception) { return; }
 				Debug.Log("Behavior tree (" + fileName + ") Save completed.");
 			}
@@ -87,7 +91,7 @@ namespace Editor
 				if (change == PlayModeStateChange.EnteredPlayMode)
 				{
 					foreach (var e in instances)
-						if (e.m_nodeView != null) e.m_nodeView.Save();
+						if (e.nodeView != null) e.nodeView.Save();
 				}
 			}
 		}

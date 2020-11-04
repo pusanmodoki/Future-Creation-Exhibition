@@ -37,9 +37,12 @@ namespace Editor
 						{
 							int findBegin = Mathf.Max(e.LastIndexOf('\\'), e.LastIndexOf('/')) + 1;
 							int findLast = e.LastIndexOf('.');
+							string name = e.Substring(findBegin, findLast - findBegin);
 
-							entries.Add(new SearchTreeEntry(
-								new GUIContent(e.Substring(findBegin, findLast - findBegin), e)) { level = 2, userData = true });
+							foreach (var window in BehaviorTreeWindow.instances)
+								if (window.fileName == name) continue;
+
+							entries.Add(new SearchTreeEntry(new GUIContent(name, e)) { level = 2, userData = true });
 						}
 					}
 

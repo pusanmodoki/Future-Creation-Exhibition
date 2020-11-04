@@ -53,7 +53,7 @@ namespace Editor
 					Node node = (Node)System.Activator.CreateInstance((System.Type)searchTreeEntry.userData, m_view);
 					node.SetPosition(m_view.LocalMousePositionToNodePosition(context, node.GetPosition()));
 					node.name = searchTreeEntry.content.text;
-
+					node.userData = searchTreeEntry.content.text;
 					m_view.AddElement(node);
 	
 					var cashType = BTClassMediator.cashTypes[searchTreeEntry.content.text];		
@@ -62,7 +62,7 @@ namespace Editor
 						BTClassMediator.classTypes[searchTreeEntry.content.text].FullName,
 						BTClassMediator.nodeTypes[searchTreeEntry.content.text].FullName,
 						m_view.LocalMousePositionToNodePosition(context, node.GetPosition()).position);
-
+					
 					return true;
 				}
 			}

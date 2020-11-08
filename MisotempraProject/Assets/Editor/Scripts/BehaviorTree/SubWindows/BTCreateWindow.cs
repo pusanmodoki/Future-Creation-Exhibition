@@ -19,14 +19,17 @@ namespace Editor
 				public static readonly Vector2 cWindowSize = new Vector2(700, 160);
 
 				BehaviorTreeNodeView m_view = null;
+				Vector2 m_position = Vector2.zero;
 				string m_name = "";
+				string m_path = "";
 				bool m_isInitFocus = false;
 				bool m_isPushOK = false;
 
-				public void Initialize(BehaviorTreeNodeView view)
+				public void Initialize(BehaviorTreeNodeView view, Vector2 position, string usePath)
 				{
 					m_view = view;
-					
+					m_position = position;
+					m_path = usePath;
 				}
 
 				public override Vector2 GetWindowSize()
@@ -48,7 +51,7 @@ namespace Editor
 					GUI.SetNextControlName("BehaviorTreeCreateWindowFocusField");
 					m_name = GUILayout.TextField(m_name, 30);
 
-					string path = Application.streamingAssetsPath + "/AI/" + m_name + ".dat";
+					string path = m_path + m_name + ".dat";
 					GUILayout.Space(10.0f);
 					GUILayout.Label("Path: " + path);
 					GUILayout.Space(10.0f);
@@ -79,10 +82,14 @@ namespace Editor
 
 					if (!m_isInitFocus)
 					{
-						var position = editorWindow.position;
-						position.position = new Vector2(Screen.currentResolution.width / 2, Screen.currentResolution.height / 2) - GetWindowSize() * 0.5f;
-						editorWindow.position = position;
-
+						if (m_position.x < 0.0f) m_position.x = 0.0f;
+						if (m_position.y < 0.0f) m_position.y = 0.0f;
+						if (m_position.x + editorWindow.position.width > Screen.currentResolution.width)
+							m_position.x = Screen.currentResolution.width - editorWindow.position.width * 1.3f;
+						if (m_position.y + editorWindow.position.height > Screen.currentResolution.height)
+							m_position.y = Screen.currentResolution.height - editorWindow.position.height * 1.3f;
+						
+						editorWindow.position = new Rect(m_position, editorWindow.position.size);
 						EditorGUI.FocusTextInControl("BehaviorTreeCreateWindowFocusField");
 						m_isInitFocus = true;
 					}

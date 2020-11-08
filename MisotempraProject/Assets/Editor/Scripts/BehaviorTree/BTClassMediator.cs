@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using CashContainer = AI.BehaviorTree.CashContainer;
+using Composite = AI.BehaviorTree.Node.Composite;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor
@@ -89,11 +90,11 @@ namespace Editor
 					if (m_classTypes == null)
 					{
 						m_classTypes = new Dictionary<string, System.Type>();
-						m_classTypes.Add(compositeNodeNames[0], typeof(AI.BehaviorTree.BehaviorCompositeSequenceNode));
-						m_classTypes.Add(compositeNodeNames[1], typeof(AI.BehaviorTree.BehaviorCompositeSelectorNode));
-						m_classTypes.Add(compositeNodeNames[2], typeof(AI.BehaviorTree.BehaviorCompositeRandomSelectorNode));
-						m_classTypes.Add(compositeNodeNames[3], typeof(AI.BehaviorTree.BehaviorCompositeParallelNode));
-						m_classTypes.Add(compositeNodeNames[4], typeof(AI.BehaviorTree.BehaviorCompositeSimpleParallelNode));
+						m_classTypes.Add(compositeNodeNames[0], typeof(Composite.SequenceNode));
+						m_classTypes.Add(compositeNodeNames[1], typeof(Composite.SelectorNode));
+						m_classTypes.Add(compositeNodeNames[2], typeof(Composite.RandomSelectorNode));
+						m_classTypes.Add(compositeNodeNames[3], typeof(Composite.ParallelNode));
+						m_classTypes.Add(compositeNodeNames[4], typeof(Composite.SimpleParallelNode));
 						m_classTypes.Add(cTaskNodeName, typeof(AI.BehaviorTree.BaseTask));
 					}
 					return m_classTypes;

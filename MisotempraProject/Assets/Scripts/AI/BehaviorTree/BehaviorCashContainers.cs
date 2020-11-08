@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 using AI.BehaviorTree;
+using AI.BehaviorTree.Node.Composite;
 
 namespace AI
 {
@@ -13,6 +14,24 @@ namespace AI
 		{
 			namespace Detail
 			{
+				[System.Serializable]
+				public struct ServiceInfomations
+				{
+					public string className { get { return m_className; } }
+					public float callInterval { get { return m_callInterval; } }
+
+					public ServiceInfomations(string className, float callInterval)
+					{
+						m_className = className;
+						m_callInterval = callInterval;
+					}
+
+					[SerializeField]
+					string m_className;
+					[SerializeField]
+					float m_callInterval;
+				}
+
 				[System.Serializable]
 				public class BaseCashContainer
 				{
@@ -51,10 +70,28 @@ namespace AI
 			[System.Serializable]
 			public class RootCashContainer : Detail.BaseCashContainer
 			{
+				public BlackboardCashContainer blackbord { get { return m_blackboard; } }
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
 				
 				public override bool isSaveReady { get { return true; } }
-				
+
+				public bool isBlackboardSaveReady
+				{
+					get
+					{
+						HashSet<string> names = new HashSet<string>();
+						foreach (var e in m_blackboard.keys)
+						{
+							if (e.Length == 0) return false;
+							else if (names.Contains(e)) return false;
+							names.Add(e);
+						}
+						return true;
+					}
+				}
+
+				[SerializeField]
+				BlackboardCashContainer m_blackboard = new BlackboardCashContainer();
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
 			}
@@ -62,13 +99,16 @@ namespace AI
 			[System.Serializable]
 			public abstract class NotRootCashContainer : Detail.BaseCashContainer
 			{
+				public List<Detail.ServiceInfomations> serviceClasses { get { return m_serviceClasses; } }
 				public List<string> decoratorClasses { get { return m_decoratorClasses; } }
 				public string parentGuid { get { return m_parentGuid; } set { m_parentGuid = value; } }
 
 				public override bool isSaveReady { get { return m_parentGuid != null && m_parentGuid.Length > 0; } }
 
 				[SerializeField]
-				protected List<string> m_decoratorClasses = new List<string>();
+				List<Detail.ServiceInfomations> m_serviceClasses = new List<Detail.ServiceInfomations>();
+				[SerializeField]
+				List<string> m_decoratorClasses = new List<string>();
 				[SerializeField]
 				string m_parentGuid = "";
 			}
@@ -77,22 +117,19 @@ namespace AI
 			public class TaskCashContainer : NotRootCashContainer
 			{
 				public string taskClassName { get { return m_taskClassName; } set { m_taskClassName = value; } }
-				public BaseTask task { get { return m_task; } set { m_task = value; } }
+				public string taskToJson { get { return m_taskToJson; } set { m_taskToJson = value; } }
 				
 				[SerializeField]
 				string m_taskClassName = "";
 				[SerializeField]
-				BaseTask m_task = null;
+				string m_taskToJson = "";
 			}
 
 			[System.Serializable]
 			public class CompositeCashContainer : NotRootCashContainer
 			{
-				public List<string> serviceClasses { get { return m_serviceClasses; } }
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
 				
-				[SerializeField]
-				List<string> m_serviceClasses = new List<string>();
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
 			}
@@ -100,13 +137,13 @@ namespace AI
 			[System.Serializable]
 			public class ParallelCashContainer : CompositeCashContainer
 			{
-				public BehaviorBaseCompositeNode.ParallelFinishMode finishMode { get { return m_finishMode; } set { m_finishMode = value; } }
+				public ParallelFinishMode finishMode { get { return m_finishMode; } set { m_finishMode = value; } }
 
 				public override bool isSaveReady { get { return parentGuid != null && parentGuid.Length > 0 
-							&& finishMode != BehaviorBaseCompositeNode.ParallelFinishMode.Null; } }
+							&& finishMode != ParallelFinishMode.Null; } }
 
 				[SerializeField]
-				BehaviorBaseCompositeNode.ParallelFinishMode m_finishMode = BehaviorBaseCompositeNode.ParallelFinishMode.Null;
+				ParallelFinishMode m_finishMode = ParallelFinishMode.Null;
 			}
 
 			[System.Serializable]
@@ -116,6 +153,24 @@ namespace AI
 				
 				[SerializeField]
 				List<float> m_probabilitys = new List<float>();
+			}
+
+			[System.Serializable]
+			public class BlackboardCashContainer
+			{
+				public List<int> classeNameIndexes { get { return m_classeNameIndexes; } }
+				public List<string> keys { get { return m_keys; } }
+				public List<string> memos { get { return m_memos; } }
+				public List<bool> isStatics { get { return m_isStatics; } }
+
+				[SerializeField]
+				List<int> m_classeNameIndexes = new List<int>();
+				[SerializeField]
+				List<string> m_keys = new List<string>();
+				[SerializeField]
+				List<string> m_memos = new List<string>();
+				[SerializeField]
+				List<bool> m_isStatics = new List<bool>();
 			}
 		}
 	}

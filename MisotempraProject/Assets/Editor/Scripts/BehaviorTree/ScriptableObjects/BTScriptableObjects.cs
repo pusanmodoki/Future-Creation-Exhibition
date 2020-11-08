@@ -4,6 +4,7 @@ using UnityEngine;
 using AI.BehaviorTree.CashContainer.Detail;
 using CashContainer = AI.BehaviorTree.CashContainer;
 using System.Linq;
+using UnityEditor;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor

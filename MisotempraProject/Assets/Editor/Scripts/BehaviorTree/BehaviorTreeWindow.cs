@@ -23,6 +23,7 @@ namespace Editor
 			static bool m_isAddSaveCallback = false;
 
 			public BehaviorTreeNodeView nodeView { get; private set; } = null;
+			public Vector2 mousePosition { get; private set; } = default;
 			public string fileName { get { return m_fileName; } set { m_fileName = value; titleContent = new GUIContent("BTEditor: " + m_fileName); } }
 			[SerializeField, HideInInspector]
 			string m_fileName = "";
@@ -30,22 +31,32 @@ namespace Editor
 			public bool isDeleteFile { get; private set; } = false;
 			public void SetTrueIsDeleteFile() { isDeleteFile = true; }
 
-			public void RegisterEditorGUI()
+			public void RegisterNodeEditorGUI(string nodeName, string guid)
 			{
-				if (rootVisualElement.childCount == 2)
-					rootVisualElement.RemoveAt(1);
-
-				IMGUIContainer container = new IMGUIContainer(nodeView.scriptableEditor.OnInspectorGUI);
-				rootVisualElement.Add(container);
+				BTInspectorWindow.Open();
+				BTInspectorWindow.instance.RegisterNodeEditorGUI(this, nodeName, guid);
+				BTInspectorWindow.instance.RegisterBlackboardEditorGUI(this);
+				BTInspectorWindow.instance.Repaint();
 			}
-			public void UnregisterEditorGUI()
+			public void UnregisterNodeEditorGUI()
 			{
-				if (rootVisualElement.childCount == 2)
-					rootVisualElement.RemoveAt(1);
+				BTInspectorWindow.Open();
+				BTInspectorWindow.instance.UnregisterNodeEditorGUI(this);
+			}
+			public void RegisterBlackboardEditorGUI()
+			{
+				BTInspectorWindow.Open();
+				BTInspectorWindow.instance.RegisterBlackboardEditorGUI(this);
+				BTInspectorWindow.instance.Repaint();
+			}
+			public void UnregisterBlackboardNodeEditorGUI()
+			{
+				BTInspectorWindow.Open();
+				BTInspectorWindow.instance.UnregisterBlackboardEditorGUI(this);
 			}
 
 			/// <summary>Open</summary>
-			[MenuItem("Window/Misotempra/Behavior tree")]
+			[MenuItem("Window/Behavior tree/BT Editor")]
 			static void Open()
 			{
 				//インスタンス作成
@@ -69,6 +80,8 @@ namespace Editor
 
 				nodeView = new BehaviorTreeNodeView(this);
 				rootVisualElement.Add(nodeView);
+
+				wantsMouseMove = true;
 			}
 
 			void OnDisable()
@@ -79,9 +92,21 @@ namespace Editor
 
 				if (isDeleteFile) return;
 
-				try { if (nodeView != null) nodeView.Save(); }
+				bool isSaveResult = false;
+
+				try { if (nodeView != null) isSaveResult = nodeView.ForceSave(); }
 				catch (System.Exception) { return; }
-				Debug.Log("Behavior tree (" + fileName + ") Save completed.");
+
+				if (nodeView != null && isSaveResult)
+					Debug.Log("Behavior tree (" + fileName + ") Save completed.");
+				else if (nodeView != null)
+					Debug.LogWarning("Behavior tree (" + fileName + ") invalid contents. Force save completed.");
+			}
+
+			void OnGUI()
+			{
+				if (Event.current.type == EventType.MouseMove)
+					mousePosition = Event.current.mousePosition + position.position;
 			}
 
 			/// <summary>EditorApplication用コールバック</summary>

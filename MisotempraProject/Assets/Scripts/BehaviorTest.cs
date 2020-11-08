@@ -1,26 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AI.BehaviorTree.Node;
+using Composite = AI.BehaviorTree.Node.Composite;
 
 public class BehaviorTest : MonoBehaviour
 {
-	AI.BehaviorTree.BehaviorCompositeSequenceNode m_node = new AI.BehaviorTree.BehaviorCompositeSequenceNode();
+	Composite.SequenceNode m_node = new Composite.SequenceNode();
     // Start is called before the first frame update
     void Start()
     {
 		{
-			var node = new AI.BehaviorTree.BehaviorTaskNode();
+			var node = new TaskNode();
 			node.task = new TestTask();
 			m_node.nodes.Add(node);
 		}
 		{
-			var node = new AI.BehaviorTree.BehaviorCompositeSequenceNode();
+			var node = new Composite.SequenceNode();
 			m_node.nodes.Add(node);
 
 
 			for (int i = 0; i < 3; ++i)
 			{
-				AI.BehaviorTree.BehaviorTaskNode taskNode = new AI.BehaviorTree.BehaviorTaskNode();
+				TaskNode taskNode = new TaskNode();
 				taskNode.task = new TestTask();
 				node.nodes.Add(taskNode);
 			}

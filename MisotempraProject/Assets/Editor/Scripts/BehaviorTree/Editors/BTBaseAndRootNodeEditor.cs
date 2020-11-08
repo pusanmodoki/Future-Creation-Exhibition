@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
+using CashContainer = AI.BehaviorTree.CashContainer;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor
@@ -14,7 +17,7 @@ namespace Editor
 		{
 			public class BTBaseNodeEditor : UnityEditor.Editor
 			{
-				public struct Propertys
+				public class Propertys
 				{
 					public SerializedProperty guid { get; private set; }
 					public SerializedProperty memo { get; private set; }
@@ -22,7 +25,8 @@ namespace Editor
 					public SerializedProperty childrenNodesGuid { get; private set; }
 					public SerializedProperty decoratorClasses { get; private set; }
 					public SerializedProperty serviceClasses { get; private set; }
-					public SerializedProperty task { get; private set; }
+					public SerializedProperty taskToJson { get; private set; }
+					public SerializedProperty taskClassName { get; private set; }
 					public SerializedProperty finishMode { get; private set; }
 					public SerializedProperty probabilitys { get; private set; }
 
@@ -35,100 +39,15 @@ namespace Editor
 						childrenNodesGuid = m_this.thisContainer.FindPropertyRelative("m_childrenNodesGuid");
 						decoratorClasses = m_this.thisContainer.FindPropertyRelative("m_decoratorClasses");
 						serviceClasses = m_this.thisContainer.FindPropertyRelative("m_serviceClasses");
-						task = m_this.thisContainer.FindPropertyRelative("m_task");
+						taskToJson = m_this.thisContainer.FindPropertyRelative("m_taskToJson");
+						taskClassName = m_this.thisContainer.FindPropertyRelative("m_taskClassName");
 						finishMode = m_this.thisContainer.FindPropertyRelative("m_finishMode");
 						probabilitys = m_this.thisContainer.FindPropertyRelative("m_probabilitys");
 					}
 
 					BTBaseNodeEditor m_this;
 				}
-				public class ChildrensList
-				{
-					public struct Content 
-					{
-						public Content(string name, string guid)
-						{
-							m_name = name;
-							m_guid = guid;
-						}
-						public string nodeName { get { return m_name; } }
-						public string guid { get { return m_guid; } }
-						[SerializeField]
-						string m_name;
-						[SerializeField]
-						string m_guid;
-					}
-
-					public UnityEditorInternal.ReorderableList list { get; private set; } = null;
-
-					public ChildrensList(BTBaseNodeEditor editor)
-					{
-						m_this = editor;
-						m_this.propertys.childrenNodesGuid.ForElements(property =>
-							{
-								m_guids.Add(property.stringValue);
-								m_contents.Add(new Content(m_this.thisView.cashContainersKeyGuid[property.stringValue].nodeName, property.stringValue));
-							});
-
-						list = new UnityEditorInternal.ReorderableList(
-						  elements: m_contents,				//要素
-						  elementType: typeof(Content),	//要素の種類
-						  draggable: true,						//ドラッグして要素を入れ替えられるか
-						  displayHeader: true,					//ヘッダーを表示するか
-						  displayAddButton: false,			//要素追加用の+ボタンを表示するか
-						  displayRemoveButton: false		//要素削除用の-ボタンを表示するか
-						);
-
-						list.onReorderCallback += ReorderCallback;
-						list.drawHeaderCallback += (rect) => EditorGUI.LabelField(rect, "Children node prioritys");
-						list.drawElementCallback =(rect, index, isActive, isFocused) => {
-							  EditorGUI.LabelField(rect, "name: " + m_contents[index].nodeName, "guid: " + m_contents[index].guid);
-						  };
-					}
-					
-					BTBaseNodeEditor m_this;
-					List<string> m_guids = new List<string>();
-					List<Content> m_contents = new List<Content>();
-
-					public void Reload()
-					{
-						if (m_guids.Count == m_this.propertys.childrenNodesGuid.arraySize)
-						{
-							bool isNotChange = true;
-							for (int i = 0; i < m_this.propertys.childrenNodesGuid.arraySize && isNotChange; ++i)
-								isNotChange &= m_guids.Contains(m_this.propertys.childrenNodesGuid.GetArrayElementAtIndex(i).stringValue);
-
-							if (isNotChange) return;
-						}
-
-						m_guids.Clear();
-						m_contents.Clear();
-
-						m_this.propertys.childrenNodesGuid.ForElements(property =>
-						{
-							m_guids.Add(property.stringValue);
-							m_contents.Add(new Content(m_this.thisView.cashContainersKeyGuid[property.stringValue].nodeName, property.stringValue));
-						});
-					}
-
-					void ReorderCallback(UnityEditorInternal.ReorderableList list)
-					{
-						for (int i = 0; i < m_contents.Count; ++i)
-						{
-							for (int k = 0; k < m_this.propertys.childrenNodesGuid.arraySize; ++k)
-							{
-								if (m_this.propertys.childrenNodesGuid.GetArrayElementAtIndex(k).stringValue == m_contents[i].guid)
-								{
-									if (i != k)
-										m_this.propertys.childrenNodesGuid.MoveArrayElement(k, i);
-									break;
-								}
-							}
-						}
-
-						m_this.thisView.ChangeChildrenOrder(m_this.propertys.guid.stringValue);
-					}
-				}
+		
 				public struct DrawFunctions
 				{
 					public DrawFunctions(BTBaseNodeEditor thisEditor)
@@ -146,15 +65,38 @@ namespace Editor
 					}
 					public void DrawDecorators()
 					{
-						//あと配線問題だけなおせばかいけつ
+						m_this.m_decoratorsList.list.DoLayoutList();
 					}
 					public void DrawServices()
 					{
-
+						m_this.m_servicesList.list.DoLayoutList();
 					}
 					public void DrawTask()
 					{
+						string name = m_this.propertys.taskClassName.stringValue;
+						bool isEmpty = name == null || name.Length == 0;
 
+						if (isEmpty) name = "Empty!! press set button→";
+
+						EditorGUILayout.Space();
+						GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+						using (new EditorGUILayout.HorizontalScope())
+						{
+							EditorGUILayout.LabelField("Task class:  " + name);
+							if (GUILayout.Button("set"))
+							{
+								var searchWindowProvider = CreateInstance<SubWindow.TaskClassWindowProvider>();
+								searchWindowProvider.Initialize(m_this);
+								var position = BTInspectorWindow.instance != null ? BTInspectorWindow.instance.mousePosition : m_this.thisView.mousePosition;
+								SearchWindow.Open(new SearchWindowContext(position), searchWindowProvider);
+							}
+						}
+						if (m_this.m_task == null)
+							return;
+
+						m_this.m_taskEditor.OnInspectorGUI();
+						GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
+						m_this.propertys.taskToJson.stringValue = JsonUtility.ToJson(m_this.m_task);
 					}
 					public void DrawFinishMode()
 					{
@@ -162,7 +104,7 @@ namespace Editor
 					}
 					public void DrawProbabilitys()
 					{
-
+						m_this.m_probabilitysList.list.DoLayoutList();
 					}
 					
 					BTBaseNodeEditor m_this;
@@ -174,12 +116,64 @@ namespace Editor
 				public DrawFunctions functions { get; set; } = default;
 				public BehaviorTreeNodeView thisView { get; set; } = default;
 
-				ChildrensList m_childrensList = null;
+				ReorderableLists.ChildrensList m_childrensList = null;
+				ReorderableLists.ServiceList m_servicesList = null;
+				ReorderableLists.ClassList m_decoratorsList = null;
+				ReorderableLists.ProbabilityList m_probabilitysList = null;
+				AI.BehaviorTree.BaseTask m_task = null;
+				UnityEngine.ScriptableObject m_scriptableObject = null;
+				UnityEditor.Editor m_taskEditor = null;
+
 
 				public void Initialize(BehaviorTreeNodeView view)
 				{
 					thisView = view;
-					if (propertys.childrenNodesGuid != null) m_childrensList = new ChildrensList(this);
+					if (propertys.childrenNodesGuid != null)
+						m_childrensList = new ReorderableLists.ChildrensList(this);
+					if (propertys.serviceClasses != null)
+						m_servicesList = new ReorderableLists.ServiceList(this, propertys.serviceClasses, typeof(AI.BehaviorTree.BaseService), "Services");
+					if (propertys.decoratorClasses != null)
+						m_decoratorsList = new ReorderableLists.ClassList(this, propertys.decoratorClasses, typeof(AI.BehaviorTree.BaseDecorator), "Decorators");
+					if (propertys.probabilitys != null)
+						m_probabilitysList = new ReorderableLists.ProbabilityList(this);
+
+					if (propertys.taskClassName != null && propertys.taskClassName.stringValue.Length > 0)
+					{
+						System.Type type = TypeExtension.FindTypeInAllAssembly(propertys.taskClassName.stringValue);
+
+						if (propertys.taskToJson == null || propertys.taskToJson.stringValue.Length == 0)
+						{
+							m_task = (AI.BehaviorTree.BaseTask)System.Activator.CreateInstance(type);
+							TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
+								m_task, out m_taskEditor, out m_scriptableObject, propertys.taskClassName.stringValue);
+						}
+						else
+						{
+							if (type != null)
+							{
+								m_task = (AI.BehaviorTree.BaseTask)JsonUtility.FromJson(propertys.taskToJson.stringValue, type);
+								TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
+									m_task, out m_taskEditor, out m_scriptableObject, propertys.taskClassName.stringValue);
+							}
+							else
+							{
+								serializedObject.Update();
+								propertys.taskClassName.stringValue = "";
+								serializedObject.ApplyModifiedProperties();
+							}
+						}
+					}
+				}
+				public void CreateTaskCallback(SearchTreeEntry searchTreeEntry)
+				{
+					serializedObject.Update();
+					propertys.taskClassName.stringValue = (searchTreeEntry.userData as System.Type).FullName;
+					serializedObject.ApplyModifiedProperties();
+
+					m_task = (AI.BehaviorTree.BaseTask)System.Activator.CreateInstance(
+						 TypeExtension.FindTypeInAllAssembly(propertys.taskClassName.stringValue));
+					TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
+						m_task, out m_taskEditor, out m_scriptableObject, propertys.taskClassName.stringValue);
 				}
 
 				protected void OnEnable()
@@ -200,6 +194,7 @@ namespace Editor
 
 					functions.DrawMemo();
 					functions.DrawChildrensList();
+					EditorGUILayout.Space(15.0f);
 
 					serializedObject.ApplyModifiedProperties();
 				}

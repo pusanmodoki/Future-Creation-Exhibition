@@ -9,11 +9,11 @@ namespace AI
 		public class BehaviorTree : MonoBehaviour
 		{
 			/// <summary>Data save path</summary>
-			public static string dataSavePath { get { return Application.streamingAssetsPath + "/AI"; } }
+			public static string dataSavePath { get { return Application.streamingAssetsPath + "/AI/BehaviorFile"; } }
 			public static readonly string cFileBeginMark = "<<B>>BehaviorTreeNodeDataBeginMark";
 #if UNITY_EDITOR
 			/// <summary>Data save path (Assetから, Editor用)</summary>
-			public static readonly string cDUseEditorDataSavePath = "Assets/StreamingAssets/AI";
+			public static readonly string cDUseEditorDataSavePath = "Assets/StreamingAssets/AI/BehaviorFile";
 #endif
 
 

@@ -20,18 +20,24 @@ namespace Editor
 			public List<BaseCashContainer> cashContainers { get; private set; } = new List<BaseCashContainer>();
 			public Dictionary<string, BaseCashContainer> cashContainersKeyGuid { get; private set; } = new Dictionary<string, BaseCashContainer>();
 			public Dictionary<Node, BaseCashContainer> cashContainersKeyNode { get; private set; } = new Dictionary<Node, BaseCashContainer>();
-			public string fileName { get { return m_thisWindow.fileName; } set { m_thisWindow.fileName = value; } } 
+			public BehaviorTreeWindow thisWindow { get; private set; } = null;
+			public string fileName { get { return thisWindow.fileName; } set { thisWindow.fileName = value; } } 
 
-			public ScriptableObject.Detail.BTBaseScriptableObject scriptableObject { get { return m_scriptableObject; } }
-			public UnityEditor.Editor scriptableEditor { get { return m_scriptableEditor; } }
+			public ScriptableObject.Detail.BTBaseScriptableObject nodeScriptableObject { get { return m_nodeScriptableObject; } }
+			public UnityEditor.Editor nodeScriptableEditor { get { return m_nodeScriptableEditor; } }
+			public ScriptableObject.BTBlackboardScriptableObject blackboardScriptableObject { get { return m_blackboardScriptableObject; } }
+			public UnityEditor.Editor blackboardScriptableEditor { get { return m_blackboardScriptableEditor; } }
+
+			public Vector2 mousePosition { get { return thisWindow.mousePosition; } }
 
 			static readonly Vector2 m_cRootPosition = Vector2.zero;
 
-			protected ScriptableObject.Detail.BTBaseScriptableObject m_scriptableObject = null;
-			protected UnityEditor.Editor m_scriptableEditor = null;
+			protected ScriptableObject.Detail.BTBaseScriptableObject m_nodeScriptableObject = null;
+			protected UnityEditor.Editor m_nodeScriptableEditor = null;
+			protected ScriptableObject.BTBlackboardScriptableObject m_blackboardScriptableObject = null;
+			protected UnityEditor.Editor m_blackboardScriptableEditor = null;
 
 			Node m_selectNode = null;
-			BehaviorTreeWindow m_thisWindow = null;
 
 			string m_reloadGuid = null;
 			bool m_isDelayCallCreateCallback = false;
@@ -55,15 +61,22 @@ namespace Editor
 
 			public Rect LocalMousePositionToNodePosition(SearchWindowContext context, Rect rect)
 			{
-				var worldMousePosition = m_thisWindow.rootVisualElement.ChangeCoordinatesTo(
-					m_thisWindow.rootVisualElement.parent, context.screenMousePosition - m_thisWindow.position.position);
+				var worldMousePosition = thisWindow.rootVisualElement.ChangeCoordinatesTo(
+					thisWindow.rootVisualElement.parent, context.screenMousePosition - thisWindow.position.position);
 				rect.position = contentViewContainer.WorldToLocal(worldMousePosition);
 				return rect;
 			}
 
+			public void CreateBlackboardEditor()
+			{
+				m_blackboardScriptableObject = UnityEngine.ScriptableObject.CreateInstance<ScriptableObject.BTBlackboardScriptableObject>();
+				m_blackboardScriptableObject.Initialize((cashContainers[0] as RootCashContainer).blackbord);
+				m_blackboardScriptableEditor = UnityEditor.Editor.CreateEditor(m_blackboardScriptableObject);
+			}
+
 			public BehaviorTreeNodeView(BehaviorTreeWindow thisWindow) : base("BehaviorTreeUSS")
 			{
-				m_thisWindow = thisWindow;
+				this.thisWindow = thisWindow;
 				EditorApplication.update += Update;
 
 				nodeCreationRequest += context =>
@@ -74,7 +87,6 @@ namespace Editor
 				};
 
 				graphViewChanged += GraphViewChangeCallback;
-
 
 				if (fileName != null && fileName.Length > 0)
 					this.Load(fileName);
@@ -98,6 +110,10 @@ namespace Editor
 						{
 							composite.childrenNodesGuid.Add(cashContainersKeyNode[edge.input.node].guid);
 							index = composite.childrenNodesGuid.Count;
+
+							var random = composite as RandomCashContainer;
+							if (random != null)
+								random.probabilitys.Add(0.0f);
 						}
 
 						(cashContainersKeyNode[edge.input.node] as NotRootCashContainer).parentGuid 
@@ -120,6 +136,14 @@ namespace Editor
 							cashContainersKeyGuid.Remove(cashContainersKeyNode[node].guid);
 							cashContainers.Remove(cashContainersKeyNode[node]);
 							cashContainersKeyNode.Remove(node);
+
+							if (m_selectNode == node)
+							{
+								BTInspectorWindow.Open();
+								BTInspectorWindow.instance.UnregisterNodeEditorGUI(thisWindow);
+								m_nodeScriptableEditor = null;
+								m_nodeScriptableObject = null;
+							}
 
 							if (parentGuid == null || parentGuid.Length == 0)
 								continue;
@@ -168,6 +192,29 @@ namespace Editor
 			public override List<Port> GetCompatiblePorts(Port startAnchor, NodeAdapter nodeAdapter)
 			{
 				var compatiblePorts = new List<Port>();
+				bool isSimpleParallel = false;
+				bool isSimpleParallelHaveComposite = false;
+				bool isSimpleParallelHaveTask = false;
+
+				ParallelCashContainer parallel = cashContainersKeyNode[startAnchor.node] as ParallelCashContainer;
+				if (parallel != null)
+				{
+					if (parallel.className == typeof(AI.BehaviorTree.Node.Composite.ParallelNode).FullName
+						&& startAnchor.direction == Direction.Output && parallel.childrenNodesGuid.Count >= 2)
+						return compatiblePorts;
+					else if (parallel.className == typeof(AI.BehaviorTree.Node.Composite.SimpleParallelNode).FullName
+						&& startAnchor.direction == Direction.Output)
+					{
+						isSimpleParallel = true;
+						if (parallel.childrenNodesGuid.Count >= 2)
+							return compatiblePorts;
+						else if (parallel.childrenNodesGuid.Count == 1)
+						{
+							isSimpleParallelHaveComposite = cashContainersKeyGuid[parallel.childrenNodesGuid[0]] is CompositeCashContainer;
+							isSimpleParallelHaveTask = !isSimpleParallelHaveComposite;
+						}
+					}
+				}
 
 				compatiblePorts.AddRange(ports.ToList().Where(port =>
 				{
@@ -186,6 +233,16 @@ namespace Editor
 					if (port.portType != startAnchor.portType)
 						return false;
 
+
+					//SimpleParallel用
+					if (isSimpleParallel)
+					{
+						if (isSimpleParallelHaveComposite && !(cashContainersKeyNode[port.node] is TaskCashContainer))
+							return false;
+						else if (isSimpleParallelHaveTask && !(cashContainersKeyNode[port.node] is CompositeCashContainer))
+							return false;
+					}
+
 					return true;
 				}));
 
@@ -195,17 +252,24 @@ namespace Editor
 			public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
 			{
 				base.BuildContextualMenu(evt);
-				
-				evt.menu.AppendAction("Save", SaveCallback,
+
+				evt.menu.AppendAction("Show Blackbord", ShowBlackbordCallback,
 					action => fileName != null && fileName.Length > 0 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
 					evt.mousePosition);
+				
+				evt.menu.AppendSeparator();
 
-				evt.menu.AppendAction("Load", LoadCallback,
-					action => System.IO.Directory.GetFiles(AI.BehaviorTree.BehaviorTree.dataSavePath).Length > 0 
+				evt.menu.AppendAction("Save File", SaveCallback,
+					action => fileName != null && fileName.Length > 0 ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
+					evt.mousePosition + thisWindow.position.position);
+
+				evt.menu.AppendAction("Load File", LoadCallback,
+					action => System.IO.Directory.Exists(AI.BehaviorTree.BehaviorTree.dataSavePath) 
+						&& System.IO.Directory.GetFiles(AI.BehaviorTree.BehaviorTree.dataSavePath).Length > 0 
 						? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled,
-					evt.mousePosition);
+					evt.mousePosition + thisWindow.position.position);
 
-				evt.menu.AppendAction("Create", CreateCallback, action => DropdownMenuAction.Status.Normal, evt.mousePosition);
+				evt.menu.AppendAction("Create File", CreateCallback, action => DropdownMenuAction.Status.Normal, evt.mousePosition);
 			}
 
 			public void LoadCallback(DropdownMenuAction action)
@@ -227,10 +291,14 @@ namespace Editor
 			public void CreateCallback(DropdownMenuAction action)
 			{
 				var content = new BTCreateWindow();
-				content.Initialize(this);
+				content.Initialize(this, thisWindow.mousePosition, Application.streamingAssetsPath + "/AI/BehaviorFile/");
 
 				// 開く
 				UnityEditor.PopupWindow.Show(Rect.zero, content);
+			}
+			public void ShowBlackbordCallback(DropdownMenuAction action)
+			{
+				thisWindow.RegisterBlackboardEditorGUI();
 			}
 
 			public void DoLoadCallback(string name)
@@ -238,7 +306,12 @@ namespace Editor
 				if (name == null)
 					m_isDelayCallCreateCallback = true;
 				else
+				{
 					this.Load(name);
+					m_selectNode = null;
+					thisWindow.UnregisterBlackboardNodeEditorGUI();
+					thisWindow.UnregisterNodeEditorGUI();
+				}
 			}
 			public void DoCreateCallback(string name)
 			{
@@ -264,18 +337,19 @@ namespace Editor
 				{
 					if (m_selectNode == null)
 					{
-						m_thisWindow.UnregisterEditorGUI();
+						thisWindow.UnregisterNodeEditorGUI();
+						thisWindow.RegisterBlackboardEditorGUI();
 					}
 					else
 					{
-						m_scriptableObject = UnityEngine.ScriptableObject.CreateInstance(
+						m_nodeScriptableObject = UnityEngine.ScriptableObject.CreateInstance(
 							BTClassMediator.scriptableObjects[cashContainersKeyNode[m_selectNode].nodeName]) 
 							as ScriptableObject.Detail.BTBaseScriptableObject;
-						m_scriptableObject.Initialize(cashContainersKeyNode[m_selectNode], cashContainers);
+						m_nodeScriptableObject.Initialize(cashContainersKeyNode[m_selectNode], cashContainers);
 
-						m_scriptableEditor = BTClassMediator.CreateEditor(this, m_selectNode,  m_scriptableObject);
+						m_nodeScriptableEditor = BTClassMediator.CreateEditor(this, m_selectNode,  m_nodeScriptableObject);
 
-						m_thisWindow.RegisterEditorGUI();
+						thisWindow.RegisterNodeEditorGUI(m_selectNode.title, cashContainersKeyNode[m_selectNode].guid);
 					}
 				}
 
@@ -366,6 +440,7 @@ namespace Editor
 					var cast = cashContainersKeyGuid[guid] as CompositeCashContainer;
 					if (cast != null) childrens = cast.childrenNodesGuid;
 				}
+				if (childrens == null) return;
 
 				for (int i = 0; i < childrens.Count; ++i)
 				{

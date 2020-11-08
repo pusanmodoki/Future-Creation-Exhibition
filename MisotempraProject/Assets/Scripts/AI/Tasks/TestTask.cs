@@ -3,8 +3,17 @@ using System.Collections.Generic;
 using AI.BehaviorTree;
 using UnityEngine;
 
+[System.Serializable]
 public class TestTask : AI.BehaviorTree.BaseTask
 {
+	[SerializeField]
+	int a = 0;
+
+	int b = 0;
+
+	public int c;
+
+
 	public override void OnQuit(UpdateResult result)
 	{
 	}

@@ -1,12 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
-public static class SerializedPropertyExtensions 
+/// <summary>MisoTempra editor</summary>
+namespace Editor
 {
-	public static void ForElements(this UnityEditor.SerializedProperty self, System.Action<UnityEditor.SerializedProperty> loopAction)
+	public static class SerializedPropertyExtensions
 	{
-		for (int i = 0; i < self.arraySize; ++i)
-			loopAction(self.GetArrayElementAtIndex(i));
+		public static void ForElements(this UnityEditor.SerializedProperty self, System.Action<UnityEditor.SerializedProperty> loopAction)
+		{
+			for (int i = 0; i < self.arraySize; ++i)
+				loopAction(self.GetArrayElementAtIndex(i));
+		}
+
+		public static void ArrayAddEmpty(this UnityEditor.SerializedProperty self)
+		{
+			self.InsertArrayElementAtIndex(self.arraySize);
+		}
+		public static SerializedProperty ArrayBack(this UnityEditor.SerializedProperty self)
+		{
+			return self.GetArrayElementAtIndex(self.arraySize - 1);
+		}
+		public static SerializedProperty GetArrayElement(this UnityEditor.SerializedProperty self, int index)
+		{
+			return self.GetArrayElementAtIndex(index);
+		}
 	}
 }

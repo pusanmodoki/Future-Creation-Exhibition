@@ -23,6 +23,7 @@ namespace Editor
 					functions.DrawDecorators();
 					functions.DrawServices();
 					functions.DrawChildrensList();
+					EditorGUILayout.Space(15.0f);
 
 					serializedObject.ApplyModifiedProperties();
 				}
@@ -38,6 +39,7 @@ namespace Editor
 					functions.DrawFinishMode();
 					functions.DrawDecorators();
 					functions.DrawServices();
+					EditorGUILayout.Space(15.0f);
 
 					serializedObject.ApplyModifiedProperties();
 				}
@@ -53,6 +55,7 @@ namespace Editor
 					functions.DrawDecorators();
 					functions.DrawServices();
 					functions.DrawProbabilitys();
+					EditorGUILayout.Space(15.0f);
 
 					serializedObject.ApplyModifiedProperties();
 				}
@@ -68,6 +71,7 @@ namespace Editor
 					functions.DrawDecorators();
 					functions.DrawServices();
 					functions.DrawTask();
+					EditorGUILayout.Space(15.0f);
 
 					serializedObject.ApplyModifiedProperties();
 				}

@@ -6,11 +6,12 @@ namespace AI
 {
 	namespace BehaviorTree
 	{
-		public abstract class BaseTask
+		[System.Serializable]
+		public class BaseTask
 		{
-			public abstract EnableResult OnEnale();
-			public abstract UpdateResult Update();
-			public abstract void OnQuit(UpdateResult result);
+			public virtual EnableResult OnEnale() { return EnableResult.Success; }
+			public virtual UpdateResult Update() { return UpdateResult.Success; }	
+			public virtual void OnQuit(UpdateResult result) { }
 		}
 	}
 }

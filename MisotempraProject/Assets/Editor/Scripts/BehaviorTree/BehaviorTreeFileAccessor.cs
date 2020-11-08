@@ -25,9 +25,10 @@ namespace Editor
 				var nodeList = new List<BaseCashContainer>();
 				nodeList.Add(new RootCashContainer());
 				nodeList.Back().Initialize("Root",
-					typeof(AI.BehaviorTree.BehaviorCompositeSequenceNode).FullName,
+					typeof(AI.BehaviorTree.Node.RootNode).FullName,
 					typeof(EditNode.BTEditRootNode).FullName, position);
 				nodeView.BuildNodeView(nodeList);
+				nodeView.CreateBlackboardEditor();
 
 				var saveList = nodeView.cashContainers;
 				FileAccess.FileAccessor.SaveObject(AI.BehaviorTree.BehaviorTree.dataSavePath, name, ref saveList, AI.BehaviorTree.BehaviorTree.cFileBeginMark);
@@ -40,13 +41,59 @@ namespace Editor
 				if (nodeView.fileName == null || nodeView.cashContainers == null)
 					throw new System.NullReferenceException("File not loaded.");
 
-				foreach(var cash in nodeView.cashContainers)
+				List<string> throws = new List<string>();
+				bool isBlackbordThrow = false;
+
+				if (!(nodeView.cashContainers[0] as RootCashContainer).isBlackboardSaveReady)
+					isBlackbordThrow = true;
+
+				foreach (var cash in nodeView.cashContainers)
 					if (!cash.isSaveReady)
-						throw new System.InvalidOperationException("Not save ready. node: " + cash.nodeName);
+						throws.Add(cash.nodeName + "node");
+
+				if (throws.Count > 0 || isBlackbordThrow)
+				{
+					string str = "Not save ready. Cause";
+
+					if (isBlackbordThrow)
+						str += ": Blackbord contents,\n";
+					else str += "↓\n";
+
+					for (int i = 0; i < throws.Count; ++i)
+					{
+						str += throws[i];
+						if ((i + 1) % 3 == 0) str += "\n";
+						else str = ",";
+					}
+
+					throw new System.InvalidOperationException(str);
+				}
+
 
 				var saveList = nodeView.cashContainers;
 				FileAccess.FileAccessor.SaveObject(AI.BehaviorTree.BehaviorTree.dataSavePath, nodeView.fileName, 
 					ref saveList, AI.BehaviorTree.BehaviorTree.cFileBeginMark);
+			}
+			public static bool ForceSave(this BehaviorTreeNodeView nodeView)
+			{
+				bool isResult = true;
+				if (nodeView.fileName == null || nodeView.cashContainers == null)
+					throw new System.NullReferenceException("File not loaded.");
+
+				foreach (var cash in nodeView.cashContainers)
+					if (!cash.isSaveReady)
+					{
+						isResult = false;
+						break;
+					}
+				if (!(nodeView.cashContainers[0] as RootCashContainer).isBlackboardSaveReady)
+					isResult = false;
+
+				var saveList = nodeView.cashContainers;
+				FileAccess.FileAccessor.SaveObject(AI.BehaviorTree.BehaviorTree.dataSavePath, nodeView.fileName,
+					ref saveList, AI.BehaviorTree.BehaviorTree.cFileBeginMark);
+
+				return isResult;
 			}
 
 			public static void Load(this BehaviorTreeNodeView nodeView, string name)
@@ -61,6 +108,7 @@ namespace Editor
 				nodeView.fileName = name;
 
 				nodeView.BuildNodeView(loadList);
+				nodeView.CreateBlackboardEditor();
 			}
 		}
 	}

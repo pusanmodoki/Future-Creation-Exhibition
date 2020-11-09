@@ -41,15 +41,16 @@ namespace AI
 					{
 						foreach(var serviceInfo in container.serviceClasses)
 						{
-							m_services.Add((BaseService)System.Activator.CreateInstance(
-								System.Type.GetType(serviceInfo.className)));
-							m_services.Back().LoadInterval(serviceInfo.callInterval);
+							var type = System.Type.GetType(serviceInfo.className);
+							m_services.Add((BaseService)JsonUtility.FromJson(serviceInfo.jsonData, type));
+							m_services.Back().LoadBase(serviceInfo, type);
 						}
-
+						
 						foreach (var decorator in container.decoratorClasses)
 						{
-							m_decorators.Add((BaseDecorator)System.Activator.CreateInstance(
-								System.Type.GetType(decorator)));
+							var type = System.Type.GetType(decorator.className);
+							m_decorators.Add((BaseDecorator)JsonUtility.FromJson(decorator.jsonData, type));
+							m_decorators.Back().LoadBase(decorator, type);
 						}
 					}
 
@@ -57,12 +58,17 @@ namespace AI
 					{
 						foreach (var service in node.services)
 						{
-							m_services.Add(service.ReturnNewThisClass());
-							m_services.Back().LoadInterval(service.callInterval);
+							m_services.Add((BaseService)JsonUtility.FromJson(
+								BaseService.jsonData[service.guid], service.thisType));
+							m_services.Back().CloneBase(service);
 						}
 
 						foreach (var decorator in node.decorators)
-							m_decorators.Add(decorator.ReturnNewThisClass());
+						{
+							m_decorators.Add((BaseDecorator)JsonUtility.FromJson(
+								BaseDecorator.jsonData[decorator.guid], decorator.thisType));
+							m_decorators.Back().CloneBase(decorator);
+						}
 					}
 				}
 			}

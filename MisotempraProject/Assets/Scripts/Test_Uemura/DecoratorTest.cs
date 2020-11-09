@@ -6,18 +6,18 @@ using UnityEngine;
 
 namespace Test_Uemura
 {
+	[System.Serializable]
 	public class TestD1 : AI.BehaviorTree.BaseDecorator
 	{
+		[SerializeField]
+		int a;
 		public override bool IsPredicate()
 		{
 			return true;
 		}
 
-		public override BaseDecorator ReturnNewThisClass()
-		{
-			return new TestD1();
-		}
 	}
+	[System.Serializable]
 	public class TestD2 : AI.BehaviorTree.BaseDecorator
 	{
 		public override bool IsPredicate()
@@ -25,9 +25,5 @@ namespace Test_Uemura
 			return true;
 		}
 
-		public override BaseDecorator ReturnNewThisClass()
-		{
-			return new TestD2();
-		}
 	}
 }

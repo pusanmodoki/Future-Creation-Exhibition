@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine.UIElements;
 using System;
 
 /// <summary>MisoTempra editor</summary>
@@ -18,20 +17,18 @@ namespace Editor
 			/// <summary>ReorderableList classes</summary>
 			namespace ReorderableLists
 			{
-				public class ServiceList : ClassList
+				public class DecoratorList : ClassList
 				{
 					BTBaseNodeEditor m_editor;
-
-					public ServiceList(BTBaseNodeEditor editor, SerializedProperty useProperty, System.Type baseType, string title)
+					public DecoratorList(BTBaseNodeEditor editor, SerializedProperty useProperty, System.Type baseType, string title)
 						: base(editor, useProperty, baseType, title)
 					{
 						m_editor = editor;
 					}
-
 					protected override void InitializeList(Type baseType)
 					{
 						list.drawHeaderCallback += (rect) => EditorGUI.LabelField(rect, m_title);
-						list.elementHeight = EditorGUIUtility.singleLineHeight * 2 + 4;
+						list.elementHeight = EditorGUIUtility.singleLineHeight + 2;
 						list.drawElementCallback = (rect, index, isActive, isFocused) =>
 						{
 							EditorGUI.PropertyField(rect, m_useProperty.GetArrayElementAtIndex(index));
@@ -51,24 +48,22 @@ namespace Editor
 							string className = element.FindPropertyRelative("m_className").stringValue;
 							if (className.Length > 0)
 							{
-								m_editor.SelectService(className, element.FindPropertyRelative("m_jsonData"));
+								m_editor.SelectDecorator(className, element.FindPropertyRelative("m_jsonData"));
 							}
 						};
 
 						list.onRemoveCallback += list =>
 						{
 							list.serializedProperty.DeleteArrayElementAtIndex(list.index);
-							m_editor.UnselectService();
+							m_editor.UnselectDecorator();
 						};
 					}
-
 					public override void AddCallback(string name)
 					{
 						m_object.Update();
 						m_useProperty.ArrayAddEmpty();
 						var back = m_useProperty.ArrayBack();
 						back.FindPropertyRelative("m_className").stringValue = name;
-						back.FindPropertyRelative("m_callInterval").floatValue = 0.5f;
 						back.FindPropertyRelative("m_guid").stringValue = System.Guid.NewGuid().ToString();
 						back.FindPropertyRelative("m_jsonData").stringValue = JsonUtility.ToJson(
 							System.Activator.CreateInstance(TypeExtension.FindTypeInAllAssembly(name)));

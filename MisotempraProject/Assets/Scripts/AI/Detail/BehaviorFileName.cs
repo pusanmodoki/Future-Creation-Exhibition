@@ -63,12 +63,27 @@ namespace Editor
 
 			public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 			{
-				m_selectIndex = EditorGUI.Popup(position, "Behavior file", m_selectIndex, m_selects);
-
-				if (GUI.changed | !m_isInit)
+				if (!m_isInit)
 				{
 					m_isInit = true;
+					var name = property.FindPropertyRelative("m_fileName").stringValue;
+					for (int i = 0; i < m_selects.Length; ++i)
+					{
+						if (m_selects[i] == name)
+						{
+							m_selectIndex = i;
+							break;
+						}
+					}
+				}
+
+				property.serializedObject.Update();
+				m_selectIndex = EditorGUI.Popup(position, "Behavior file", m_selectIndex, m_selects);
+
+				if (GUI.changed)
+				{
 					property.FindPropertyRelative("m_fileName").stringValue = m_selects[m_selectIndex];
+					property.serializedObject.ApplyModifiedProperties();
 				}
 			}
 		}

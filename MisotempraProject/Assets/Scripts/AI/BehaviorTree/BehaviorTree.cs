@@ -128,8 +128,8 @@ namespace AI
 					throw new System.InvalidOperationException("Behavior tree data copy failed.");
 
 				if (blackboard.isFirstInstance)
-					blackboardInitialzier.InitializeFirstInstance(blackboard);
-				blackboardInitialzier.InitializeAllInstance(blackboard);
+					blackboardInitialzier?.InitializeFirstInstance(blackboard);
+				blackboardInitialzier?.InitializeAllInstance(blackboard);
 			}
 		}
 	}

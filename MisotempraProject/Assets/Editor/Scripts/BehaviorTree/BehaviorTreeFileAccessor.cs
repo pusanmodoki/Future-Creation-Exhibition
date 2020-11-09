@@ -65,7 +65,7 @@ namespace Editor
 					{
 						str += throws[i];
 						if ((i + 1) % 3 == 0) str += "\n";
-						else str = ",";
+						else str += ",";
 					}
 
 					throw new System.InvalidOperationException(str);

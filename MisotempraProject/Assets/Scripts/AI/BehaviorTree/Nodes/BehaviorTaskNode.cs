@@ -35,6 +35,7 @@ namespace AI
 						return EnableResult.Failed;
 
 					aiAgent.RegisterTask(this);
+					foreach (var e in services) e.OnEnable();
 
 					return task.OnEnale();
 				}
@@ -80,7 +81,7 @@ namespace AI
 					var taskInfo = m_taskDataKeyGuid[guid];
 					result.task = (BaseTask)JsonUtility.FromJson(taskInfo.jsonData, taskInfo.classType);
 					result.aiAgent = agent;
-					result.task.InitializeBase(behaviorTree, aiAgent);
+					result.task.InitializeBase(behaviorTree, result.aiAgent);
 
 					return result;
 				}

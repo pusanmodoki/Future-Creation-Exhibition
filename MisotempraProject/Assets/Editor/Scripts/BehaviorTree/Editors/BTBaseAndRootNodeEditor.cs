@@ -66,10 +66,36 @@ namespace Editor
 					public void DrawDecorators()
 					{
 						m_this.m_decoratorsList.list.DoLayoutList();
+						if (m_this.m_decoratorProperty != null)
+						{
+							EditorGUILayout.LabelField("Select decorator inspector");
+
+							//m_this.m_decoratorEditor.serializedObject.Update();
+							m_this.m_decoratorEditor.OnInspectorGUI();
+							//m_this.m_decoratorEditor.serializedObject.ApplyModifiedProperties();
+
+							m_this.m_decoratorProperty.stringValue = JsonUtility.ToJson(m_this.m_decorator);
+							m_this.m_decoratorProperty.serializedObject.ApplyModifiedProperties();
+
+							EditorGUILayout.Space();
+						}
 					}
 					public void DrawServices()
 					{
 						m_this.m_servicesList.list.DoLayoutList();
+						if (m_this.m_serviceProperty != null)
+						{
+							EditorGUILayout.LabelField("Select service inspector");
+
+							//m_this.m_serviceEditor.serializedObject.Update();
+							m_this.m_serviceEditor.OnInspectorGUI();
+							//m_this.m_serviceEditor.serializedObject.ApplyModifiedProperties();
+
+							m_this.m_serviceProperty.stringValue = JsonUtility.ToJson(m_this.m_service);
+							m_this.m_serviceProperty.serializedObject.ApplyModifiedProperties();
+
+							EditorGUILayout.Space();
+						}
 					}
 					public void DrawTask()
 					{
@@ -94,7 +120,10 @@ namespace Editor
 						if (m_this.m_task == null)
 							return;
 
+						m_this.m_taskEditor.serializedObject.Update();
 						m_this.m_taskEditor.OnInspectorGUI();
+						m_this.m_taskEditor.serializedObject.ApplyModifiedProperties();
+
 						GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(1));
 						m_this.propertys.taskToJson.stringValue = JsonUtility.ToJson(m_this.m_task);
 					}
@@ -118,11 +147,22 @@ namespace Editor
 
 				ReorderableLists.ChildrensList m_childrensList = null;
 				ReorderableLists.ServiceList m_servicesList = null;
-				ReorderableLists.ClassList m_decoratorsList = null;
+				ReorderableLists.DecoratorList	 m_decoratorsList = null;
 				ReorderableLists.ProbabilityList m_probabilitysList = null;
+
 				AI.BehaviorTree.BaseTask m_task = null;
-				UnityEngine.ScriptableObject m_scriptableObject = null;
+				UnityEngine.ScriptableObject m_taskScriptableObject = null;
 				UnityEditor.Editor m_taskEditor = null;
+
+				AI.BehaviorTree.BaseService m_service = null;
+				UnityEngine.ScriptableObject m_serviceScriptableObject = null;
+				UnityEditor.Editor m_serviceEditor = null;
+				SerializedProperty m_serviceProperty = null;
+
+				AI.BehaviorTree.BaseDecorator m_decorator = null;
+				UnityEngine.ScriptableObject m_decoratorScriptableObject = null;
+				UnityEditor.Editor m_decoratorEditor = null;
+				SerializedProperty m_decoratorProperty = null;
 
 
 				public void Initialize(BehaviorTreeNodeView view)
@@ -133,7 +173,7 @@ namespace Editor
 					if (propertys.serviceClasses != null)
 						m_servicesList = new ReorderableLists.ServiceList(this, propertys.serviceClasses, typeof(AI.BehaviorTree.BaseService), "Services");
 					if (propertys.decoratorClasses != null)
-						m_decoratorsList = new ReorderableLists.ClassList(this, propertys.decoratorClasses, typeof(AI.BehaviorTree.BaseDecorator), "Decorators");
+						m_decoratorsList = new ReorderableLists.DecoratorList(this, propertys.decoratorClasses, typeof(AI.BehaviorTree.BaseDecorator), "Decorators");
 					if (propertys.probabilitys != null)
 						m_probabilitysList = new ReorderableLists.ProbabilityList(this);
 
@@ -145,7 +185,7 @@ namespace Editor
 						{
 							m_task = (AI.BehaviorTree.BaseTask)System.Activator.CreateInstance(type);
 							TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
-								m_task, out m_taskEditor, out m_scriptableObject, propertys.taskClassName.stringValue);
+								m_task, out m_taskEditor, out m_taskScriptableObject, propertys.taskClassName.stringValue);
 						}
 						else
 						{
@@ -153,7 +193,7 @@ namespace Editor
 							{
 								m_task = (AI.BehaviorTree.BaseTask)JsonUtility.FromJson(propertys.taskToJson.stringValue, type);
 								TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
-									m_task, out m_taskEditor, out m_scriptableObject, propertys.taskClassName.stringValue);
+									m_task, out m_taskEditor, out m_taskScriptableObject, propertys.taskClassName.stringValue);
 							}
 							else
 							{
@@ -164,6 +204,47 @@ namespace Editor
 						}
 					}
 				}
+
+				public void SelectService(string className, SerializedProperty property)
+				{
+					m_serviceProperty = property;
+
+					if (property.stringValue.Length == 0)
+						m_service = (AI.BehaviorTree.BaseService)System.Activator.CreateInstance(TypeExtension.FindTypeInAllAssembly(className));
+					else
+						m_service = (AI.BehaviorTree.BaseService)JsonUtility.FromJson(property.stringValue, TypeExtension.FindTypeInAllAssembly(className));
+
+					ServiceScriptableObjects.ServiceScriptableObjectClassMediator.CreateEditorAndScriptableObject(
+						m_service, out m_serviceEditor, out m_serviceScriptableObject, className);
+				}
+				public void UnselectService()
+				{
+					m_service = null;
+					m_serviceProperty = null;
+					m_serviceScriptableObject = null;
+					m_serviceEditor = null;
+				}
+
+				public void SelectDecorator(string className, SerializedProperty property)
+				{
+					m_decoratorProperty = property;
+
+					if (property.stringValue.Length == 0)
+						m_decorator = (AI.BehaviorTree.BaseDecorator)System.Activator.CreateInstance(TypeExtension.FindTypeInAllAssembly(className));
+					else
+						m_decorator = (AI.BehaviorTree.BaseDecorator)JsonUtility.FromJson(property.stringValue, TypeExtension.FindTypeInAllAssembly(className));
+
+					DecoratorScriptableObjects.DecoratorScriptableObjectClassMediator.CreateEditorAndScriptableObject(
+						m_decorator, out m_decoratorEditor, out m_decoratorScriptableObject, className);
+				}
+				public void UnselectDecorator()
+				{
+					m_decorator = null;
+					m_decoratorProperty = null;
+					m_decoratorScriptableObject = null;
+					m_decoratorEditor = null;
+				}
+
 				public void CreateTaskCallback(SearchTreeEntry searchTreeEntry)
 				{
 					serializedObject.Update();
@@ -173,7 +254,7 @@ namespace Editor
 					m_task = (AI.BehaviorTree.BaseTask)System.Activator.CreateInstance(
 						 TypeExtension.FindTypeInAllAssembly(propertys.taskClassName.stringValue));
 					TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
-						m_task, out m_taskEditor, out m_scriptableObject, propertys.taskClassName.stringValue);
+						m_task, out m_taskEditor, out m_taskScriptableObject, propertys.taskClassName.stringValue);
 				}
 
 				protected void OnEnable()

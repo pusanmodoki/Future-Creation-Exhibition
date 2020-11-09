@@ -20,8 +20,6 @@ public class TestTask : AI.BehaviorTree.BaseTask
 
 	public override UpdateResult Update()
 	{
-		Debug.Log("Hello!! + " + this.GetHashCode());
-
 		if (Input.GetKeyDown(KeyCode.Space))
 			return UpdateResult.Success;
 		else if (Input.GetKeyDown(KeyCode.A))

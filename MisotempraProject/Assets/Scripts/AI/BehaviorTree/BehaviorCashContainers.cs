@@ -19,18 +19,48 @@ namespace AI
 				{
 					public string className { get { return m_className; } }
 					public float callInterval { get { return m_callInterval; } }
+					public string jsonData { get { return m_jsonData; } }
+					public string guid { get { return m_guid; } }
 
-					public ServiceInfomations(string className, float callInterval)
+					public ServiceInfomations(string className, float callInterval, string jsonData, string guid)
 					{
 						m_className = className;
 						m_callInterval = callInterval;
+						m_jsonData = jsonData;
+						m_guid = guid;
 					}
 
 					[SerializeField]
 					string m_className;
 					[SerializeField]
 					float m_callInterval;
+					[SerializeField]
+					string m_jsonData;
+					[SerializeField]
+					string m_guid;
 				}
+				[System.Serializable]
+				public struct DecoratorInfomations
+				{
+					public string className { get { return m_className; } }
+					public string jsonData { get { return m_jsonData; } }
+					public string guid { get { return m_guid; } }
+
+					public DecoratorInfomations(string className, float callInterval, string jsonData, string guid)
+					{
+						m_className = className;
+						m_jsonData = jsonData;
+						m_guid = guid;
+					}
+
+					[SerializeField]
+					string m_className;
+					[SerializeField]
+					string m_jsonData;
+					[SerializeField]
+					string m_guid;
+				}
+
 
 				[System.Serializable]
 				public class BaseCashContainer
@@ -100,7 +130,7 @@ namespace AI
 			public abstract class NotRootCashContainer : Detail.BaseCashContainer
 			{
 				public List<Detail.ServiceInfomations> serviceClasses { get { return m_serviceClasses; } }
-				public List<string> decoratorClasses { get { return m_decoratorClasses; } }
+				public List<Detail.DecoratorInfomations> decoratorClasses { get { return m_decoratorClasses; } }
 				public string parentGuid { get { return m_parentGuid; } set { m_parentGuid = value; } }
 
 				public override bool isSaveReady { get { return m_parentGuid != null && m_parentGuid.Length > 0; } }
@@ -108,7 +138,7 @@ namespace AI
 				[SerializeField]
 				List<Detail.ServiceInfomations> m_serviceClasses = new List<Detail.ServiceInfomations>();
 				[SerializeField]
-				List<string> m_decoratorClasses = new List<string>();
+				List<Detail.DecoratorInfomations> m_decoratorClasses = new List<Detail.DecoratorInfomations>();
 				[SerializeField]
 				string m_parentGuid = "";
 			}
@@ -118,7 +148,9 @@ namespace AI
 			{
 				public string taskClassName { get { return m_taskClassName; } set { m_taskClassName = value; } }
 				public string taskToJson { get { return m_taskToJson; } set { m_taskToJson = value; } }
-				
+				public override bool isSaveReady { get { return parentGuid != null && parentGuid.Length > 0 && m_taskClassName != null
+							&& m_taskToJson != null && m_taskClassName.Length > 0 && m_taskToJson.Length > 0; } }
+
 				[SerializeField]
 				string m_taskClassName = "";
 				[SerializeField]
@@ -129,7 +161,9 @@ namespace AI
 			public class CompositeCashContainer : NotRootCashContainer
 			{
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
-				
+
+				public override bool isSaveReady { get { return parentGuid != null && parentGuid.Length > 0 && m_childrenNodesGuid.Count > 0; } }
+
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
 			}

@@ -41,10 +41,12 @@ namespace Editor
 				if (nodeView.fileName == null || nodeView.cashContainers == null)
 					throw new System.NullReferenceException("File not loaded.");
 
+				var root = nodeView.cashContainers[0] as RootCashContainer;
 				List<string> throws = new List<string>();
 				bool isBlackbordThrow = false;
 
-				if (!(nodeView.cashContainers[0] as RootCashContainer).isBlackboardSaveReady)
+				root.blackbord = nodeView.blackboradCashContainer;
+				if (!root.isBlackboardSaveReady)
 					isBlackbordThrow = true;
 
 				foreach (var cash in nodeView.cashContainers)

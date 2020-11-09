@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using AI.BehaviorTree.CashContainer.Detail;
+using AI.BehaviorTree.Node.Detail;
 using UnityEngine;
 
 namespace AI
@@ -16,37 +18,56 @@ namespace AI
 
 					public override EnableResult OnEnable()
 					{
-						if (!isAllTrueDecorators || nodes.Count == 0 || !nodes[0].isAllTrueDecorators
-							|| nodes[m_selectIndex].OnEnable() == EnableResult.Failed)
-							return EnableResult.Failed;
-
 						m_selectIndex = 0;
+
+						if (!isAllTrueDecorators || childrenNodes.Count == 0 || !childrenNodes[0].isAllTrueDecorators
+							|| childrenNodes[m_selectIndex].OnEnable() == EnableResult.Failed)
+							return EnableResult.Failed;
+						
 						foreach (var e in services) e.OnEnable();
 
 						return EnableResult.Success;
 					}
 					public override void OnDisable(UpdateResult result) { }
 
-					public override UpdateResult Update()
+					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						foreach (var e in services) e.Update();
-						var result = nodes[m_selectIndex].Update();
+						if (!isAllTrueDecorators)
+						{
+							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+							return UpdateResult.Failed;
+						}
+
+						foreach (var e in services) e.Update(agent, blackboard);
+						var result = childrenNodes[m_selectIndex].Update(agent, blackboard);
 						switch (result)
 						{
 							case UpdateResult.Success:
-								nodes[m_selectIndex].OnDisable(UpdateResult.Success);
-								if (++m_selectIndex == nodes.Count)
+								childrenNodes[m_selectIndex].OnDisable(UpdateResult.Success);
+								if (++m_selectIndex == childrenNodes.Count)
 									return UpdateResult.Success;
-								else if (!nodes[m_selectIndex].isAllTrueDecorators || nodes[m_selectIndex].OnEnable() == EnableResult.Failed)
+								else if (!childrenNodes[m_selectIndex].isAllTrueDecorators || childrenNodes[m_selectIndex].OnEnable() == EnableResult.Failed)
 									return UpdateResult.Failed;
 								else
 									return UpdateResult.Run;
 							case UpdateResult.Failed:
-								nodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+								childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
 								return UpdateResult.Failed;
 							default:
 								return UpdateResult.Run;
 						}
+					}
+
+					public override void Load(BaseCashContainer container, Blackboard blackboard)
+					{
+						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+					}
+					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
+					{
+						var result = new SequenceNode();
+						result.CloneBase(this);
+						result.CloneDecoratorAndService(this);
+						return result;
 					}
 				}
 
@@ -62,9 +83,9 @@ namespace AI
 						m_selectIndex = -1;
 						foreach (var e in services) e.OnEnable();
 
-						for (int i = 0; i < nodes.Count; ++i)
+						for (int i = 0; i < childrenNodes.Count; ++i)
 						{
-							if (nodes[i].isAllTrueDecorators && nodes[i].OnEnable() == EnableResult.Success)
+							if (childrenNodes[i].isAllTrueDecorators && childrenNodes[i].OnEnable() == EnableResult.Success)
 								m_selectIndex = i;
 						}
 
@@ -73,21 +94,26 @@ namespace AI
 
 					public override void OnDisable(UpdateResult result) { }
 
-					public override UpdateResult Update()
+					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						foreach (var e in services) e.Update();
-						var result = nodes[m_selectIndex].Update();
+						if (!isAllTrueDecorators)
+						{
+							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+							return UpdateResult.Failed;
+						}
+						foreach (var e in services) e.Update(agent, blackboard);
+						var result = childrenNodes[m_selectIndex].Update(agent, blackboard);
 
 						switch (result)
 						{
 							case UpdateResult.Success:
-								nodes[m_selectIndex].OnDisable(UpdateResult.Success);
+								childrenNodes[m_selectIndex].OnDisable(UpdateResult.Success);
 								return UpdateResult.Success;
 							case UpdateResult.Failed:
-								nodes[m_selectIndex].OnDisable(UpdateResult.Failed);
-								for (int i = m_selectIndex = 0; i < nodes.Count; ++i)
+								childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+								for (int i = m_selectIndex = 0; i < childrenNodes.Count; ++i)
 								{
-									if (nodes[i].isAllTrueDecorators && nodes[i].OnEnable() == EnableResult.Success)
+									if (childrenNodes[i].isAllTrueDecorators && childrenNodes[i].OnEnable() == EnableResult.Success)
 									{
 										m_selectIndex = i;
 										return UpdateResult.Run;
@@ -98,6 +124,18 @@ namespace AI
 								return UpdateResult.Run;
 						}
 					}
+
+					public override void Load(BaseCashContainer container, Blackboard blackboard)
+					{
+						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+					}
+					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
+					{
+						var result = new SelectorNode();
+						result.CloneBase(this);
+						result.CloneDecoratorAndService(this);
+						return result;
+					}
 				}
 
 				public class RandomSelectorNode : Detail.BaseCompositeNode
@@ -105,24 +143,23 @@ namespace AI
 					HashSet<int> m_randomIndexes = new HashSet<int>();
 					int m_selectIndex = 0;
 
-
 					public override EnableResult OnEnable()
 					{
-						if (nodes.Count == 0) return EnableResult.Failed;
+						if (childrenNodes.Count == 0) return EnableResult.Failed;
 						m_randomIndexes.Clear();
 						m_selectIndex = 0;
 						foreach (var e in services) e.OnEnable();
 
-						for (int i = 0, index = 0; i < nodes.Count; ++i)
+						for (int i = 0, index = 0; i < childrenNodes.Count; ++i)
 						{
 							do
 							{
-								index = Random.Range(0, nodes.Count);
+								index = Random.Range(0, childrenNodes.Count);
 							} while (!m_randomIndexes.Contains(m_selectIndex));
 							m_randomIndexes.Add(m_selectIndex);
 						}
 
-						if (nodes[m_selectIndex].isAllTrueDecorators && nodes[m_selectIndex].OnEnable() == EnableResult.Success)
+						if (childrenNodes[m_selectIndex].isAllTrueDecorators && childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success)
 							return EnableResult.Success;
 
 						return EnableResult.Failed;
@@ -130,22 +167,27 @@ namespace AI
 
 					public override void OnDisable(UpdateResult result) { }
 
-					public override UpdateResult Update()
+					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						foreach (var e in services) e.Update();
-						var result = nodes[m_selectIndex].Update();
+						if (!isAllTrueDecorators)
+						{
+							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+							return UpdateResult.Failed;
+						}
+						foreach (var e in services) e.Update(agent, blackboard);
+						var result = childrenNodes[m_selectIndex].Update(agent, blackboard);
 
 						switch (result)
 						{
 							case UpdateResult.Success:
-								nodes[m_selectIndex].OnDisable(UpdateResult.Success);
+								childrenNodes[m_selectIndex].OnDisable(UpdateResult.Success);
 								return UpdateResult.Success;
 							case UpdateResult.Failed:
 								{
-									nodes[m_selectIndex].OnDisable(UpdateResult.Failed);
-									for (int i = m_selectIndex = 0; i < nodes.Count; ++i)
+									childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+									for (int i = m_selectIndex = 0; i < childrenNodes.Count; ++i)
 									{
-										if (nodes[i].isAllTrueDecorators && nodes[i].OnEnable() == EnableResult.Success)
+										if (childrenNodes[i].isAllTrueDecorators && childrenNodes[i].OnEnable() == EnableResult.Success)
 										{
 											m_selectIndex = i;
 											return UpdateResult.Run;
@@ -157,6 +199,18 @@ namespace AI
 								return UpdateResult.Run;
 						}
 					}
+
+					public override void Load(BaseCashContainer container, Blackboard blackboard)
+					{
+						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+					}
+					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
+					{
+						var result = new RandomSelectorNode();
+						result.CloneBase(this);
+						result.CloneDecoratorAndService(this);
+						return result;
+					}
 				}
 
 				public class ParallelNode : Detail.BaseCompositeNode
@@ -165,10 +219,10 @@ namespace AI
 
 					public override EnableResult OnEnable()
 					{
-						if (nodes.Count != 2) return EnableResult.Failed;
+						if (childrenNodes.Count != 2) return EnableResult.Failed;
 
-						m_isEndNodes[0] = !nodes[0].isAllTrueDecorators && nodes[0].OnEnable() == EnableResult.Success;
-						m_isEndNodes[1] = !nodes[1].isAllTrueDecorators && nodes[1].OnEnable() == EnableResult.Success;
+						m_isEndNodes[0] = !childrenNodes[0].isAllTrueDecorators && childrenNodes[0].OnEnable() == EnableResult.Success;
+						m_isEndNodes[1] = !childrenNodes[1].isAllTrueDecorators && childrenNodes[1].OnEnable() == EnableResult.Success;
 						foreach (var e in services) e.OnEnable();
 
 						if ((parallelFinishMode == ParallelFinishMode.Immediate && (!m_isEndNodes[0] & !m_isEndNodes[1]))
@@ -179,39 +233,45 @@ namespace AI
 					}
 					public override void OnDisable(UpdateResult result) { }
 
-					public override UpdateResult Update()
+					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
+						if (!isAllTrueDecorators)
+						{
+							childrenNodes[0].OnDisable(UpdateResult.Failed);
+							childrenNodes[1].OnDisable(UpdateResult.Failed);
+							return UpdateResult.Failed;
+						}
 						UpdateResult result;
-						foreach (var e in services) e.Update();
+						foreach (var e in services) e.Update(agent, blackboard);
 
 						for (int i = 0, partner = 1; i < 2; ++i, --partner)
 						{
 							if (!m_isEndNodes[i])
 							{
-								result = nodes[i].Update();
+								result = childrenNodes[i].Update(agent, blackboard);
 								switch (result)
 								{
 									case UpdateResult.Success:
-										nodes[i].OnDisable(UpdateResult.Success);
+										childrenNodes[i].OnDisable(UpdateResult.Success);
 										m_isEndNodes[i] = true;
 
 										if (m_isEndNodes[partner]) return UpdateResult.Success;
 
 										if (parallelFinishMode == ParallelFinishMode.Immediate)
 										{
-											nodes[partner].OnDisable(UpdateResult.Success);
+											childrenNodes[partner].OnDisable(UpdateResult.Success);
 											return UpdateResult.Success;
 										}
 										break;
 									case UpdateResult.Failed:
-										nodes[i].OnDisable(UpdateResult.Failed);
+										childrenNodes[i].OnDisable(UpdateResult.Failed);
 										m_isEndNodes[i] = true;
 
 										if (m_isEndNodes[partner]) return UpdateResult.Failed;
 
 										if (parallelFinishMode == ParallelFinishMode.Immediate)
 										{
-											nodes[partner].OnDisable(UpdateResult.Failed);
+											childrenNodes[partner].OnDisable(UpdateResult.Failed);
 											return UpdateResult.Failed;
 										}
 										break;
@@ -223,6 +283,19 @@ namespace AI
 
 						return m_isEndNodes[0] & m_isEndNodes[1] ? UpdateResult.Success : UpdateResult.Run;
 					}
+
+					public override void Load(BaseCashContainer container, Blackboard blackboard)
+					{
+						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+					}
+					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
+					{
+						var result = new ParallelNode();
+						result.CloneBase(this);
+						result.CloneDecoratorAndService(this);
+						result.parallelFinishMode = parallelFinishMode;
+						return result;
+					}
 				}
 
 
@@ -232,10 +305,10 @@ namespace AI
 
 					public override EnableResult OnEnable()
 					{
-						if (nodes.Count != 2) return EnableResult.Failed;
+						if (childrenNodes.Count != 2) return EnableResult.Failed;
 
-						m_isEndNodes[0] = !nodes[0].isAllTrueDecorators && nodes[0].OnEnable() == EnableResult.Success;
-						m_isEndNodes[1] = !nodes[1].isAllTrueDecorators && nodes[1].OnEnable() == EnableResult.Success;
+						m_isEndNodes[0] = !childrenNodes[0].isAllTrueDecorators && childrenNodes[0].OnEnable() == EnableResult.Success;
+						m_isEndNodes[1] = !childrenNodes[1].isAllTrueDecorators && childrenNodes[1].OnEnable() == EnableResult.Success;
 						foreach (var e in services) e.OnEnable();
 
 						if ((parallelFinishMode == ParallelFinishMode.Immediate && (!m_isEndNodes[0]))
@@ -247,33 +320,39 @@ namespace AI
 
 					public override void OnDisable(UpdateResult result) { }
 
-					public override UpdateResult Update()
+					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
+						if (!isAllTrueDecorators)
+						{
+							childrenNodes[0].OnDisable(UpdateResult.Failed);
+							childrenNodes[1].OnDisable(UpdateResult.Failed);
+							return UpdateResult.Failed;
+						}
 						UpdateResult result;
-						foreach (var e in services) e.Update();
+						foreach (var e in services) e.Update(agent, blackboard);
 
 						if (!m_isEndNodes[0])
 						{
-							result = nodes[0].Update();
+							result = childrenNodes[0].Update(agent, blackboard);
 							switch (result)
 							{
 								case UpdateResult.Success:
-									nodes[0].OnDisable(UpdateResult.Success);
+									childrenNodes[0].OnDisable(UpdateResult.Success);
 									m_isEndNodes[0] = true;
 
 									if (parallelFinishMode == ParallelFinishMode.Immediate)
 									{
-										nodes[1].OnDisable(UpdateResult.Success);
+										childrenNodes[1].OnDisable(UpdateResult.Success);
 										return UpdateResult.Success;
 									}
 									break;
 								case UpdateResult.Failed:
-									nodes[0].OnDisable(UpdateResult.Failed);
+									childrenNodes[0].OnDisable(UpdateResult.Failed);
 									m_isEndNodes[1] = true;
 
 									if (parallelFinishMode == ParallelFinishMode.Immediate)
 									{
-										nodes[0].OnDisable(UpdateResult.Failed);
+										childrenNodes[0].OnDisable(UpdateResult.Failed);
 										return UpdateResult.Failed;
 									}
 									break;
@@ -282,21 +361,34 @@ namespace AI
 							}
 						}
 
-						result = nodes[1].Update();
+						result = childrenNodes[1].Update(agent, blackboard);
 						if (!(parallelFinishMode == ParallelFinishMode.Delayed && m_isEndNodes[0]))
 							return UpdateResult.Run;
 
 						switch (result)
 						{
 							case UpdateResult.Success:
-								nodes[1].OnDisable(UpdateResult.Success);
+								childrenNodes[1].OnDisable(UpdateResult.Success);
 								return UpdateResult.Success;
 							case UpdateResult.Failed:
-								nodes[1].OnDisable(UpdateResult.Failed);
+								childrenNodes[1].OnDisable(UpdateResult.Failed);
 								return UpdateResult.Failed;
 							default:
 								return UpdateResult.Run;
 						}
+					}
+
+					public override void Load(BaseCashContainer container, Blackboard blackboard)
+					{
+						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+					}
+					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
+					{
+						var result = new SimpleParallelNode();
+						result.CloneBase(this);
+						result.CloneDecoratorAndService(this);
+						result.parallelFinishMode = parallelFinishMode;
+						return result;
 					}
 				}
 

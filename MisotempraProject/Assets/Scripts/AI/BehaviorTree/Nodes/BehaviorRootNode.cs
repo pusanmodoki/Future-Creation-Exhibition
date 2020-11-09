@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using AI.BehaviorTree.CashContainer.Detail;
+using AI.BehaviorTree.Node.Detail;
 using UnityEngine;
 
 
@@ -9,45 +11,74 @@ namespace AI
 	{
 		namespace Node
 		{
-			public class RootNode : BehaviorBaseNode
+			public class RootNode : Detail.BaseNode
 			{
-				public List<BehaviorBaseNode> nodes { get; private set; } = new List<BehaviorBaseNode>();
-
 				int m_selectIndex = 0;
 
 				public override EnableResult OnEnable()
 				{
-					if (!isAllTrueDecorators || nodes.Count == 0 || !nodes[0].isAllTrueDecorators
-						|| nodes[m_selectIndex].OnEnable() == EnableResult.Failed)
+					if (childrenNodes.Count == 0 || !childrenNodes[0].isAllTrueDecorators
+						|| childrenNodes[m_selectIndex].OnEnable() == EnableResult.Failed)
 						return EnableResult.Failed;
-
-					m_selectIndex = 0;
-
+					
 					return EnableResult.Success;
 				}
 				public override void OnDisable(UpdateResult result) { }
 
-				public override UpdateResult Update()
+				public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 				{
-					var result = nodes[m_selectIndex].Update();
+					if (m_selectIndex == -1)
+						FindRunNode(agent);
+
+					var result = childrenNodes[m_selectIndex].Update(agent, blackboard);
 					switch (result)
 					{
 						case UpdateResult.Success:
-							nodes[m_selectIndex].OnDisable(UpdateResult.Success);
-							if (++m_selectIndex == nodes.Count)
-								return UpdateResult.Success;
-							else if (!nodes[m_selectIndex].isAllTrueDecorators || nodes[m_selectIndex].OnEnable() == EnableResult.Failed)
-								return UpdateResult.Failed;
-							else
-								return UpdateResult.Run;
+							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Success);
+
+							m_selectIndex = 0;
+							FindRunNode(agent);
+							return UpdateResult.Run;
+
 						case UpdateResult.Failed:
-							nodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
+							m_selectIndex = 0;
 							return UpdateResult.Failed;
 						default:
 							return UpdateResult.Run;
 					}
 				}
 
+				public override void Load(BaseCashContainer container, Blackboard blackboard) {}
+				public override BaseNode Clone(AIAgent agnet, BehaviorTree behaviorTree)
+				{
+					var result = new RootNode();
+					result.CloneBase(this);
+					return result;
+				}
+
+				bool FindRunNode(AIAgent agent)
+				{
+					int findIndex = m_selectIndex;
+					bool isRunOk = false;
+					do
+					{
+						findIndex = (findIndex + 1) % childrenNodes.Count;
+
+						isRunOk = childrenNodes[m_selectIndex].isAllTrueDecorators
+						&& childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success;
+
+					} while (!isRunOk || findIndex != m_selectIndex);
+					if (!isRunOk && findIndex == m_selectIndex)
+					{
+#if UNITY_EDITOR
+						Debug.Log("実行できるタスクが存在しません: " + agent.gameObject.name);
+#endif
+						m_selectIndex = -1;
+					}
+
+					return m_selectIndex > -1;
+				}
 			}
 		}
 	}

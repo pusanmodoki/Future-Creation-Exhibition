@@ -95,7 +95,7 @@ namespace Editor
 						m_classTypes.Add(compositeNodeNames[2], typeof(Composite.RandomSelectorNode));
 						m_classTypes.Add(compositeNodeNames[3], typeof(Composite.ParallelNode));
 						m_classTypes.Add(compositeNodeNames[4], typeof(Composite.SimpleParallelNode));
-						m_classTypes.Add(cTaskNodeName, typeof(AI.BehaviorTree.BaseTask));
+						m_classTypes.Add(cTaskNodeName, typeof(AI.BehaviorTree.Node.TaskNode));
 					}
 					return m_classTypes;
 				}

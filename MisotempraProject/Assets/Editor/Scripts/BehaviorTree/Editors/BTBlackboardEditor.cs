@@ -13,7 +13,7 @@ namespace Editor
 		[CustomEditor(typeof(ScriptableObject.BTBlackboardScriptableObject))]
 		public class BTBlackboardEditor : UnityEditor.Editor
 		{
-			static readonly string[] m_cSelectClasseNames = new string[15]
+			static readonly string[] m_cSelectClasseNames = new string[14]
 			{
 				"GameObject",
 				"Transform",
@@ -28,15 +28,14 @@ namespace Editor
 				"int",
 				"float",
 				"double",
-				"Unity Object",
-				"C# object"
+				"object"
 			};
 
 
 			SerializedProperty m_classeNameIndexes = null;
 			SerializedProperty m_keys = null;
 			SerializedProperty m_memos = null;
-			SerializedProperty m_isStatics = null;
+			SerializedProperty m_isShareds = null;
 
 			[SerializeField]
 			List<bool> m_isFoldouts = new List<bool>();
@@ -45,11 +44,16 @@ namespace Editor
 
 			void OnEnable()
 			{
+				try { if (serializedObject == null) return; }
+				catch(System.Exception) { return; }
+
 				SerializedProperty container = serializedObject.FindProperty("m_cashContainer");
-				m_classeNameIndexes = container.FindPropertyRelative("m_classeNameIndexes");
+				if (container == null) return;
+
+				m_classeNameIndexes = container.FindPropertyRelative("m_classNameIndexes");
 				m_keys = container.FindPropertyRelative("m_keys");
 				m_memos = container.FindPropertyRelative("m_memos");
-				m_isStatics = container.FindPropertyRelative("m_isStatics");
+				m_isShareds = container.FindPropertyRelative("m_isShareds");
 
 				m_keyNamesDictionary.Clear();
 				for (int i = 0; i < m_classeNameIndexes.arraySize; ++i)
@@ -100,17 +104,21 @@ namespace Editor
 					{
 						m_isFoldouts[i] = EditorGUILayout.Foldout(m_isFoldouts[i], title, true, style);
 						GUILayout.FlexibleSpace();
-						if (GUILayout.Button(" Delete "))
+						var color = GUI.backgroundColor;
+						GUI.backgroundColor = new Color(1.0f, 0.3f, 0.3f);
+						if (GUILayout.Button(" ー "))
 						{
 							m_classeNameIndexes.DeleteArrayElementAtIndex(i);
 							m_keys.DeleteArrayElementAtIndex(i);
-							m_isStatics.DeleteArrayElementAtIndex(i);
+							m_isShareds.DeleteArrayElementAtIndex(i);
 							m_memos.DeleteArrayElementAtIndex(i);
 							m_isFoldouts.RemoveAt(i);
 
 							--i;
+							GUI.backgroundColor = color;
 							continue;
 						}
+						GUI.backgroundColor = color;
 					}
 					if (m_isFoldouts[i])
 					{
@@ -126,8 +134,8 @@ namespace Editor
 							m_classeNameIndexes.GetArrayElement(i).intValue =
 								EditorGUILayout.Popup("Type: ", m_classeNameIndexes.GetArrayElement(i).intValue, m_cSelectClasseNames);
 
-							m_isStatics.GetArrayElement(i).boolValue =
-								EditorGUILayout.Toggle("IsStatic: ", m_isStatics.GetArrayElement(i).boolValue);
+							m_isShareds.GetArrayElement(i).boolValue =
+								EditorGUILayout.Toggle("IsShared: ", m_isShareds.GetArrayElement(i).boolValue);
 						}
 					}
 				}
@@ -152,19 +160,21 @@ namespace Editor
 						m_keyNamesDictionary.Add(property.stringValue, new List<SerializedProperty>());
 					m_keyNamesDictionary[property.stringValue].Add(property);
 				}
+
+				EditorUtility.SetDirty(target);
 			}
 
 			void AddElement(List<SerializedProperty> keysTemp)
 			{
 				m_classeNameIndexes.ArrayAddEmpty();
 				m_keys.ArrayAddEmpty();
-				m_isStatics.ArrayAddEmpty();
+				m_isShareds.ArrayAddEmpty();
 				m_memos.ArrayAddEmpty();
 				m_isFoldouts.Add(false);
 
 				m_classeNameIndexes.ArrayBack().intValue = 0;
 				m_keys.ArrayBack().stringValue = "";
-				m_isStatics.ArrayBack().boolValue = false;
+				m_isShareds.ArrayBack().boolValue = false;
 				m_memos.ArrayBack().stringValue = "";
 
 				keysTemp.Add(m_keys.ArrayBack());

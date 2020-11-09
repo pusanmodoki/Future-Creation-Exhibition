@@ -98,7 +98,7 @@ namespace Editor
 				catch (System.Exception) { return; }
 
 				if (nodeView != null && isSaveResult)
-					Debug.Log("Behavior tree (" + fileName + ") Save completed.");
+					nodeView.DrawSaveCompletedLog();
 				else if (nodeView != null)
 					Debug.LogWarning("Behavior tree (" + fileName + ") invalid contents. Force save completed.");
 			}
@@ -112,11 +112,16 @@ namespace Editor
 			/// <summary>EditorApplication用コールバック</summary>
 			static void SaveCallaback(PlayModeStateChange change)
 			{
-				//プレイモードになった場合セーブを行う
-				if (change == PlayModeStateChange.EnteredPlayMode)
+				foreach (var e in instances)
 				{
-					foreach (var e in instances)
-						if (e.nodeView != null) e.nodeView.Save();
+					if (e.nodeView != null)
+					{
+						//プレイモードになった場合セーブを行う
+						if (change == PlayModeStateChange.ExitingEditMode)
+							e.nodeView.Save();
+						//なんにしろリロード
+						e.nodeView.Reload();
+					}
 				}
 			}
 		}

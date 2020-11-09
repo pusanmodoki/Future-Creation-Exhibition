@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace AI
@@ -19,12 +20,9 @@ namespace AI
 
 				namespace Detail
 				{
-					public abstract class BaseCompositeNode : BehaviorBaseNode
+					public abstract class BaseCompositeNode : Node.Detail.NotRootNode
 					{
-						public ParallelFinishMode parallelFinishMode { get; private set; } = ParallelFinishMode.Null;
-
-						public List<BaseService> services { get; private set; } = new List<BaseService>();
-						public List<BehaviorBaseNode> nodes { get; private set; } = new List<BehaviorBaseNode>();
+						public ParallelFinishMode parallelFinishMode { get; protected set; } = ParallelFinishMode.Null;
 					}
 				}
 			}

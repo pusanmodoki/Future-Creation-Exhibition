@@ -8,26 +8,23 @@ namespace AI
 	{
 		public abstract class BaseService
 		{
-			public enum CallMode
-			{
-				TimeInterval,
-				
-			}
-
 			public float callInterval { get; private set; } = 0.0f;
 			Timer m_timer = new Timer();
 
+			public void LoadInterval(float callInterval) { this.callInterval = callInterval; }
+
 			public void OnEnable() { m_timer.Start(); }
-			public void Update()
+			public void Update(AIAgent agent, Blackboard blackboard)
 			{
 				if (m_timer.elapasedTime >= callInterval)
 				{
 					m_timer.Start();
-					ServiceFunction();
+					ServiceFunction(agent, blackboard);
 				}
 			}
 
-			public abstract void ServiceFunction();
+			public abstract void ServiceFunction(AIAgent agent, Blackboard blackboard);
+			public abstract BaseService ReturnNewThisClass();
 		}
 	}
 }

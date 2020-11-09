@@ -8,7 +8,9 @@ namespace AI
 	{
 		public abstract class BaseDecorator
 		{
-			public abstract bool isPredicate();
+			public abstract bool IsPredicate();
+
+			public abstract BaseDecorator ReturnNewThisClass();
 		}
 	}
 }

@@ -68,7 +68,7 @@ namespace Editor
 		Vector2 m_windowBlockRightSize2 = default;
 
 		/// <summary>Open</summary>
-		[MenuItem("Window/Misotempra/Time layer")]
+		[MenuItem("Window/Time layer")]
 		static void Open()
 		{
 			//インスタンス作成

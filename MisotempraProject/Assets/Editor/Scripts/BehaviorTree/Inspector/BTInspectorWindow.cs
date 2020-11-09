@@ -12,11 +12,11 @@ namespace Editor
 		public class BTInspectorWindow : EditorWindow
 		{
 			public static BTInspectorWindow instance { get; private set; } = null;
+			public BehaviorTreeWindow editorWindow { get; private set; } = null;
+			public UnityEditor.Editor nodeEditor { get; private set; } = null;
+			public UnityEditor.Editor blackboardEditor { get; private set; } = null;
 			public Vector2 mousePosition { get; private set; } = default;
 
-			BehaviorTreeWindow m_editorWindow = null;
-			UnityEditor.Editor m_nodeEditor = null;
-			UnityEditor.Editor m_blackboardEditor = null;
 			Vector2 m_scrollPosition = Vector2.zero;
 			string m_nodeName;
 			string m_guid;
@@ -39,38 +39,38 @@ namespace Editor
 
 			public void RegisterNodeEditorGUI(BehaviorTreeWindow editorWindow, string nodeName, string guid)
 			{
-				if (m_editorWindow != editorWindow)
-					m_blackboardEditor = null;
+				if (this.editorWindow != editorWindow)
+					blackboardEditor = null;
 
-				m_editorWindow = editorWindow;
-				m_nodeEditor = editorWindow.nodeView.nodeScriptableEditor;
+				this.editorWindow = editorWindow;
+				nodeEditor = editorWindow.nodeView.nodeScriptableEditor;
 				m_nodeName = nodeName;
 				m_guid = guid;
 			}
 			public void UnregisterNodeEditorGUI(BehaviorTreeWindow editorWindow)
 			{
-				if (m_editorWindow == editorWindow && m_nodeEditor == editorWindow.nodeView.nodeScriptableEditor)
+				if (this.editorWindow == editorWindow && nodeEditor == editorWindow.nodeView.nodeScriptableEditor)
 				{
-					m_nodeEditor = null;
-					if (m_blackboardEditor == null) m_editorWindow = null;
+					nodeEditor = null;
+					if (blackboardEditor == null) this.editorWindow = null;
 					Repaint();
 				}
 			}
 
 			public void RegisterBlackboardEditorGUI(BehaviorTreeWindow editorWindow)
 			{
-				if (m_editorWindow != editorWindow)
-					m_nodeEditor = null;
+				if (this.editorWindow != editorWindow)
+					nodeEditor = null;
 
-				m_editorWindow = editorWindow;
-				m_blackboardEditor = editorWindow.nodeView.blackboardScriptableEditor;
+				this.editorWindow = editorWindow;
+				blackboardEditor = editorWindow.nodeView.blackboardScriptableEditor;
 			}
 			public void UnregisterBlackboardEditorGUI(BehaviorTreeWindow editorWindow)
 			{
-				if (m_editorWindow == editorWindow)
+				if (this.editorWindow == editorWindow)
 				{
-					m_blackboardEditor = null;
-					if (m_nodeEditor == null) m_editorWindow = null;
+					blackboardEditor = null;
+					if (nodeEditor == null) this.editorWindow = null;
 					Repaint();
 				}
 			}
@@ -78,12 +78,21 @@ namespace Editor
 			void OnEnable()
 			{
 				wantsMouseMove = true;
+				EditorApplication.playModeStateChanged += change =>
+				{
+					editorWindow = null;
+					blackboardEditor = null;
+					nodeEditor = null;
+				};
 			}
 			void OnDisable()
 			{
-				m_editorWindow = null;
-				m_blackboardEditor = null;
-				m_nodeEditor = null;
+				nodeEditor?.serializedObject?.ApplyModifiedProperties();
+				blackboardEditor?.serializedObject?.ApplyModifiedProperties();
+
+				editorWindow = null;
+				blackboardEditor = null;
+				nodeEditor = null;
 			}
 
 			void OnGUI()
@@ -99,9 +108,10 @@ namespace Editor
 
 			void DrawNodeGUI()
 			{
-				if (m_editorWindow == null || m_nodeEditor == null)
+				if (editorWindow == null || nodeEditor == null ||
+					nodeEditor.target == null || nodeEditor.serializedObject == null)
 				{
-					m_nodeEditor = null;
+					nodeEditor = null;
 
 					EditorGUILayout.HelpBox("Not behavior node selected.", MessageType.Info);
 					return;
@@ -113,21 +123,22 @@ namespace Editor
 					using (new EditorGUI.IndentLevelScope())
 					{
 						GUIStyle style = new GUIStyle() { wordWrap = true };
-						EditorGUILayout.LabelField(new GUIContent("File name:: " + m_editorWindow.fileName 
+						EditorGUILayout.LabelField(new GUIContent("File name:: " + editorWindow.fileName 
 							+ "\nNode name:: " + m_nodeName + "\nNode guid:: " + m_guid), style);
 
 						GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(3));
 						EditorGUILayout.Space();
 
-						m_nodeEditor.OnInspectorGUI();
+						nodeEditor.OnInspectorGUI();
 					}
 				}
 			}
 			void DrawBlackbordGUI()
 			{
-				if (m_editorWindow == null || m_blackboardEditor == null)
+				if (editorWindow == null || blackboardEditor == null 
+					|| blackboardEditor.target == null || blackboardEditor.serializedObject == null)
 				{
-					m_blackboardEditor = null;
+					blackboardEditor = null;
 
 					EditorGUILayout.HelpBox("Not blackbord selected.", MessageType.Info);
 					return;
@@ -138,7 +149,7 @@ namespace Editor
 				{
 					using (new EditorGUI.IndentLevelScope())
 					{
-						m_blackboardEditor.OnInspectorGUI();
+						blackboardEditor.OnInspectorGUI();
 					}
 				}
 			}

@@ -197,6 +197,8 @@ namespace Editor
 					EditorGUILayout.Space(15.0f);
 
 					serializedObject.ApplyModifiedProperties();
+
+					EditorUtility.SetDirty(target);
 				}
 			}
 		}

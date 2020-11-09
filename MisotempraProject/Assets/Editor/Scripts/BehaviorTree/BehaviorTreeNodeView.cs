@@ -27,6 +27,7 @@ namespace Editor
 			public UnityEditor.Editor nodeScriptableEditor { get { return m_nodeScriptableEditor; } }
 			public ScriptableObject.BTBlackboardScriptableObject blackboardScriptableObject { get { return m_blackboardScriptableObject; } }
 			public UnityEditor.Editor blackboardScriptableEditor { get { return m_blackboardScriptableEditor; } }
+			public BlackboardCashContainer blackboradCashContainer { get; private set; } = null;
 
 			public Vector2 mousePosition { get { return thisWindow.mousePosition; } }
 
@@ -38,11 +39,28 @@ namespace Editor
 			protected UnityEditor.Editor m_blackboardScriptableEditor = null;
 
 			Node m_selectNode = null;
-
 			string m_reloadGuid = null;
 			bool m_isDelayCallCreateCallback = false;
+			
+			public BehaviorTreeNodeView(BehaviorTreeWindow thisWindow) : base("BehaviorTreeUSS")
+			{
+				this.thisWindow = thisWindow;
+				EditorApplication.update += Update;
 
-			//protected override bool canDuplicateSelection => false;
+				nodeCreationRequest += context =>
+				{	
+					var searchWindowProvider = UnityEngine.ScriptableObject.CreateInstance<BTNewNodeWindowProvider>();
+					searchWindowProvider.Initialize(this);
+					SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindowProvider);
+				};
+
+				graphViewChanged += GraphViewChangeCallback;
+
+				blackboradCashContainer = new BlackboardCashContainer();
+
+				if (fileName != null && fileName.Length > 0)
+					this.Load(fileName);
+			}
 
 			public void AddCash(BaseCashContainer cash, Node node,
 				string nodeName, string className, string editNodeClassName, Vector2 position)
@@ -53,6 +71,8 @@ namespace Editor
 				cashContainersKeyGuid.Add(cash.guid, cash);
 				cashContainersKeyNode.Add(node, cash);
 			}
+
+			public void DrawSaveCompletedLog() { Debug.Log("Behavior tree (" + fileName + ") Save completed."); }
 
 			public void ChangeChildrenOrder(string parentGuid)
 			{
@@ -69,28 +89,13 @@ namespace Editor
 
 			public void CreateBlackboardEditor()
 			{
+				blackboradCashContainer = (cashContainers[0] as RootCashContainer).blackbord;
 				m_blackboardScriptableObject = UnityEngine.ScriptableObject.CreateInstance<ScriptableObject.BTBlackboardScriptableObject>();
-				m_blackboardScriptableObject.Initialize((cashContainers[0] as RootCashContainer).blackbord);
+				m_blackboardScriptableObject.Initialize(blackboradCashContainer);
 				m_blackboardScriptableEditor = UnityEditor.Editor.CreateEditor(m_blackboardScriptableObject);
 			}
 
-			public BehaviorTreeNodeView(BehaviorTreeWindow thisWindow) : base("BehaviorTreeUSS")
-			{
-				this.thisWindow = thisWindow;
-				EditorApplication.update += Update;
 
-				nodeCreationRequest += context =>
-				{	
-					var searchWindowProvider = UnityEngine.ScriptableObject.CreateInstance<BTNewNodeWindowProvider>();
-					searchWindowProvider.Initialize(this);
-					SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindowProvider);
-				};
-
-				graphViewChanged += GraphViewChangeCallback;
-
-				if (fileName != null && fileName.Length > 0)
-					this.Load(fileName);
-			}
 			GraphViewChange GraphViewChangeCallback(GraphViewChange graphViewChange)
 			{
 				if (graphViewChange.edgesToCreate != null)
@@ -286,7 +291,7 @@ namespace Editor
 					Debug.LogError(e.Message + "\n" + e.Source);
 					return;
 				}
-				Debug.Log("Behavior tree (" + fileName + ") Save completed.");
+				DrawSaveCompletedLog();
 			}
 			public void CreateCallback(DropdownMenuAction action)
 			{
@@ -358,6 +363,17 @@ namespace Editor
 					ReloadChildrensTitle(m_reloadGuid);
 					m_reloadGuid = null;
 				}
+			}
+
+			public void Reload()
+			{
+				if (m_selectNode != null)
+					m_selectNode.selected = false;
+
+				if (fileName == null) return;
+
+				this.Load(fileName);
+				m_selectNode = null;
 			}
 
 			public void BuildNodeView(List<BaseCashContainer> loadList)

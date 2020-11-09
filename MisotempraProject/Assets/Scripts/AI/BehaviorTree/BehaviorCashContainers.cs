@@ -70,7 +70,7 @@ namespace AI
 			[System.Serializable]
 			public class RootCashContainer : Detail.BaseCashContainer
 			{
-				public BlackboardCashContainer blackbord { get { return m_blackboard; } }
+				public BlackboardCashContainer blackbord { get { return m_blackboard; } set { m_blackboard = value; } }
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
 				
 				public override bool isSaveReady { get { return true; } }
@@ -158,19 +158,19 @@ namespace AI
 			[System.Serializable]
 			public class BlackboardCashContainer
 			{
-				public List<int> classeNameIndexes { get { return m_classeNameIndexes; } }
+				public List<int> classNameIndexes { get { return m_classNameIndexes; } }
 				public List<string> keys { get { return m_keys; } }
 				public List<string> memos { get { return m_memos; } }
-				public List<bool> isStatics { get { return m_isStatics; } }
+				public List<bool> isShareds { get { return m_isShareds; } }
 
 				[SerializeField]
-				List<int> m_classeNameIndexes = new List<int>();
+				List<int> m_classNameIndexes = new List<int>();
 				[SerializeField]
 				List<string> m_keys = new List<string>();
 				[SerializeField]
 				List<string> m_memos = new List<string>();
 				[SerializeField]
-				List<bool> m_isStatics = new List<bool>();
+				List<bool> m_isShareds = new List<bool>();
 			}
 		}
 	}

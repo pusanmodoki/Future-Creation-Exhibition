@@ -7,11 +7,24 @@ namespace AI
 	namespace BehaviorTree
 	{
 		[System.Serializable]
-		public class BaseTask
+		public abstract class BaseTask
 		{
-			public virtual EnableResult OnEnale() { return EnableResult.Success; }
-			public virtual UpdateResult Update() { return UpdateResult.Success; }	
-			public virtual void OnQuit(UpdateResult result) { }
+			public AIAgent aiAgent { get; private set; } = null;
+			public UnityEngine.AI.NavMeshAgent navMeshAgent { get { return aiAgent.navMeshAgent; } }
+			public Rigidbody rigidbody { get { return aiAgent.rigidbody; } }
+			public BehaviorTree behaviorTree { get; private set; } = null;
+			public Blackboard blackboard { get { return behaviorTree.blackboard; } }
+
+			public abstract EnableResult OnEnale();
+			public abstract UpdateResult Update();
+			public abstract void FixedUpdate();
+			public abstract void OnQuit(UpdateResult result);
+
+			public void InitializeBase(BehaviorTree behaviorTree, AIAgent agent)
+			{
+				aiAgent = agent;
+				this.behaviorTree = behaviorTree;
+			}
 		}
 	}
 }

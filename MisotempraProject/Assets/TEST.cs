@@ -1,29 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-[System.Serializable]
-public class TestA
-{
-	[SerializeField]
-	string str = "AAAAAAAAAAA";
-}
-[System.Serializable]
-public class TestB : TestA
-{
-	[SerializeField]
-	int aa = 100;
-}
-
+using AI.BehaviorTree;
 
 public class TEST : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
     {
-		TestA b = new TestB();
-		FileAccess.FileAccessor.SaveObject<TestA>("Test", "test", ref b);
-    }
+		//BehaviorTree.LoadBehaviorTree("a");
+
+		//BehaviorTree tree = new BehaviorTree("a");
+
+		//int a = 0;
+		//a = 0;
+	}
 
     // Update is called once per frame
     void Update()

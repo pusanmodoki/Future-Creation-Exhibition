@@ -19,6 +19,13 @@ namespace Editor
 				TestTask m_task = null;
 				public void Initialize(TestTask initialize) { m_task = initialize; }
 			}
+			public class TaskScriptableObjectClassNametest1 : BaseTaskScriptableObject
+			{
+				public test1 task { get { return m_task; } }
+				[SerializeField]
+				test1 m_task = null;
+				public void Initialize(test1 initialize) { m_task = initialize; }
+			}
 
 			public static class TaskScriptableObjectClassMediator
 			{
@@ -30,6 +37,13 @@ namespace Editor
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameTestTask>();
 						(scriptableObject as TaskScriptableObjectClassNameTestTask).Initialize(task as TestTask);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameTestTask);
+						return;
+					}
+					if (taskTypeFullName == typeof(test1).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNametest1>();
+						(scriptableObject as TaskScriptableObjectClassNametest1).Initialize(task as test1);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNametest1);
 						return;
 					}
 					scriptableObject = null;

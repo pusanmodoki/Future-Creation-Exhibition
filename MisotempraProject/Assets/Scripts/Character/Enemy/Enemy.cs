@@ -21,18 +21,52 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private EffectDictionary m_effectDictionary = null;
 
+    [SerializeField]
+    private Rigidbody m_rigidbody = null;
+
+    [SerializeField]
+    private Transform m_player = null;
+
+    [SerializeField]
+    private float m_speed = 10.0f;
 
     [SerializeField]
     private float m_checkTime = 0.02f;
 
+
     [SerializeField]
-    private MeshRenderer m_renderer = null;
+    private TimeManagement.TimeLayer m_timeLayer = null;
 
     private bool m_isCheck = true;
+
+    private void Awake()
+    {
+        TimeManagement.TimeLayer.InitLayer(ref m_timeLayer);
+    }
 
     private void OnEnable()
     {
         StartCoroutine("CheckArmorState");
+    }
+
+    private void Update()
+    {
+        
+    }
+
+    private void FixedUpdate()
+    {
+        switch (m_state)
+        {
+            case State.Searching:
+                Vector3 vec = m_player.position - transform.position;
+                vec.Normalize();
+                vec *= m_speed * m_timeLayer.fixedDeltaTime;
+                m_rigidbody.velocity = vec;
+                break;
+
+
+        }
     }
 
     private IEnumerator CheckArmorState()
@@ -43,7 +77,6 @@ public class Enemy : MonoBehaviour
             {
                 m_effectDictionary.PlayEffect("DeadEffect");
                 m_state = State.Dead;
-                m_renderer.enabled = false;
                 break;
             }
             yield return new WaitForSeconds(m_checkTime);

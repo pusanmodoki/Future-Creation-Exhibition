@@ -4998,4 +4998,5 @@ MonoBehaviour:
   m_armor: {fileID: 6484212717487981528}
   m_effectDictionary: {fileID: 6484212717543574704}
   m_checkTime: 0.2
-  m_renderer: {fileID: 6484212717487981534}
+  m_timeLayer:
+    m_guid: 6dac7cfe-fded-4fcd-a90c-978aaf2f6af2

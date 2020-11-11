@@ -15,7 +15,14 @@ public class ProcessingLoadManager : MonoBehaviour
 
     [SerializeField]
     float reduceDelayTimer = 0.0f;  // 減少までの時間（未使用）
-    
+
+    [SerializeField]
+    TimeManagement.TimeLayer m_timeLayer = null;
+
+    public TimeManagement.TimeLayer timeLayer { get { return m_timeLayer; } }
+
+    public static ProcessingLoadManager instance { get; private set; } = null;
+
     float gaugeBorderCaution = 50.0f;   // StableとCautionの境界％
     float gaugeBorderWarning = 80.0f;   // CautionとWarningの境界％
 
@@ -55,7 +62,12 @@ public class ProcessingLoadManager : MonoBehaviour
 
     public gaugeState getGaugeState() { return nowState; }
 
+    private void Awake()
+    {
+        TimeManagement.TimeLayer.InitLayer(ref m_timeLayer);
+        instance = this;
 
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -123,10 +135,12 @@ public class ProcessingLoadManager : MonoBehaviour
             case gaugeState.Caution:
                 plPercentText.color = orange;
                 gaugeFillImage.color = orange;
+                m_timeLayer.SetTimeScale(0.5f);
                 break;
             case gaugeState.Stable:
                 plPercentText.color = green;
                 gaugeFillImage.color = green;
+                m_timeLayer.SetTimeScale(1.0f);
                 break;
         }
     }

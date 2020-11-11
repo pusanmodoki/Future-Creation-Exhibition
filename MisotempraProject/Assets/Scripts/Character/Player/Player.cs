@@ -115,14 +115,14 @@ public class Player : MonoBehaviour
             case StateType.Stand:
                 {
                     MoveInputKeyboard();
-                    Jump();
+                    // Jump();
                     AttackInput();
                     break;
                 }
             case StateType.Run:
                 {
                     MoveInputKeyboard();
-                    Jump();
+                    // Jump();
                     AttackInput();
                     break;
                 }
@@ -151,6 +151,8 @@ public class Player : MonoBehaviour
                 {
                     Run();
                     Jump();
+                    Moving();
+
                     break;
                 }
             case StateType.Attack:
@@ -166,7 +168,6 @@ public class Player : MonoBehaviour
         }
 
         // 移動
-        Moving();
         JumpDetect();
     }
 
@@ -293,6 +294,7 @@ public class Player : MonoBehaviour
 
             m_animator.SetTrigger("Attack");
             m_isAcceptAttack = false;
+            m_rigidbody.velocity = Vector3.zero;
         }
     }
 
@@ -338,4 +340,10 @@ public class Player : MonoBehaviour
         }
     }
     
+    private void Advance(float force)
+    {
+        // m_rigidbody.AddForce(transform.forward * force);
+        Vector3 vec = m_rigidbody.velocity + transform.forward * force;
+        m_rigidbody.velocity = vec;
+    }
 }

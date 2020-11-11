@@ -32,6 +32,7 @@ public class EffectPopManager : MonoBehaviour
         public Vector3 position { get; }
     }
 
+
     public static Queue<Message> messages { get; private set; } = new Queue<Message>();
 
     private void Start()
@@ -40,6 +41,7 @@ public class EffectPopManager : MonoBehaviour
         {
             m_dictionary.Add(obj.name, obj);
         }
+
     }
 
     private void Update()
@@ -66,5 +68,4 @@ public class EffectPopManager : MonoBehaviour
     {
         m_instancedEffects.Enqueue(GameObject.Instantiate(m_dictionary[name], pos, Quaternion.identity));        
     }
-
 }

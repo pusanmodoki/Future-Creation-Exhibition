@@ -129,7 +129,12 @@ namespace Editor
 						GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(3));
 						EditorGUILayout.Space();
 
+						EditorGUI.BeginChangeCheck();
+
 						nodeEditor.OnInspectorGUI();
+
+						if (EditorGUI.EndChangeCheck())
+							editorWindow.nodeView.CheckSaveReady();
 					}
 				}
 			}
@@ -149,7 +154,12 @@ namespace Editor
 				{
 					using (new EditorGUI.IndentLevelScope())
 					{
+						EditorGUI.BeginChangeCheck();
+
 						blackboardEditor.OnInspectorGUI();
+
+						if (EditorGUI.EndChangeCheck())
+							editorWindow.nodeView.CheckSaveReady();
 					}
 				}
 			}

@@ -31,7 +31,19 @@ namespace Editor
 
 			public Vector2 mousePosition { get { return thisWindow.mousePosition; } }
 
+			public static readonly Dictionary<string, StyleColor> cNodeColors = new Dictionary<string, StyleColor>
+			{
+				{ "Root",  new StyleColor(new Color(0.15f, 0.15f, 0.15f, 0.8f)) },
+				{ "Task",  new StyleColor(new Color(0.8f, 0.5f, 0.15f, 0.8f)) },
+				{ "Sequence", new StyleColor(new Color(0.3f, 0.3f, 1.0f, 0.8f)) },
+				{ "Selector", new StyleColor(new Color(0.5f, 0.1f, 0.5f, 0.8f)) },
+				{ "Random selector", new StyleColor(new Color(0.8f, 0.2f, 0.5f, 0.8f)) },
+				{ "Parallel", new StyleColor(new Color(0.05f, 0.5f, 0.05f, 0.8f)) },
+				{ "Simple parallel", new StyleColor(new Color(0.1f, 0.7f, 0.1f, 0.8f)) }
+			};
+
 			static readonly Vector2 m_cRootPosition = Vector2.zero;
+			static readonly StyleColor m_cNotSaveReadyColor = new StyleColor(new Color(1.0f, 0.15f, 0.15f, 0.7f));	
 
 			protected ScriptableObject.Detail.BTBaseScriptableObject m_nodeScriptableObject = null;
 			protected UnityEditor.Editor m_nodeScriptableEditor = null;
@@ -79,6 +91,20 @@ namespace Editor
 				m_reloadGuid = parentGuid;
 			}
 
+			public void CheckSaveReady()
+			{
+				var list = nodes.ToList();
+				foreach (var node in list)
+				{
+					if (!cashContainersKeyNode.ContainsKey(node))
+						continue;
+					if (!cashContainersKeyNode[node].isSaveReady)
+						node.titleContainer.style.backgroundColor = m_cNotSaveReadyColor;
+					else
+						node.titleContainer.style.backgroundColor = cNodeColors[cashContainersKeyNode[node].nodeName];
+				}
+			}
+
 			public Rect LocalMousePositionToNodePosition(SearchWindowContext context, Rect rect)
 			{
 				var worldMousePosition = thisWindow.rootVisualElement.ChangeCoordinatesTo(
@@ -98,6 +124,15 @@ namespace Editor
 
 			GraphViewChange GraphViewChangeCallback(GraphViewChange graphViewChange)
 			{
+				if (EditorApplication.isPlaying | EditorApplication.isPaused)
+				{
+					Debug.LogWarning("Behavior tree (" + fileName + ") 再生中は変更できません");
+					graphViewChange.edgesToCreate?.Clear();
+					graphViewChange.elementsToRemove?.Clear();
+					graphViewChange.movedElements?.Clear();
+					return graphViewChange;
+				}
+
 				if (graphViewChange.edgesToCreate != null)
 				{
 					foreach(var edge in graphViewChange.edgesToCreate)
@@ -191,6 +226,8 @@ namespace Editor
 						if (node != null) cashContainersKeyNode[node].position = node.GetPosition().position;
 					}
 				}
+
+				CheckSaveReady();
 				return graphViewChange;
 			}
 
@@ -384,6 +421,10 @@ namespace Editor
 				{
 					Node node = (Node)(System.Activator.CreateInstance(System.Type.GetType(loadList[i].editNodeClassName), this));
 					node.userData = loadList[i].nodeName;
+					if (loadList[i].isSaveReady)
+						node.titleContainer.style.backgroundColor = cNodeColors[loadList[i].nodeName];
+					else
+						node.titleContainer.style.backgroundColor = m_cNotSaveReadyColor;
 					AddElement(node);
 
 					Rect position = node.GetPosition();

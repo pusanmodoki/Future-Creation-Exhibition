@@ -119,8 +119,10 @@ namespace Editor
 						//プレイモードになった場合セーブを行う
 						if (change == PlayModeStateChange.ExitingEditMode)
 							e.nodeView.Save();
-						//なんにしろリロード
-						e.nodeView.Reload();
+						//なんにしろEnterでリロード
+						if (change == PlayModeStateChange.EnteredPlayMode
+							|| change == PlayModeStateChange.EnteredEditMode)
+							e.nodeView.Reload();
 					}
 				}
 			}

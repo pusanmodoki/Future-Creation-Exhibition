@@ -33,6 +33,11 @@ namespace Editor
 						entries.Add(new SearchTreeGroupEntry(new GUIContent("Not loaded…")));
 						return entries;
 					}
+					if (EditorApplication.isPlaying | EditorApplication.isPaused)
+					{
+						entries.Add(new SearchTreeGroupEntry(new GUIContent("Cannot change during playback…")));
+						return entries;
+					}
 
 					entries.Add(new SearchTreeGroupEntry(new GUIContent("Node classes")));
 
@@ -54,6 +59,7 @@ namespace Editor
 					node.SetPosition(m_view.LocalMousePositionToNodePosition(context, node.GetPosition()));
 					node.name = searchTreeEntry.content.text;
 					node.userData = searchTreeEntry.content.text;
+					node.titleContainer.style.backgroundColor = BehaviorTreeNodeView.cNodeColors[searchTreeEntry.content.text];
 					m_view.AddElement(node);
 	
 					var cashType = BTClassMediator.cashTypes[searchTreeEntry.content.text];		
@@ -62,7 +68,9 @@ namespace Editor
 						BTClassMediator.classTypes[searchTreeEntry.content.text].FullName,
 						BTClassMediator.nodeTypes[searchTreeEntry.content.text].FullName,
 						m_view.LocalMousePositionToNodePosition(context, node.GetPosition()).position);
-					
+
+					m_view.CheckSaveReady();
+
 					return true;
 				}
 			}

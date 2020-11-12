@@ -249,12 +249,16 @@ namespace Editor
 				{
 					serializedObject.Update();
 					propertys.taskClassName.stringValue = (searchTreeEntry.userData as System.Type).FullName;
-					serializedObject.ApplyModifiedProperties();
 
 					m_task = (AI.BehaviorTree.BaseTask)System.Activator.CreateInstance(
 						 TypeExtension.FindTypeInAllAssembly(propertys.taskClassName.stringValue));
 					TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
 						m_task, out m_taskEditor, out m_taskScriptableObject, propertys.taskClassName.stringValue);
+
+					propertys.taskToJson.stringValue = JsonUtility.ToJson(m_task);
+					serializedObject.ApplyModifiedProperties();
+
+					thisView.CheckSaveReady();
 				}
 
 				protected void OnEnable()

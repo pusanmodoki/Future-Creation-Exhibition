@@ -25,7 +25,6 @@ namespace AI
 				}
 
 
-				public AIAgent aiAgent { get; private set; } = null;
 				public BaseTask task { get; private set; } = null;
 				static Dictionary<string, TaskInfo> m_taskDataKeyGuid = new Dictionary<string, TaskInfo>();
 
@@ -65,8 +64,6 @@ namespace AI
 					var cast = container as CashContainer.TaskCashContainer;
 					LoadDecoratorAndService(cast);
 
-					blackboard = new Blackboard(blackboard);
-
 					System.Type type = System.Type.GetType(cast.taskClassName);
 					m_taskDataKeyGuid.Add(guid, new TaskInfo(type, cast.taskToJson));
 					task = (BaseTask)JsonUtility.FromJson(cast.taskToJson, type);
@@ -75,12 +72,11 @@ namespace AI
 				public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 				{
 					TaskNode result = new TaskNode();
-					result.CloneBase(this);
+					result.CloneBase(behaviorTree, this);
 					result.CloneDecoratorAndService(this);
 
 					var taskInfo = m_taskDataKeyGuid[guid];
 					result.task = (BaseTask)JsonUtility.FromJson(taskInfo.jsonData, taskInfo.classType);
-					result.aiAgent = agent;
 					result.task.InitializeBase(behaviorTree, result.aiAgent);
 
 					return result;

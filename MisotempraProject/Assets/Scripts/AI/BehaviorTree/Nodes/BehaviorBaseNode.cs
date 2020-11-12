@@ -24,6 +24,10 @@ namespace AI
 			{
 				public class BaseNode
 				{
+					public BehaviorTree thisTree { get; private set; } = null;
+					public AIAgent aiAgent { get { return thisTree.aiAgent; } }
+					public Blackboard blackboard { get { return thisTree.blackboard; } }
+
 					public string name { get; protected set; } = "";
 					public string guid { get; protected set; } = "";
 					public string editorMemo { get; protected set; } = "";
@@ -46,15 +50,17 @@ namespace AI
 					public void RegisterParent(BaseNode node) { parentNode = node; }
 					public void RegisterChildren(BaseNode node) { m_childrenNodes.Add(node as NotRootNode); }
 
-					public void BaseInitialize(CashContainer.Detail.BaseCashContainer container)
+					public void BaseInitialize(BehaviorTree tree, CashContainer.Detail.BaseCashContainer container)
 					{
+						thisTree = tree;
 						name = container.nodeName;
 						guid = container.guid;
 						editorMemo = container.memo;
 					}
 
-					protected void CloneBase(BaseNode node)
+					protected void CloneBase(BehaviorTree tree, BaseNode node)
 					{
+						thisTree = tree;
 						name = node.name;
 						guid = node.guid;
 						editorMemo = node.editorMemo;

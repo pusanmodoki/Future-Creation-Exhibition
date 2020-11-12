@@ -11,7 +11,7 @@ namespace Test_Uemura
 	{
 		[SerializeField]
 		int a;
-		public override bool IsPredicate()
+		public override bool IsPredicate(AI.AIAgent agent, Blackboard blackboard)
 		{
 			return true;
 		}
@@ -20,7 +20,7 @@ namespace Test_Uemura
 	[System.Serializable]
 	public class TestD2 : AI.BehaviorTree.BaseDecorator
 	{
-		public override bool IsPredicate()
+		public override bool IsPredicate(AI.AIAgent agent, Blackboard blackboard)
 		{
 			return true;
 		}

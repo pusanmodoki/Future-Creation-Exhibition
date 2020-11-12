@@ -65,7 +65,7 @@ namespace AI
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
 						var result = new SequenceNode();
-						result.CloneBase(this);
+						result.CloneBase(behaviorTree, this);
 						result.CloneDecoratorAndService(this);
 						return result;
 					}
@@ -132,7 +132,7 @@ namespace AI
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
 						var result = new SelectorNode();
-						result.CloneBase(this);
+						result.CloneBase(behaviorTree, this);
 						result.CloneDecoratorAndService(this);
 						return result;
 					}
@@ -207,7 +207,7 @@ namespace AI
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
 						var result = new RandomSelectorNode();
-						result.CloneBase(this);
+						result.CloneBase(behaviorTree, this);
 						result.CloneDecoratorAndService(this);
 						return result;
 					}
@@ -291,7 +291,7 @@ namespace AI
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
 						var result = new ParallelNode();
-						result.CloneBase(this);
+						result.CloneBase(behaviorTree, this);
 						result.CloneDecoratorAndService(this);
 						result.parallelFinishMode = parallelFinishMode;
 						return result;
@@ -385,7 +385,7 @@ namespace AI
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
 						var result = new SimpleParallelNode();
-						result.CloneBase(this);
+						result.CloneBase(behaviorTree, this);
 						result.CloneDecoratorAndService(this);
 						result.parallelFinishMode = parallelFinishMode;
 						return result;

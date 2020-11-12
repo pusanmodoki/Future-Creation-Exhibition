@@ -15,7 +15,7 @@ namespace AI
 			public System.Type thisType { get; private set; } = null;
 			public string guid { get; private set; } = null;
 
-			public abstract bool IsPredicate();
+			public abstract bool IsPredicate(AIAgent agent, Blackboard blackboard);
 
 			public void LoadBase(CashContainer.Detail.DecoratorInfomations infomations, System.Type thisType)
 			{

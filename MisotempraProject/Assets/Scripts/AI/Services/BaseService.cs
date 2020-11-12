@@ -27,7 +27,7 @@ namespace AI
 				this.callInterval = infomations.callInterval;
 
 				if (jsonData == null) jsonData = new ReadOnlyDictionary<string, string>(m_jsonData);
-				m_jsonData.Add(this.guid, infomations.jsonData);
+				if (!m_jsonData.ContainsKey(guid)) m_jsonData.Add(guid, infomations.jsonData);
 			}
 			public void CloneBase(BaseService service)
 			{

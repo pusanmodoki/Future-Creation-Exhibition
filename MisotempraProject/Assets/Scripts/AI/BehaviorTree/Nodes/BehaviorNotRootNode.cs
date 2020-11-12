@@ -24,7 +24,7 @@ namespace AI
 						{
 							bool isResult = true;
 							foreach (var e in decorators)
-								isResult &= e.IsPredicate();
+								isResult &= e.IsPredicate(aiAgent, blackboard);
 							return isResult;
 						}
 					}

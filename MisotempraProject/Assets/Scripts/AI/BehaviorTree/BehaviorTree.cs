@@ -75,7 +75,7 @@ namespace AI
 						System.Type.GetType(container.className));
 
 					instance.m_nodes.Add(node as Node.Detail.BaseNode);
-					instance.m_nodes.Back().BaseInitialize(container);
+					instance.m_nodes.Back().BaseInitialize(null, container);
 					instance.m_nodes.Back().Load(container, instance.blackboard);
 
 					instance.m_nodesKeyGuid.Add(container.guid, instance.m_nodes.Back());
@@ -104,7 +104,12 @@ namespace AI
 
 			public void LoadMasterData(BehaviorTree masterData, AIAgent aiAgent, BaseBlackboardInitialzier blackboardInitialzier)
 			{
-				foreach(var node in masterData.m_nodes)
+				blackboard = new Blackboard(masterData.blackboard);
+				if (blackboard.isFirstInstance)
+					blackboardInitialzier?.InitializeFirstInstance(blackboard);
+				blackboardInitialzier?.InitializeAllInstance(blackboard);
+
+				foreach (var node in masterData.m_nodes)
 				{
 					m_nodes.Add(node.Clone(aiAgent, this));
 					m_nodesKeyGuid.Add(node.guid, m_nodes.Back());
@@ -122,14 +127,9 @@ namespace AI
 				}
 
 				rootNode = m_nodes[0] as Node.RootNode;
-				blackboard = new Blackboard(masterData.blackboard);
 
 				if (rootNode.OnEnable() == EnableResult.Failed)
 					throw new System.InvalidOperationException("Behavior tree data copy failed.");
-
-				if (blackboard.isFirstInstance)
-					blackboardInitialzier?.InitializeFirstInstance(blackboard);
-				blackboardInitialzier?.InitializeAllInstance(blackboard);
 			}
 		}
 	}

@@ -123,6 +123,7 @@ namespace AI
 				Blackboard first = m_instances[instanceKey][0];
 				bool isExists = m_instances[instanceKey].Count > 1;
 				this.instanceKey = instanceKey;
+				this.isFirstInstance = false;
 
 				for (int i = 0; i < classNameIndexes.Count; ++i)
 				{

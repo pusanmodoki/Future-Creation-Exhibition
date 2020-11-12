@@ -6,7 +6,7 @@ using AI.BehaviorTree.Node;
 
 namespace AI
 {
-	[DisallowMultipleComponent, RequireComponent(typeof(Rigidbody)),
+	[DisallowMultipleComponent, DefaultExecutionOrder(-1), RequireComponent(typeof(Rigidbody)),
 		RequireComponent(typeof(NavMeshAgent))]
 	public class AIAgent : MonoBehaviour
 	{

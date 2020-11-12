@@ -17,11 +17,19 @@ namespace AI
 
 				public override EnableResult OnEnable()
 				{
-					if (childrenNodes.Count == 0 || !childrenNodes[0].isAllTrueDecorators
-						|| childrenNodes[m_selectIndex].OnEnable() == EnableResult.Failed)
-						return EnableResult.Failed;
-					
-					return EnableResult.Success;
+					if (childrenNodes.Count == 0) return EnableResult.Failed;
+
+					for (int i = 0; i < childrenNodes.Count; ++i)
+					{
+						if (childrenNodes[i].isAllTrueDecorators
+							&& childrenNodes[i].OnEnable() == EnableResult.Success)
+						{
+							m_selectIndex = i;
+							return EnableResult.Success;
+						}
+					}
+
+					return EnableResult.Failed;
 				}
 				public override void OnDisable(UpdateResult result) { }
 
@@ -53,7 +61,7 @@ namespace AI
 				public override BaseNode Clone(AIAgent agnet, BehaviorTree behaviorTree)
 				{
 					var result = new RootNode();
-					result.CloneBase(this);
+					result.CloneBase(behaviorTree, this);
 					return result;
 				}
 

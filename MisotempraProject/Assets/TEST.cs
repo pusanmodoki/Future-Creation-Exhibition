@@ -5,6 +5,9 @@ using AI.BehaviorTree;
 
 public class TEST : MonoBehaviour
 {
+	[SerializeField]
+	TimeManagement.TimeLayer timeLayer = null;
+
     // Start is called before the first frame update
     void Start()
     {

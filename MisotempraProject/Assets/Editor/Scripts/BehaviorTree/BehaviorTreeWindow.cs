@@ -56,7 +56,7 @@ namespace Editor
 			}
 
 			/// <summary>Open</summary>
-			[MenuItem("Window/Behavior tree/BT Editor")]
+			[MenuItem("Window/Behavior tree Editor")]
 			static void Open()
 			{
 				//インスタンス作成

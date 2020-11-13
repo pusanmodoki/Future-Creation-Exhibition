@@ -72,18 +72,31 @@ namespace Editor
 		static void Open()
 		{
 			//インスタンス作成
-			if (instance == null)
-				instance = CreateInstance<TimeLayerWindow>();
+			if (instance != null)
+			{
+				var window = CreateInstance<TimeLayerWindow>();
+				window.titleContent = new GUIContent("TimeLayer Editor");
+
+				//ロード->表示
+				window?.Load();
+				window?.Show();
+			}
+			else
+			{
+				instance.Show();
+			}
+		}
+
+		void OnEnable()
+		{
+			instance = this;
+
 			//コールバック追加
 			if (!m_isAddSaveCallback)
 			{
 				EditorApplication.playModeStateChanged += SaveCallaback;
 				m_isAddSaveCallback = true;
 			}
-
-			//ロード->表示
-			instance.Load();
-			instance.Show();
 		}
 
 		/// <summary>OnGUI</summary>
@@ -135,8 +148,8 @@ namespace Editor
 		static void SaveCallaback(PlayModeStateChange change)
 		{
 			//プレイモードになった場合セーブを行う
-			if (change == PlayModeStateChange.EnteredPlayMode)
-				instance.Save();
+			if (change == PlayModeStateChange.ExitingEditMode)
+				instance?.Save();
 		}
 
 

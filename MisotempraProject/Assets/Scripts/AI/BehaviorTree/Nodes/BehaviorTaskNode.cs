@@ -26,14 +26,17 @@ namespace AI
 
 
 				public BaseTask task { get; private set; } = null;
+
 				static Dictionary<string, TaskInfo> m_taskDataKeyGuid = new Dictionary<string, TaskInfo>();
+
+				BaseTask m_subsequentTask = null;
 
 				public override EnableResult OnEnable()
 				{
 					if (!isAllTrueDecorators)
 						return EnableResult.Failed;
 
-					aiAgent.RegisterTask(this);
+					thisTree.RegisterTask(this);
 					foreach (var e in services) e.OnEnable();
 
 					return task.OnEnale();
@@ -41,22 +44,55 @@ namespace AI
 
 				public override void OnDisable(UpdateResult result)
 				{
-					aiAgent.UnregisterTask();
-					task.OnQuit(result);
+					if (result != UpdateResult.ForceReschedule)
+					{
+						m_subsequentTask?.OnQuit(result);
+						thisTree.UnregisterTask();
+					}
+					else
+					{
+						if (m_subsequentTask == null)
+							task.OnQuit(UpdateResult.ForceReschedule);
+						else
+							m_subsequentTask.OnQuit(UpdateResult.ForceReschedule);
+					}
+
+					m_subsequentTask = null;
 				}
 
 				public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 				{
 					if (!isAllTrueDecorators)
 						return UpdateResult.Failed;
+					if (m_subsequentTask != null)
+						return m_subsequentTask.Update();
 
 					foreach (var e in services) e.Update(agent, blackboard);
-					return task.Update();
+
+					var updateResult = task.Update();
+					if (updateResult != UpdateResult.Run)
+					{
+						task.OnQuit(updateResult);
+
+						if (task.subsequentTaskKey != null &&
+							task.behaviorTree.subsequentTasks[task.subsequentTaskKey].OnEnale() == EnableResult.Success)
+						{
+							m_subsequentTask = task.behaviorTree.subsequentTasks[task.subsequentTaskKey];
+							return UpdateResult.Run;
+						}
+						else return updateResult;
+					}
+					return updateResult;
 				}
 
 				public void FixedUpdate()
 				{
-					task.FixedUpdate();
+					if (m_subsequentTask != null)
+					{
+						m_subsequentTask.FixedUpdate();
+						return;
+					}
+					else task.FixedUpdate();
 				}
 
 				public override void Load(BaseCashContainer container, Blackboard blackboard)

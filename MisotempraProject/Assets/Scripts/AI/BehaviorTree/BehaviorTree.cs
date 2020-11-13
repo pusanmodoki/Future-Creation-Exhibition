@@ -18,16 +18,34 @@ namespace AI
 #endif
 
 			public ReadOnlyCollection<Node.Detail.BaseNode> nodes { get; private set; } = null;
+			public ReadOnlyDictionary<string, BaseTask> subsequentTasks { get; private set; } = null;
 			public Node.RootNode rootNode { get; private set; } = null;
 			public AIAgent aiAgent { get; private set; } = null;
 			public Blackboard blackboard { get; private set; } = null;
 			public string fileName { get; private set; } = "";
 			public bool isLoaded { get { return m_masterDatum.ContainsKey(fileName); } }
 
-			public BehaviorTree() { nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes); }
+			static Dictionary<string, BehaviorTree> m_masterDatum = new Dictionary<string, BehaviorTree>();
+
+			List<Node.Detail.BaseNode> m_nodes = new List<Node.Detail.BaseNode>();
+			Dictionary<string, Node.Detail.BaseNode> m_nodesKeyGuid = new Dictionary<string, Node.Detail.BaseNode>();
+
+			Dictionary<string, BaseTask> m_subsequentTasks = new Dictionary<string, BaseTask>();
+			List<CashContainer.Detail.SubsequentTaskInfomations> m_subsequentTaskInfos = null;
+			Node.TaskNode m_nowTask = null;
+
+			public void RegisterTask(Node.TaskNode node) { m_nowTask = node; }
+			public void UnregisterTask() { m_nowTask = null; }
+
+			public BehaviorTree()
+			{
+				nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes);
+				subsequentTasks = new ReadOnlyDictionary<string, BaseTask>(m_subsequentTasks);
+			}
 			public BehaviorTree(string fileName, AIAgent aiAgent, BaseBlackboardInitialzier blackboardInitialzier)
 			{
 				nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes);
+				subsequentTasks = new ReadOnlyDictionary<string, BaseTask>(m_subsequentTasks);
 				this.aiAgent = aiAgent;
 				if (m_masterDatum.ContainsKey(fileName))
 					LoadMasterData(m_masterDatum[fileName], aiAgent, blackboardInitialzier);
@@ -39,19 +57,26 @@ namespace AI
 				}
 			}
 
-			static Dictionary<string, BehaviorTree> m_masterDatum = new Dictionary<string, BehaviorTree>();
-
-			List<Node.Detail.BaseNode> m_nodes = new List<Node.Detail.BaseNode>();
-			Dictionary<string, Node.Detail.BaseNode> m_nodesKeyGuid = new Dictionary<string, Node.Detail.BaseNode>();
+			public void OnDestroy()
+			{
+				blackboard?.OnDestroy();
+				rootNode?.OnDisable(UpdateResult.Success);
+			}
 
 			public void Update()
 			{
-				if (rootNode != null) rootNode.Update(aiAgent, blackboard);
+				rootNode?.Update(aiAgent, blackboard);
 			}
-			public void OnDestroy()
+			public void FixedUpdate()
 			{
-				if (blackboard != null) blackboard.OnDestroy();
-				if (rootNode != null) rootNode.OnDisable(UpdateResult.Success);
+				m_nowTask?.FixedUpdate();
+			}
+			public void ForceReschedule()
+			{
+				m_nowTask?.OnDisable(UpdateResult.ForceReschedule);
+				m_nowTask = null;
+
+				rootNode.OnEnable();
 			}
 
 			public static void LoadBehaviorTree(string fileName)
@@ -65,9 +90,16 @@ namespace AI
 				FileAccess.FileAccessor.LoadObject(dataSavePath, fileName, out loadList, cFileBeginMark);
 				instance.fileName = fileName;
 
-				var blackboardCash = (loadList[0] as CashContainer.RootCashContainer).blackbord;
-				instance.blackboard = new Blackboard(fileName, blackboardCash.classNameIndexes,
-					blackboardCash.keys, blackboardCash.memos, blackboardCash.isShareds);
+				{
+					var root = (loadList[0] as CashContainer.RootCashContainer);
+					var blackboardCash = root.blackbord;
+					instance.blackboard = new Blackboard(fileName, blackboardCash.classNameIndexes,
+						blackboardCash.keys, blackboardCash.memos, blackboardCash.isShareds);
+
+					instance.m_subsequentTaskInfos = new List<CashContainer.Detail.SubsequentTaskInfomations>();
+					foreach (var task in root.subsequentTasks)
+						instance.m_subsequentTaskInfos.Add(task);
+				}
 
 				foreach (var container in loadList)
 				{
@@ -108,6 +140,10 @@ namespace AI
 				if (blackboard.isFirstInstance)
 					blackboardInitialzier?.InitializeFirstInstance(blackboard);
 				blackboardInitialzier?.InitializeAllInstance(blackboard);
+
+				foreach(var task in masterData.m_subsequentTaskInfos)
+					m_subsequentTasks.Add(task.key,
+						(BaseTask)JsonUtility.FromJson(task.jsonData, System.Type.GetType(task.className)));
 
 				foreach (var node in masterData.m_nodes)
 				{

@@ -45,7 +45,7 @@ namespace Editor
 
 				bool ISearchWindowProvider.OnSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
 				{
-					m_editor.CreateTaskCallback(searchTreeEntry);	
+					m_editor.CreateTaskCallback(searchTreeEntry);
 					return true;
 				}
 			}

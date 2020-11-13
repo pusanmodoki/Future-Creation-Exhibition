@@ -94,14 +94,17 @@ namespace Editor
 			public void CheckSaveReady()
 			{
 				var list = nodes.ToList();
-				foreach (var node in list)
+				for (int i = 0; i < list.Count; ++i)
 				{
-					if (!cashContainersKeyNode.ContainsKey(node))
+					var cast = cashContainersKeyNode[list[i]] as RootCashContainer;
+
+					if (!cashContainersKeyNode.ContainsKey(list[i]))
 						continue;
-					if (!cashContainersKeyNode[node].isSaveReady)
-						node.titleContainer.style.backgroundColor = m_cNotSaveReadyColor;
+					if (!cashContainersKeyNode[list[i]].isSaveReady ||
+						(cast != null && (!cast.isSubsequentTaskSaveReady | !cast.isBlackboardSaveReady)))
+						list[i].titleContainer.style.backgroundColor = m_cNotSaveReadyColor;
 					else
-						node.titleContainer.style.backgroundColor = cNodeColors[cashContainersKeyNode[node].nodeName];
+						list[i].titleContainer.style.backgroundColor = cNodeColors[cashContainersKeyNode[list[i]].nodeName];
 				}
 			}
 
@@ -421,10 +424,6 @@ namespace Editor
 				{
 					Node node = (Node)(System.Activator.CreateInstance(System.Type.GetType(loadList[i].editNodeClassName), this));
 					node.userData = loadList[i].nodeName;
-					if (loadList[i].isSaveReady)
-						node.titleContainer.style.backgroundColor = cNodeColors[loadList[i].nodeName];
-					else
-						node.titleContainer.style.backgroundColor = m_cNotSaveReadyColor;
 					AddElement(node);
 
 					Rect position = node.GetPosition();
@@ -438,6 +437,7 @@ namespace Editor
 					nodesKeyGuid.Add(loadList[i].guid, node);
 				}
 				TitleBuild(nodesKeyGuid, cashContainers[0].guid, 0, true);
+				CheckSaveReady();
 
 				foreach(var cash in cashContainers)
 				{

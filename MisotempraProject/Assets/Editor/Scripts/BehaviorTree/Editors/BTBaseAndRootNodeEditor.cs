@@ -25,6 +25,7 @@ namespace Editor
 					public SerializedProperty childrenNodesGuid { get; private set; }
 					public SerializedProperty decoratorClasses { get; private set; }
 					public SerializedProperty serviceClasses { get; private set; }
+					public SerializedProperty subsequentTasks { get; private set; }
 					public SerializedProperty taskToJson { get; private set; }
 					public SerializedProperty taskClassName { get; private set; }
 					public SerializedProperty finishMode { get; private set; }
@@ -39,6 +40,7 @@ namespace Editor
 						childrenNodesGuid = m_this.thisContainer.FindPropertyRelative("m_childrenNodesGuid");
 						decoratorClasses = m_this.thisContainer.FindPropertyRelative("m_decoratorClasses");
 						serviceClasses = m_this.thisContainer.FindPropertyRelative("m_serviceClasses");
+						subsequentTasks = m_this.thisContainer.FindPropertyRelative("m_subsequentTasks");
 						taskToJson = m_this.thisContainer.FindPropertyRelative("m_taskToJson");
 						taskClassName = m_this.thisContainer.FindPropertyRelative("m_taskClassName");
 						finishMode = m_this.thisContainer.FindPropertyRelative("m_finishMode");
@@ -135,7 +137,24 @@ namespace Editor
 					{
 						m_this.m_probabilitysList.list.DoLayoutList();
 					}
-					
+					public void DrawSubsequentTasks()
+					{
+						m_this.m_subsequentTaskList.list.DoLayoutList();
+						if (m_this.m_subsequentTaskProperty != null)
+						{
+							EditorGUILayout.LabelField("Select task inspector");
+
+							//m_this.m_subsequentTaskEditor.serializedObject.Update();
+							m_this.m_subsequentTaskEditor.OnInspectorGUI();
+							//m_this.m_subsequentTaskEditor.serializedObject.ApplyModifiedProperties();
+
+							m_this.m_subsequentTaskProperty.stringValue = JsonUtility.ToJson(m_this.m_subsequentTask);
+							m_this.m_subsequentTaskProperty.serializedObject.ApplyModifiedProperties();
+
+							EditorGUILayout.Space();
+						}
+					}
+
 					BTBaseNodeEditor m_this;
 				}
 
@@ -149,6 +168,7 @@ namespace Editor
 				ReorderableLists.ServiceList m_servicesList = null;
 				ReorderableLists.DecoratorList	 m_decoratorsList = null;
 				ReorderableLists.ProbabilityList m_probabilitysList = null;
+				ReorderableLists.SubsequentTaskList m_subsequentTaskList = null;
 
 				AI.BehaviorTree.BaseTask m_task = null;
 				UnityEngine.ScriptableObject m_taskScriptableObject = null;
@@ -164,6 +184,11 @@ namespace Editor
 				UnityEditor.Editor m_decoratorEditor = null;
 				SerializedProperty m_decoratorProperty = null;
 
+				AI.BehaviorTree.BaseTask m_subsequentTask = null;
+				UnityEngine.ScriptableObject m_subsequentTaskObject = null;
+				UnityEditor.Editor m_subsequentTaskEditor = null;
+				SerializedProperty m_subsequentTaskProperty = null;
+
 
 				public void Initialize(BehaviorTreeNodeView view)
 				{
@@ -176,6 +201,8 @@ namespace Editor
 						m_decoratorsList = new ReorderableLists.DecoratorList(this, propertys.decoratorClasses, typeof(AI.BehaviorTree.BaseDecorator), "Decorators");
 					if (propertys.probabilitys != null)
 						m_probabilitysList = new ReorderableLists.ProbabilityList(this);
+					if (propertys.subsequentTasks != null)
+						m_subsequentTaskList = new ReorderableLists.SubsequentTaskList(this, propertys.subsequentTasks, typeof(AI.BehaviorTree.BaseTask), "Subsequent tasks");
 
 					if (propertys.taskClassName != null && propertys.taskClassName.stringValue.Length > 0)
 					{
@@ -245,6 +272,26 @@ namespace Editor
 					m_decoratorEditor = null;
 				}
 
+				public void SelectSubsequentTask(string className, SerializedProperty property)
+				{
+					m_subsequentTaskProperty = property;
+
+					if (property.stringValue.Length == 0)
+						m_subsequentTask = (AI.BehaviorTree.BaseTask)System.Activator.CreateInstance(TypeExtension.FindTypeInAllAssembly(className));
+					else
+						m_subsequentTask = (AI.BehaviorTree.BaseTask)JsonUtility.FromJson(property.stringValue, TypeExtension.FindTypeInAllAssembly(className));
+
+					TaskScriptableObjects.TaskScriptableObjectClassMediator.CreateEditorAndScriptableObject(
+							m_subsequentTask, out m_subsequentTaskEditor, out m_subsequentTaskObject, className);
+				}
+				public void UnselectSubsequentTask()
+				{
+					m_subsequentTask = null;
+					m_subsequentTaskProperty = null;
+					m_subsequentTaskObject = null;
+					m_subsequentTaskEditor = null;
+				}
+
 				public void CreateTaskCallback(SearchTreeEntry searchTreeEntry)
 				{
 					serializedObject.Update();
@@ -279,11 +326,9 @@ namespace Editor
 
 					functions.DrawMemo();
 					functions.DrawChildrensList();
-					EditorGUILayout.Space(15.0f);
+					functions.DrawSubsequentTasks();
 
 					serializedObject.ApplyModifiedProperties();
-
-					EditorUtility.SetDirty(target);
 				}
 			}
 		}

@@ -46,7 +46,7 @@ namespace AI
 					public string jsonData { get { return m_jsonData; } }
 					public string guid { get { return m_guid; } }
 
-					public DecoratorInfomations(string className, float callInterval, string jsonData, string guid)
+					public DecoratorInfomations(string className, string jsonData, string guid)
 					{
 						m_className = className;
 						m_jsonData = jsonData;
@@ -59,6 +59,31 @@ namespace AI
 					string m_jsonData;
 					[SerializeField]
 					string m_guid;
+				}
+				[System.Serializable]
+				public struct SubsequentTaskInfomations
+				{
+					public string className { get { return m_className; } }
+					public string jsonData { get { return m_jsonData; } }
+					public string guid { get { return m_guid; } }
+					public string key { get { return m_key; } }
+
+					public SubsequentTaskInfomations(string className, string jsonData, string guid, string key)
+					{
+						m_className = className;
+						m_jsonData = jsonData;
+						m_guid = guid;
+						m_key = key;
+					}
+
+					[SerializeField]
+					string m_className;
+					[SerializeField]
+					string m_jsonData;
+					[SerializeField]
+					string m_guid;
+					[SerializeField]
+					string m_key;
 				}
 
 
@@ -102,7 +127,8 @@ namespace AI
 			{
 				public BlackboardCashContainer blackbord { get { return m_blackboard; } set { m_blackboard = value; } }
 				public List<string> childrenNodesGuid { get { return m_childrenNodesGuid; } }
-				
+				public List<Detail.SubsequentTaskInfomations> subsequentTasks { get { return m_subsequentTasks; } }
+
 				public override bool isSaveReady { get { return true; } }
 
 				public bool isBlackboardSaveReady
@@ -120,10 +146,27 @@ namespace AI
 					}
 				}
 
+				public bool isSubsequentTaskSaveReady
+				{
+					get
+					{
+						HashSet<string> names = new HashSet<string>();
+						foreach (var e in m_subsequentTasks)
+						{
+							if (e.key.Length == 0) return false;
+							else if (names.Contains(e.key)) return false;
+							names.Add(e.key);
+						}
+						return true;
+					}
+				}
+
 				[SerializeField]
 				BlackboardCashContainer m_blackboard = new BlackboardCashContainer();
 				[SerializeField]
 				List<string> m_childrenNodesGuid = new List<string>();
+				[SerializeField]
+				List<Detail.SubsequentTaskInfomations> m_subsequentTasks = new List<Detail.SubsequentTaskInfomations>();
 			}
 
 			[System.Serializable]

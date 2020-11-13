@@ -23,10 +23,6 @@ namespace AI
 		[SerializeField]
 		Rigidbody m_rigidbody = null;
 
-		TaskNode m_nowTask = null;
-
-		public void RegisterTask(TaskNode node) { m_nowTask = node; }
-		public void UnregisterTask() { m_nowTask = null; }
 
 		void OnEnable()
 		{
@@ -39,7 +35,6 @@ namespace AI
 		}
 		void FixedUpdate()
 		{
-			if (m_nowTask != null) m_nowTask.FixedUpdate();
 		}
 	}
 }

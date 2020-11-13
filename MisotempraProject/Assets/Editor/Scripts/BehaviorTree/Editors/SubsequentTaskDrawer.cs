@@ -12,17 +12,17 @@ namespace Editor
 		/// <summary>Editor classes</summary>
 		namespace NodeEditor
 		{
-			[CustomPropertyDrawer(typeof(AI.BehaviorTree.CashContainer.Detail.ServiceInfomations))]
-			public class BTServiceDrawer : PropertyDrawer
+			[CustomPropertyDrawer(typeof(AI.BehaviorTree.CashContainer.Detail.SubsequentTaskInfomations))]
+			public class BTSubsequentTaskDrawer : PropertyDrawer
 			{
 				public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 				{
 					position.height = EditorGUIUtility.singleLineHeight;
 					EditorGUI.LabelField(position, property.FindPropertyRelative("m_className").stringValue);
-					position.position = position.position + new Vector2(0, EditorGUIUtility.singleLineHeight + 2);
+					position.y += EditorGUIUtility.singleLineHeight;
 
-					var useProperty = property.FindPropertyRelative("m_callInterval");
-					useProperty.floatValue = EditorGUI.Slider(position, " >call interval", useProperty.floatValue, 0.0f, 10.0f);
+					var useProperty = property.FindPropertyRelative("m_key");
+					useProperty.stringValue = EditorGUI.TextField(position, " >call key", useProperty.stringValue);
 				}
 			}
 		}

@@ -17,6 +17,7 @@ namespace AI
 			Run,
 			Success,
 			Failed,
+			ForceReschedule,
 		}
 		namespace Node
 		{

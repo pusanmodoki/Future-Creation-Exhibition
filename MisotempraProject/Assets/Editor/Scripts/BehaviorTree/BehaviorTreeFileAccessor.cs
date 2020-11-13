@@ -44,21 +44,29 @@ namespace Editor
 				var root = nodeView.cashContainers[0] as RootCashContainer;
 				List<string> throws = new List<string>();
 				bool isBlackbordThrow = false;
+				bool isSubsequentTaskThrow = false;
 
 				root.blackbord = nodeView.blackboradCashContainer;
 				if (!root.isBlackboardSaveReady)
 					isBlackbordThrow = true;
+				if (!root.isSubsequentTaskSaveReady)
+					isSubsequentTaskThrow = true;
 
 				foreach (var cash in nodeView.cashContainers)
 					if (!cash.isSaveReady)
 						throws.Add(cash.nodeName + "node");
 
-				if (throws.Count > 0 || isBlackbordThrow)
+				if (throws.Count > 0 || isBlackbordThrow | isSubsequentTaskThrow)
 				{
 					string str = "Not save ready. Cause";
 
-					if (isBlackbordThrow)
-						str += ": Blackbord contents,\n";
+					if (isBlackbordThrow | isSubsequentTaskThrow)
+					{
+						str += ": ";
+						if (isBlackbordThrow) str += ": Blackbord contents, ";
+						if (isSubsequentTaskThrow) str += ": Subsequent task contents, ";
+						str += "\n";
+					}
 					else str += "↓\n";
 
 					for (int i = 0; i < throws.Count; ++i)
@@ -70,7 +78,6 @@ namespace Editor
 
 					throw new System.InvalidOperationException(str);
 				}
-
 
 				var saveList = nodeView.cashContainers;
 				FileAccess.FileAccessor.SaveObject(AI.BehaviorTree.BehaviorTree.dataSavePath, nodeView.fileName, 

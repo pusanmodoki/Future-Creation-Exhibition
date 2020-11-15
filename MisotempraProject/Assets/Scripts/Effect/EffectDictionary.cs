@@ -56,6 +56,7 @@ public class EffectDictionary : MonoBehaviour
 
     public void PlayEffect(string name)
     {
+        ProcessingLoadManager.instance.AddProcessingGauge(10.0f);
         effectDictionary[name].Play();
     }
 

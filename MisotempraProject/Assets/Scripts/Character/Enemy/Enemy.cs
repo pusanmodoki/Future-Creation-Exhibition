@@ -56,17 +56,6 @@ public class Enemy : MonoBehaviour
 
     private void FixedUpdate()
     {
-        switch (m_state)
-        {
-            case State.Searching:
-                Vector3 vec = m_player.position - transform.position;
-                vec.Normalize();
-                vec *= m_speed * m_timeLayer.fixedDeltaTime;
-                m_rigidbody.velocity = vec;
-                break;
-
-
-        }
     }
 
     private IEnumerator CheckArmorState()

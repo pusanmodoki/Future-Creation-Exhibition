@@ -135,7 +135,7 @@ public class ProcessingLoadManager : MonoBehaviour
             case gaugeState.Caution:
                 plPercentText.color = orange;
                 gaugeFillImage.color = orange;
-                m_timeLayer.SetTimeScale(0.5f);
+                m_timeLayer.SetTimeScale(0.2f);
                 break;
             case gaugeState.Stable:
                 plPercentText.color = green;

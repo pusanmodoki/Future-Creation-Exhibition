@@ -80,6 +80,21 @@ namespace Editor
 					var key = m_keys.GetArrayElementAtIndex(i);
 					string title = "Element[" + i + "] :  ";
 					string keyString = key.stringValue;
+
+					if (!m_keyNamesDictionary.ContainsKey(keyString))
+					{
+						m_keyNamesDictionary.Clear();
+						for (int k = 0; k < m_classeNameIndexes.arraySize; ++k)
+						{
+							var element = m_keys.GetArrayElement(i);
+							string elementKey = element.stringValue;
+
+							if (!m_keyNamesDictionary.ContainsKey(elementKey))
+								m_keyNamesDictionary.Add(elementKey, new List<SerializedProperty>());
+							m_keyNamesDictionary[elementKey].Add(element);
+						}
+					}
+
 					bool isKeyEmpty = keyString.Length == 0;
 					bool isExists = m_keyNamesDictionary[keyString].Count > 1;
 					GUIStyle style = EditorStyles.foldout;
@@ -160,8 +175,6 @@ namespace Editor
 						m_keyNamesDictionary.Add(property.stringValue, new List<SerializedProperty>());
 					m_keyNamesDictionary[property.stringValue].Add(property);
 				}
-
-				EditorUtility.SetDirty(target);
 			}
 
 			void AddElement(List<SerializedProperty> keysTemp)

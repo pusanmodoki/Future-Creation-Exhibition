@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-
+using InputManagement;
 
 /// <summary>MisoTempra editor</summary>
 namespace Editor
@@ -15,11 +15,15 @@ namespace Editor
 		{
 			public static InputEditorWindow instance { get; private set; } = null;
 
-			static string m_cFileName = "InputManagement";
 			static bool m_isAddSaveCallback = false;
 
-			InputCashContainer m_cashContainer = new InputCashContainer();
+			InputCashContainer m_cashContainer = null;
+			InputScriptableObject m_inputScriptableObject = null;
 			Vector2 m_scrollPosition = Vector2.zero;
+			bool m_isFoldoutKeyCode = false;
+			bool m_isFoldoutKeyCodeNormalKeys = false;
+			bool[] m_isFoldoutKeyCodeJoysticks = null;
+			bool m_isFoldoutAxisCode = false;
 
 			/// <summary>Open</summary>
 			[MenuItem("Window/Input Management")]
@@ -29,16 +33,13 @@ namespace Editor
 				if (instance == null)
 				{
 					var window = CreateInstance<InputEditorWindow>();
-					window.titleContent = new GUIContent("TimeLayer Editor");
+					window.titleContent = new GUIContent("GameInput Editor");
 
-					//ロード->表示
-					window?.Load();
+					//表示
 					window?.Show();
 				}
 				else
-				{
 					instance.Show();
-				}
 			}
 
 			void OnEnable()
@@ -51,38 +52,116 @@ namespace Editor
 					EditorApplication.playModeStateChanged += SaveCallaback;
 					m_isAddSaveCallback = true;
 				}
+
+				Load();
+			}
+			void OnDisable()
+			{
+				if (instance == this)
+					Save(true);
 			}
 
 			void OnGUI()
 			{
-				using (var scrollViewScope = new GUILayout.ScrollViewScope(m_scrollPosition))
-				{
-					m_scrollPosition = scrollViewScope.scrollPosition;
+				m_scrollPosition = EditorGUILayout.BeginScrollView(m_scrollPosition);
 
-				//	for (int i = 0; i < m_enumNames.Length - 1; ++i)
-				//	{
-				//		if (i % 3 == 0) EditorGUILayout.BeginHorizontal();
-				//		EditorGUILayout.Toggle(m_enumNames[i + 1], false);
-				//		if (i % 3 == 2) EditorGUILayout.EndHorizontal();
-				//	}
-				//	if ((m_enumNames.Length - 1) % 3 != 2)
-				//		EditorGUILayout.EndHorizontal();
+				EditorGUILayout.Space();
+				{
+					GUIStyle style = new GUIStyle(EditorStyles.label);
+					style.fontSize = 20;
+					style.fontStyle = FontStyle.Bold;
+					EditorGUILayout.LabelField("Game Input Management", style);
 				}
+
+				EditorGUI.BeginChangeCheck();
+
+				EditorGUILayout.Space(20);
+				m_isFoldoutKeyCode = EditorGUILayout.Foldout(m_isFoldoutKeyCode, "Enable key codes", true);
+				if (m_isFoldoutKeyCode)
+				{
+					using (new EditorGUI.IndentLevelScope())
+					{
+						OnGUIKeyCodes();
+					}
+				}
+
+				EditorGUILayout.Space(10);
+				m_isFoldoutAxisCode = EditorGUILayout.Foldout(m_isFoldoutAxisCode, "Enable input axes", true);
+				if (m_isFoldoutAxisCode)
+				{
+					using (new EditorGUI.IndentLevelScope())
+					{
+						OnGUIAxes();
+					}
+				}
+
+				if (EditorGUI.EndChangeCheck())
+				{
+					Save(false);
+				}
+
+				EditorGUILayout.Space(10);
+				using (new EditorGUILayout.HorizontalScope())
+				{
+					GUILayout.FlexibleSpace();
+
+					GUIStyle style = new GUIStyle(EditorStyles.miniButton);
+					style.fontSize = 14;
+
+					if (GUILayout.Button("          Reload          ", style))
+					{
+						m_cashContainer = null;
+
+						try
+						{
+							Load();
+							Debug.Log("GameInput Editor reload completed.");
+						}
+						catch (System.Exception e)
+						{
+							Debug.LogError("GameInput Editor reload failed.\n message: " + e.Message);
+						}
+					}
+
+					if (GUILayout.Button("          Save(Auto-save is enabled.)          ", style))
+						Save(true);
+				}
+
+				EditorGUILayout.EndScrollView();
 			}
 
 			void Load()
 			{
-				//var s = $"{}"
-				//if (!File.Exists(Application.streamingAssetsPath + "/Input/" + m_cFileName ))
+				if (!File.Exists($"{Application.streamingAssetsPath }/Input/{GameInput.cFileName}.dat"))
+				{
+					m_cashContainer = new InputCashContainer();
+					m_cashContainer.EditFirstInitializeEnums();
+				}
+				else
+				{
+					FileAccess.FileAccessor.LoadObject(Application.streamingAssetsPath + "/Input", GameInput.cFileName,
+						out m_cashContainer, GameInput.cFileBeginMark);
+					m_cashContainer.EditBuildAxes();
+				}
 
-				//FileAccess.FileAccessor.LoadObject(Application.streamingAssetsPath + "/Input", m_cFileName)
-				//LoadInputManager("ProjectSettings/InputManager.asset");
+				LoadInputManager("ProjectSettings/InputManager.asset");
+
+				{
+					var temp = m_isFoldoutKeyCodeJoysticks;
+					m_isFoldoutKeyCodeJoysticks = new bool[m_cashContainer.joystickIndexes.Length];
+
+					for (int i = 0; i < m_isFoldoutKeyCodeJoysticks.Length; ++i)
+						m_isFoldoutKeyCodeJoysticks[i] = temp != null && temp.Length > i ? temp[i] : false;
+				}
+
+				m_inputScriptableObject = CreateInstance<InputScriptableObject>();
+				m_inputScriptableObject.Initialize(m_cashContainer);
 			}
 			public void LoadInputManager(string path)
 			{
 				// InputManagerの設定情報読み込み
 				var serializedObject = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(path)[0]);
-				m_cashContainer.ReloadAxes(serializedObject.FindProperty("m_Axes"));
+				m_cashContainer.EditReloadAxes(serializedObject.FindProperty("m_Axes"));
 			}
 
 			/// <summary>EditorApplication用コールバック</summary>
@@ -90,13 +169,114 @@ namespace Editor
 			{
 				//プレイモードになった場合セーブを行う
 				if (change == PlayModeStateChange.ExitingEditMode)
-					instance?.Save();
+					instance?.Save(true);
 			}
 
-			void Save()
+			void Save(bool isDrawLog)
 			{
+				if (m_cashContainer == null) return;
 
+				m_cashContainer.SaveConvert();
+				try
+				{
+					FileAccess.FileAccessor.SaveObject(Application.streamingAssetsPath + "/Input",
+						GameInput.cFileName, ref m_cashContainer, GameInput.cFileBeginMark);
+					if (isDrawLog) Debug.Log("GameInput Editor save completed.");
+				}
+				catch(System.Exception e)
+				{
+					Debug.LogError("GameInput Editor save failed.\n message: " + e.Message);
+				}
 			}
+
+			void OnGUIKeyCodes()
+			{
+				m_isFoldoutKeyCodeNormalKeys = 
+					EditorGUILayout.Foldout(m_isFoldoutKeyCodeNormalKeys, "Normal key codes", true);
+
+				if (m_isFoldoutKeyCodeNormalKeys)
+				{
+					using (new EditorGUI.IndentLevelScope())
+					{
+						using (new EditorGUILayout.HorizontalScope())
+						{
+							bool temp = false;
+							for (int group = 0; group < 3; ++group)
+							{
+								using (new EditorGUILayout.VerticalScope())
+								{
+									for (int i = group + 1; i < m_cashContainer.joystickIndexes[0]; i += 3)
+									{
+										temp = EditorGUILayout.Toggle(m_cashContainer.enumNames[i], m_cashContainer.isEnableEnums[i]);
+										if (m_cashContainer.isEnableEnums[i] != temp)
+										{
+											Undo.RecordObject(m_inputScriptableObject, "Input changed");
+											m_cashContainer.isEnableEnums[i] = temp;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				for (int i = 0; i < m_cashContainer.joystickIndexes.Length; ++i)
+				{
+					m_isFoldoutKeyCodeJoysticks[i] = EditorGUILayout.Foldout(
+						m_isFoldoutKeyCodeJoysticks[i], "Joystick codes[" + i + "]", true);
+					if (!m_isFoldoutKeyCodeJoysticks[i]) continue;
+
+					using (new EditorGUI.IndentLevelScope())
+					{
+						int forEnd = i != m_cashContainer.joystickIndexes.Length - 1 ?
+							m_cashContainer.joystickIndexes[i + 1] : m_cashContainer.enumNames.Length - 1;
+
+						using (new EditorGUILayout.HorizontalScope())
+						{
+							bool temp = false;
+							for (int group = 0; group < 3; ++group)
+							{
+								using (new EditorGUILayout.VerticalScope())
+								{
+									for (int k = m_cashContainer.joystickIndexes[i] + group; k < forEnd; k += 3)
+									{
+										temp = EditorGUILayout.Toggle(m_cashContainer.enumNames[k], m_cashContainer.isEnableEnums[k]);
+										if (m_cashContainer.isEnableEnums[k] != temp)
+										{
+											Undo.RecordObject(m_inputScriptableObject, "Input changed");
+											m_cashContainer.isEnableEnums[k] = temp;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			void OnGUIAxes()
+			{
+				using (new EditorGUILayout.HorizontalScope())
+				{
+					bool temp = false;
+					for (int group = 0; group < 3; ++group)
+					{
+						using (new EditorGUILayout.VerticalScope())
+						{
+							for (int i = group; i < m_cashContainer.isEnableAxes.Count; i += 3)
+							{
+								temp = EditorGUILayout.Toggle(m_cashContainer.axisNames[i], m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]]);
+								if (m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]] != temp)
+								{
+									Undo.RecordObject(m_inputScriptableObject, "Input changed");
+									m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]] = temp;
+								}
+							}
+						}
+					}
+				}
+			}
+
 		}
 	}
 }

@@ -9,34 +9,37 @@ using TimeManagement.Detail;
 /// <summary>MisoTempra editor</summary>
 namespace Editor
 {
-	/// <summary>TimeLayerのドロワーを変更するTimeLayerEditor class</summary>
-	[CustomPropertyDrawer(typeof(TimeLayer))]
-	public class TimeLayerEditor : PropertyDrawer
+	namespace TimeLayer
 	{
-		/// <summary>OnGUI</summary>
-		/// <param name = "position" ></ param >
-		/// < param name="property"></param>
-		/// <param name = "label" ></ param >
-		public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+		/// <summary>TimeLayerのドロワーを変更するTimeLayerEditor class</summary>
+		[CustomPropertyDrawer(typeof(TimeManagement.TimeLayer))]
+		public class TimeLayerEditor : PropertyDrawer
 		{
-			TimeLayerWindow.IfEmptyLoading();
+			/// <summary>OnGUI</summary>
+			/// <param name = "position" ></ param >
+			/// < param name="property"></param>
+			/// <param name = "label" ></ param >
+			public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+			{
+				TimeLayerWindow.IfEmptyLoading();
 
-			var guid = property.FindPropertyRelative("m_guid");
-			string stringValue = guid.stringValue;
-			int nowValue = 0, result;
+				var guid = property.FindPropertyRelative("m_guid");
+				string stringValue = guid.stringValue;
+				int nowValue = 0, result;
 
-			if (TimeLayerWindow.layersKeyGuid.ContainsKey(stringValue))
-				nowValue = TimeLayerWindow.layerIndexesKeyGuid[stringValue];
+				if (TimeLayerWindow.layersKeyGuid.ContainsKey(stringValue))
+					nowValue = TimeLayerWindow.layerIndexesKeyGuid[stringValue];
 
-			Rect popUpRect = new Rect(
-					EditorGUIUtility.labelWidth,
-					position.y,
-					position.width - EditorGUIUtility.labelWidth,
-					EditorGUIUtility.singleLineHeight);
+				Rect popUpRect = new Rect(
+						EditorGUIUtility.labelWidth,
+						position.y,
+						position.width - EditorGUIUtility.labelWidth,
+						EditorGUIUtility.singleLineHeight);
 
-			EditorGUI.LabelField(position, property.displayName);
-			result = EditorGUI.Popup(popUpRect, nowValue, TimeLayerWindow.usePropertyLayerNames);
-			guid.stringValue = TimeLayerWindow.layers[TimeLayerWindow.saveLayers[result]].guid;
+				EditorGUI.LabelField(position, property.displayName);
+				result = EditorGUI.Popup(popUpRect, nowValue, TimeLayerWindow.usePropertyLayerNames);
+				guid.stringValue = TimeLayerWindow.layers[TimeLayerWindow.saveLayers[result]].guid;
+			}
 		}
 	}
 }

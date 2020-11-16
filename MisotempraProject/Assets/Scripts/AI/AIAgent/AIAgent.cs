@@ -17,24 +17,49 @@ namespace AI
 		[SerializeField]
 		BehaviorTree.Detail.BehaviorFileName m_fileName = null;
 		[SerializeField]
-		BehaviorTree.BaseBlackboardInitialzier m_blackboardInitialzier = null;
+		BehaviorTree.BaseBlackboardInitializer m_blackboardInitialzier = null;
 		[SerializeField]
 		NavMeshAgent m_navMeshAgent = null;
 		[SerializeField]
 		Rigidbody m_rigidbody = null;
 
 
-		void OnEnable()
+		void Awake()
 		{
 			behaviorTree = new BehaviorTree.BehaviorTree(m_fileName, this, m_blackboardInitialzier);
 		}
-
 		void Update()
 		{
 			behaviorTree.Update();
 		}
 		void FixedUpdate()
 		{
+			behaviorTree.FixedUpdate();
+		}
+
+		void OnCollisionEnter(Collision collision)
+		{
+			behaviorTree.nowTask?.task.OnCollisionEnter(collision);
+		}
+		void OnCollisionStay(Collision collision)
+		{
+			behaviorTree.nowTask?.task.OnCollisionStay(collision);
+		}
+		void OnCollisionExit(Collision collision)
+		{
+			behaviorTree.nowTask?.task.OnCollisionExit(collision);
+		}
+		void OnTriggerEnter(Collider other)
+		{
+			behaviorTree.nowTask?.task.OnTriggerEnter(other);
+		}
+		void OnTriggerStay(Collider other)
+		{
+			behaviorTree.nowTask?.task.OnTriggerStay(other);
+		}
+		void OnTriggerExit(Collider other)
+		{
+			behaviorTree.nowTask?.task.OnTriggerExit(other);
 		}
 	}
 }

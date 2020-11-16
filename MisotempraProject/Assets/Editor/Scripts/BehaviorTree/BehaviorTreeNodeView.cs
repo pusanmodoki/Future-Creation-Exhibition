@@ -96,6 +96,7 @@ namespace Editor
 				var list = nodes.ToList();
 				for (int i = 0; i < list.Count; ++i)
 				{
+					if (!cashContainersKeyNode.ContainsKey(list[i])) continue;
 					var cast = cashContainersKeyNode[list[i]] as RootCashContainer;
 
 					if (!cashContainersKeyNode.ContainsKey(list[i]))

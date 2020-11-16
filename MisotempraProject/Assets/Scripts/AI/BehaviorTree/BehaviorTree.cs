@@ -24,6 +24,7 @@ namespace AI
 			public Blackboard blackboard { get; private set; } = null;
 			public string fileName { get; private set; } = "";
 			public bool isLoaded { get { return m_masterDatum.ContainsKey(fileName); } }
+			public Node.TaskNode nowTask { get; private set; }
 
 			static Dictionary<string, BehaviorTree> m_masterDatum = new Dictionary<string, BehaviorTree>();
 
@@ -32,17 +33,16 @@ namespace AI
 
 			Dictionary<string, BaseTask> m_subsequentTasks = new Dictionary<string, BaseTask>();
 			List<CashContainer.Detail.SubsequentTaskInfomations> m_subsequentTaskInfos = null;
-			Node.TaskNode m_nowTask = null;
 
-			public void RegisterTask(Node.TaskNode node) { m_nowTask = node; }
-			public void UnregisterTask() { m_nowTask = null; }
+			public void RegisterTask(Node.TaskNode node) { nowTask = node; }
+			public void UnregisterTask() { nowTask = null; }
 
 			public BehaviorTree()
 			{
 				nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes);
 				subsequentTasks = new ReadOnlyDictionary<string, BaseTask>(m_subsequentTasks);
 			}
-			public BehaviorTree(string fileName, AIAgent aiAgent, BaseBlackboardInitialzier blackboardInitialzier)
+			public BehaviorTree(string fileName, AIAgent aiAgent, BaseBlackboardInitializer blackboardInitialzier)
 			{
 				nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes);
 				subsequentTasks = new ReadOnlyDictionary<string, BaseTask>(m_subsequentTasks);
@@ -69,12 +69,12 @@ namespace AI
 			}
 			public void FixedUpdate()
 			{
-				m_nowTask?.FixedUpdate();
+				nowTask?.FixedUpdate();
 			}
 			public void ForceReschedule()
 			{
-				m_nowTask?.OnDisable(UpdateResult.ForceReschedule);
-				m_nowTask = null;
+				nowTask?.OnDisable(UpdateResult.ForceReschedule);
+				nowTask = null;
 
 				rootNode.OnEnable();
 			}
@@ -134,7 +134,7 @@ namespace AI
 				}
 			}
 
-			public void LoadMasterData(BehaviorTree masterData, AIAgent aiAgent, BaseBlackboardInitialzier blackboardInitialzier)
+			public void LoadMasterData(BehaviorTree masterData, AIAgent aiAgent, BaseBlackboardInitializer blackboardInitialzier)
 			{
 				blackboard = new Blackboard(masterData.blackboard);
 				if (blackboard.isFirstInstance)

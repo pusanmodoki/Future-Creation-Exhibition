@@ -21,6 +21,13 @@ namespace AI
 			public abstract void FixedUpdate();
 			public abstract void OnQuit(UpdateResult result);
 
+			public virtual void OnCollisionEnter(Collision collision) { }
+			public virtual void OnCollisionStay(Collision collision) { }
+			public virtual void OnCollisionExit(Collision collision) { }
+			public virtual void OnTriggerEnter(Collider other) { }
+			public virtual void OnTriggerStay(Collider other) { }
+			public virtual void OnTriggerExit(Collider other) { }
+
 			public void InitializeBase(BehaviorTree behaviorTree, AIAgent agent)
 			{
 				aiAgent = agent;

@@ -388,7 +388,7 @@ namespace FileAccess
 			if (split.Length > readIndex && split[readIndex].Length > 0)
 			{
 				int find = split[readIndex].IndexOf("/");
-				string[] typeSplit = new string[2] { split[readIndex].Substring(0, find), split[readIndex].Substring(find + 1, split[readIndex].Length - 1) };
+				string[] typeSplit = new string[2] { split[readIndex].Substring(0, find), split[readIndex].Substring(find + 1, (split[readIndex].Length) - (find + 1)) };
 				data = (DataType)JsonUtility.FromJson(typeSplit[1], System.Type.GetType(typeSplit[0]));
 			}
 			else

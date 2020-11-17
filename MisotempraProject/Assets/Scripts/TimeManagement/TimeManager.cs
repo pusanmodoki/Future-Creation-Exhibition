@@ -11,7 +11,7 @@ namespace TimeManagement
 {
 	/// <summary>DeltaTimeを管理するTimeManager class</summary>
 	[DefaultExecutionOrder(-1000)]
-	public class TimeManager : SingletonMonoBehaviour<TimeManager>
+	public class TimeManager : Singleton.DontDestroySingletonMonoBehaviour<TimeManager>
 	{
 		/// <summary>Layer data save path</summary>
 		public static string savePath { get { return Application.streamingAssetsPath + "/Time"; } }

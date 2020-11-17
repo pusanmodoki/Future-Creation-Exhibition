@@ -63,6 +63,8 @@ namespace Editor
 
 			void OnGUI()
 			{
+				bool isChangedKey = false, isChangedAxis = false;
+
 				m_scrollPosition = EditorGUILayout.BeginScrollView(m_scrollPosition);
 
 				EditorGUILayout.Space();
@@ -73,15 +75,13 @@ namespace Editor
 					EditorGUILayout.LabelField("Game Input Management", style);
 				}
 
-				EditorGUI.BeginChangeCheck();
-
 				EditorGUILayout.Space(20);
 				m_isFoldoutKeyCode = EditorGUILayout.Foldout(m_isFoldoutKeyCode, "Enable key codes", true);
 				if (m_isFoldoutKeyCode)
 				{
 					using (new EditorGUI.IndentLevelScope())
 					{
-						OnGUIKeyCodes();
+						OnGUIKeyCodes(out isChangedKey);
 					}
 				}
 
@@ -91,11 +91,11 @@ namespace Editor
 				{
 					using (new EditorGUI.IndentLevelScope())
 					{
-						OnGUIAxes();
+						OnGUIAxes(out isChangedAxis);
 					}
 				}
 
-				if (EditorGUI.EndChangeCheck())
+				if (isChangedAxis | isChangedKey)
 				{
 					Save(false);
 				}
@@ -189,8 +189,10 @@ namespace Editor
 				}
 			}
 
-			void OnGUIKeyCodes()
+			void OnGUIKeyCodes(out bool isChanged)
 			{
+				isChanged = false;
+
 				m_isFoldoutKeyCodeNormalKeys = 
 					EditorGUILayout.Foldout(m_isFoldoutKeyCodeNormalKeys, "Normal key codes", true);
 
@@ -212,6 +214,7 @@ namespace Editor
 										{
 											Undo.RecordObject(m_inputScriptableObject, "Input changed");
 											m_cashContainer.isEnableEnums[i] = temp;
+											isChanged = true;
 										}
 									}
 								}
@@ -241,10 +244,12 @@ namespace Editor
 									for (int k = m_cashContainer.joystickIndexes[i] + group; k < forEnd; k += 3)
 									{
 										temp = EditorGUILayout.Toggle(m_cashContainer.enumNames[k], m_cashContainer.isEnableEnums[k]);
+
 										if (m_cashContainer.isEnableEnums[k] != temp)
 										{
 											Undo.RecordObject(m_inputScriptableObject, "Input changed");
 											m_cashContainer.isEnableEnums[k] = temp;
+											isChanged = true;
 										}
 									}
 								}
@@ -254,22 +259,44 @@ namespace Editor
 				}
 			}
 
-			void OnGUIAxes()
+			void OnGUIAxes(out bool isChanged)
 			{
+				isChanged = false;
+
 				using (new EditorGUILayout.HorizontalScope())
 				{
-					bool temp = false;
-					for (int group = 0; group < 3; ++group)
+					bool temp = false, read = false;
+					AxisMode temp2 = default, read2 = default;
+					for (int group = 0; group < 2; ++group)
 					{
 						using (new EditorGUILayout.VerticalScope())
 						{
-							for (int i = group; i < m_cashContainer.isEnableAxes.Count; i += 3)
+							for (int i = group; i < m_cashContainer.isEnableAxes.Count; i += 2)
 							{
-								temp = EditorGUILayout.Toggle(m_cashContainer.axisNames[i], m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]]);
-								if (m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]] != temp)
+								using (new EditorGUILayout.HorizontalScope())
 								{
-									Undo.RecordObject(m_inputScriptableObject, "Input changed");
-									m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]] = temp;
+									read = m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]];
+									temp = EditorGUILayout.ToggleLeft(m_cashContainer.axisNames[i], read);
+									if (read != temp)
+									{
+										Undo.RecordObject(m_inputScriptableObject, "Input changed");
+										m_cashContainer.isEnableAxes[m_cashContainer.axisNames[i]] = temp;
+										isChanged = true;
+									}
+
+									if (temp)
+									{
+										read2 = m_cashContainer.axisModes[m_cashContainer.axisNames[i]];
+										temp2 = (AxisMode)EditorGUILayout.EnumFlagsField(read2);
+										if (read2 != temp2)
+										{
+											Undo.RecordObject(m_inputScriptableObject, "Input changed");
+											m_cashContainer.axisModes[m_cashContainer.axisNames[i]] = temp2;
+											isChanged = true;
+										}
+									}
+									else
+										EditorGUILayout.LabelField("Axis disabled.");
 								}
 							}
 						}

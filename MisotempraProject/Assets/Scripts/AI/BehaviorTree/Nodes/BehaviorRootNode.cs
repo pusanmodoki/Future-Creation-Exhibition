@@ -19,24 +19,29 @@ namespace AI
 				{
 					if (childrenNodes.Count == 0) return EnableResult.Failed;
 
+					m_selectIndex = -1; 
 					for (int i = 0; i < childrenNodes.Count; ++i)
 					{
 						if (childrenNodes[i].isAllTrueDecorators
 							&& childrenNodes[i].OnEnable() == EnableResult.Success)
 						{
 							m_selectIndex = i;
-							return EnableResult.Success;
+							break;
 						}
 					}
 
-					return EnableResult.Failed;
+					return EnableResult.Success;
 				}
 				public override void OnDisable(UpdateResult result) { }
 
 				public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 				{
 					if (m_selectIndex == -1)
+					{
 						FindRunNode(agent);
+						if (m_selectIndex == -1)
+							return UpdateResult.Failed;
+					}
 
 					var result = childrenNodes[m_selectIndex].Update(agent, blackboard);
 					switch (result)

@@ -5,15 +5,24 @@ using UnityEngine;
 /// <summary>Input Management</summary>
 namespace InputManagement
 {
+	[System.Flags]
+	public enum AxisMode
+	{
+		Button = 1,
+		Axis = 2,
+		AxisRaw = 4,
+	}
 	[System.Serializable]
 	public class InputCashContainer
 	{
 		public string[] enumNames { get { return m_enumNames; } }
 		public string[] axisNames { get { return m_axisNames; } }
 		public bool[] isEnableEnums { get { return m_isEnableEnums; } }
+		public Dictionary<string, AxisMode> axisModes { get; private set; } = new Dictionary<string, AxisMode>();
 		public Dictionary<string, bool> isEnableAxes { get; private set; } = new Dictionary<string, bool>();
 
 		public bool[] usePlayIsEnableAxes { get { return m_isEnableAxes; } }
+		public AxisMode[] usePlayAxisModes { get { return m_axisModes; } }
 
 		public int[] joystickIndexes
 		{
@@ -44,7 +53,9 @@ namespace InputManagement
 		bool[] m_isEnableEnums = null;
 		[SerializeField]
 		bool[] m_isEnableAxes = null;
-
+		[SerializeField]
+		AxisMode[] m_axisModes = null; 
+		
 		int[] m_joystickIndexes = null;
 
 #if UNITY_EDITOR
@@ -57,10 +68,14 @@ namespace InputManagement
 		public void EditReloadAxes(UnityEditor.SerializedProperty axes)
 		{
 			Dictionary<string, bool> isEnableAxesTemp = isEnableAxes;
+			Dictionary<string, AxisMode> axisModesTemp = axisModes;
 
 			isEnableAxes = new Dictionary<string, bool>();
+			axisModes = new Dictionary<string, AxisMode>();
+
 			List<string> axisNamesTemp = new List<string>();
 			List<bool> isEnableAxesArrayTemp = new List<bool>();
+			List<AxisMode> axisModesArrayTemp = new List<AxisMode>();
 
 			for (int i = 0; i < axes.arraySize; ++i)
 			{
@@ -68,32 +83,48 @@ namespace InputManagement
 				if (axisNamesTemp.Contains(name)) continue;
 
 				axisNamesTemp.Add(name);
-
-				int backIndex = axisNamesTemp.Count - 1;
-				if (isEnableAxesTemp.ContainsKey(axisNamesTemp[backIndex]))
+				
+				if (isEnableAxesTemp.ContainsKey(name))
 				{
-					isEnableAxesArrayTemp.Add(isEnableAxesTemp[axisNamesTemp[backIndex]]);
-					isEnableAxes.Add(axisNamesTemp[backIndex], isEnableAxesArrayTemp[backIndex]);
+					isEnableAxesArrayTemp.Add(isEnableAxesTemp[name]);
+					isEnableAxes.Add(name, isEnableAxesTemp[name]);
 				}
 				else
 				{
 					isEnableAxesArrayTemp.Add(false);
-					isEnableAxes.Add(axisNamesTemp[backIndex], false);
+					isEnableAxes.Add(name, false);
+				}
+				if (axisModesTemp.ContainsKey(name))
+				{
+					axisModesArrayTemp.Add(axisModesTemp[name]);
+					axisModes.Add(name, axisModesTemp[name]);
+				}
+				else
+				{
+					axisModesArrayTemp.Add(0);
+					axisModes.Add(name, 0);
 				}
 			}
 			m_axisNames = axisNamesTemp.ToArray();
 			m_isEnableAxes = isEnableAxesArrayTemp.ToArray();
+			m_axisModes = axisModesArrayTemp.ToArray();
 		}
 		public void EditBuildAxes()
 		{
 			if (m_axisNames == null) return;
 			for (int i = 0; i < m_axisNames.Length; ++i)
+			{
 				isEnableAxes.Add(m_axisNames[i], m_isEnableAxes[i]);
+				axisModes.Add(m_axisNames[i], m_axisModes[i]);
+			}
 		}
 		public void SaveConvert()
 		{
 			for (int i = 0; i < axisNames.Length; ++i)
+			{
 				m_isEnableAxes[i] = isEnableAxes[axisNames[i]];
+				m_axisModes[i] = axisModes[axisNames[i]];
+			}
 		}
 #endif
 	}

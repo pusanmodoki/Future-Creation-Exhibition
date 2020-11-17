@@ -115,7 +115,7 @@ MonoBehaviour:
   m_resistPhysical: 0
   m_resistEnergy: 0
   m_weight: 20
-  m_rigidbody: {fileID: 6484212718506888193}
+  m_physics: {fileID: 2518107924220492223}
 --- !u!1 &6484212717543574705
 GameObject:
   m_ObjectHideFlags: 0
@@ -4998,7 +4998,7 @@ MonoBehaviour:
   m_state: 0
   m_armor: {fileID: 6484212717487981528}
   m_effectDictionary: {fileID: 6484212717543574704}
-  m_rigidbody: {fileID: 0}
+  m_physics: {fileID: 0}
   m_player: {fileID: 0}
   m_speed: 10
   m_checkTime: 0.2

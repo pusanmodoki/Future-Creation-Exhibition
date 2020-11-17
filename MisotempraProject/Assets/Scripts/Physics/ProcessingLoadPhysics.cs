@@ -26,10 +26,14 @@ public class ProcessingLoadPhysics : MonoBehaviour
     [SerializeField]
     private float m_maxFallSpeed = 100.0f;
 
+
     private Rigidbody m_rigidbody = null;
+    private Vector3 m_force;
+
 
     public Vector3 velocity { get { return m_velocity; } }
     public float gravity { get { return m_gravity; } }
+
 
     private void Awake()
     {
@@ -50,16 +54,20 @@ public class ProcessingLoadPhysics : MonoBehaviour
     {
         if (!m_isActive) { return; }
 
+        VelocityLoad();
 
-
-        AddGravity();           // 重力
-        Decelerate();           // 減速
+        UpdateVelocity();
 
         UpdateRigidbody();      // Rigidbodyに渡す
     }
 
-    
-    
+
+    private void UpdateVelocity()
+    {
+        AddForceToVelocity();
+        AddGravity();           // 重力
+        Decelerate();           // 減速
+    }
 
 
     /// <summary>
@@ -71,16 +79,28 @@ public class ProcessingLoadPhysics : MonoBehaviour
     }
 
 
+    private void VelocityLoad()
+    {
+        m_velocity = m_rigidbody.velocity / m_timeLayer.timeScale;
+    }
+
     /// <summary>
     /// 重力の加算
     /// </summary>
     private void AddGravity()
     {
-        m_velocity += Vector3.down * m_gravity * m_timeLayer.fixedDeltaTime;
-        if(m_velocity.y < m_maxFallSpeed)
+        m_velocity += Vector3.down * m_gravity * Time.fixedDeltaTime;
+        if(m_velocity.y < -m_maxFallSpeed)
         {
             m_velocity.y = -m_maxFallSpeed;
         }
+    }
+
+    private void AddForceToVelocity()
+    {
+        m_velocity += m_force;
+
+        m_force = Vector3.zero;
     }
 
     /// <summary>
@@ -107,4 +127,14 @@ public class ProcessingLoadPhysics : MonoBehaviour
 
     }
 
+
+    /// <summary>
+    /// 力を加える
+    /// </summary>
+    /// <param name="force"></param>
+
+    public void AddForce(in Vector3 force)
+    {
+        m_force += force * Time.fixedDeltaTime;
+    }
 }

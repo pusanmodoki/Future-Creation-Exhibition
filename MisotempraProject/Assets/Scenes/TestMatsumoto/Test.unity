@@ -1025,26 +1025,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1434537290}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1235508991 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6484212718506888251, guid: 34650ec15f8982e41b11c5cfcaa0f515,
-    type: 3}
-  m_PrefabInstance: {fileID: 773567628}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1235508992
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1235508991}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92a0425ccfdb71d4297181125f1d90c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_timeLayer:
-    m_guid: c8892d00-34c4-4128-a87c-08f7c84aad52
 --- !u!54 &1235508994 stripped
 Rigidbody:
   m_CorrespondingSourceObject: {fileID: 6484212718506888193, guid: 34650ec15f8982e41b11c5cfcaa0f515,
@@ -1247,6 +1227,11 @@ PrefabInstance:
       propertyPath: m_player
       value: 
       objectReference: {fileID: 1176117588}
+    - target: {fileID: 8173559083128842555, guid: eef01744f9f0dbf4fa5c7a5754ab42ba,
+        type: 3}
+      propertyPath: m_deadLine
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 8173559083128842559, guid: eef01744f9f0dbf4fa5c7a5754ab42ba,
         type: 3}
       propertyPath: m_Name
@@ -1408,26 +1393,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0fd4c431e76fe94c8b75c0447747630, type: 3}
---- !u!1 &1660507848 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6484212718506888251, guid: 34650ec15f8982e41b11c5cfcaa0f515,
-    type: 3}
-  m_PrefabInstance: {fileID: 299807458}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1660507852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1660507848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92a0425ccfdb71d4297181125f1d90c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_timeLayer:
-    m_guid: c8892d00-34c4-4128-a87c-08f7c84aad52
 --- !u!114 &1704673904 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8173559083128842555, guid: eef01744f9f0dbf4fa5c7a5754ab42ba,

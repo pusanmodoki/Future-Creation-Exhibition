@@ -4929,6 +4929,7 @@ GameObject:
   - component: {fileID: 6484212718506888250}
   - component: {fileID: 6484212718506888193}
   - component: {fileID: 6484212718506888197}
+  - component: {fileID: 2518107924220492223}
   m_Layer: 11
   m_Name: Enemy
   m_TagString: Untagged
@@ -4997,6 +4998,28 @@ MonoBehaviour:
   m_state: 0
   m_armor: {fileID: 6484212717487981528}
   m_effectDictionary: {fileID: 6484212717543574704}
+  m_rigidbody: {fileID: 0}
+  m_player: {fileID: 0}
+  m_speed: 10
   m_checkTime: 0.2
   m_timeLayer:
     m_guid: 6dac7cfe-fded-4fcd-a90c-978aaf2f6af2
+--- !u!114 &2518107924220492223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6484212718506888251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb5c6145b0fe69b4e9d154ce68df7766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_timeLayer:
+    m_guid: c8892d00-34c4-4128-a87c-08f7c84aad52
+  m_isActive: 1
+  m_velocity: {x: 0, y: 0, z: 0}
+  m_decelerate: 0
+  m_gravity: 9.8
+  m_maxFallSpeed: 100

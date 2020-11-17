@@ -45,20 +45,40 @@ namespace InputManagement
 		bool m_keyBuf = false;
 
 
+		/// <summary>
+		/// Input.GetKeyと同等の動作
+		/// </summary>
+		/// <param name="keyCode"></param>
+		/// <returns></returns>
 		public static bool GetKey(KeyCode keyCode)
 		{
 			return instance.m_resultKeyCodes.now[keyCode];
 		}
+		/// <summary>
+		/// Input.GetKeyDownと同等の動作
+		/// </summary>
+		/// <param name="keyCode"></param>
+		/// <returns></returns>
 		public static bool GetKeyDown(KeyCode keyCode)
 		{
 			return ((instance.m_keyBuf = instance.m_resultKeyCodes.now[keyCode]) ^
 				instance.m_resultKeyCodes.old[keyCode]) & instance.m_keyBuf;
 		}
+		/// <summary>
+		/// Input.GetKeyUpと同等の動作
+		/// </summary>
+		/// <param name="keyCode"></param>
+		/// <returns></returns>
 		public static bool GetKeyUp(KeyCode keyCode)
 		{
 			return (instance.m_resultKeyCodes.now[keyCode] ^
 				(instance.m_keyBuf = instance.m_resultKeyCodes.old[keyCode])) & instance.m_keyBuf;
 		}
+		/// <summary>
+		/// Input.GetButtonと同等の動作
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static bool GetButton(string axisName)
 		{
 #if UNITY_EDITOR
@@ -67,6 +87,11 @@ namespace InputManagement
 #endif
 			return instance.m_resultButtons.now[axisName];
 		}
+		/// <summary>
+		/// Input.GetButtonDownと同等の動作
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static bool GetButtonDown(string axisName)
 		{
 #if UNITY_EDITOR
@@ -76,6 +101,11 @@ namespace InputManagement
 			return ((instance.m_keyBuf = instance.m_resultButtons.now[axisName]) ^
 				instance.m_resultButtons.old[axisName]) & instance.m_keyBuf;
 		}
+		/// <summary>
+		/// Input.GetButtonUpと同等の動作
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static bool GetButtonUp(string axisName)
 		{
 #if UNITY_EDITOR
@@ -85,6 +115,11 @@ namespace InputManagement
 			return (instance.m_resultButtons.now[axisName] ^
 				(instance.m_keyBuf = instance.m_resultButtons.old[axisName])) & instance.m_keyBuf;
 		}
+		/// <summary>
+		/// Input.GetAxisと同等の動作
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static float GetAxis(string axisName)
 		{
 #if UNITY_EDITOR
@@ -93,6 +128,11 @@ namespace InputManagement
 #endif
 			return instance.m_resultAxes.now[axisName];
 		}
+		/// <summary>
+		/// Input.GetAxis - Input.GetAxis(前フレーム)
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static float GetMoveAxisOfPreviousFrame(string axisName)
 		{
 #if UNITY_EDITOR
@@ -101,6 +141,11 @@ namespace InputManagement
 #endif
 			return instance.m_resultAxes.now[axisName] - instance.m_resultAxes.old[axisName];
 		}
+		/// <summary>
+		/// Input.GetAxisRawと同等の動作
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static float GetAxisRaw(string axisName)
 		{
 #if UNITY_EDITOR
@@ -109,6 +154,11 @@ namespace InputManagement
 #endif
 			return instance.m_resultRawAxes.now[axisName];
 		}
+		/// <summary>
+		/// Input.GetAxisRaw - Input.GetAxisRaw(前フレーム)
+		/// </summary>
+		/// <param name="axisName"></param>
+		/// <returns></returns>
 		public static float GetMoveAxisRawOfPreviousFrame(string axisName)
 		{
 #if UNITY_EDITOR

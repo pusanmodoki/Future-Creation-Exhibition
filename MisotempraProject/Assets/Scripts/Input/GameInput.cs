@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>Input Management</summary>
 namespace InputManagement
 {
-	[DefaultExecutionOrder(-50)]
+	[DefaultExecutionOrder(-1100)]
 	public class GameInput : Singleton.DontDestroySingletonMonoBehaviour<GameInput>
 	{
 		struct Buffer<Key, Value>
@@ -37,11 +37,12 @@ namespace InputManagement
 
 		List<string> m_inputAxes = new List<string>();
 		Dictionary<string, AxisMode> m_axisModes = new Dictionary<string, AxisMode>();
+		Dictionary<string, BitSet> m_axisBits = new Dictionary<string, BitSet>();
 		Buffer<string, float> m_resultAxes = new Buffer<string, float>(0);
 		Buffer<string, float> m_resultRawAxes = new Buffer<string, float>(0);
 		Buffer<string, bool> m_resultButtons = new Buffer<string, bool>(0);
 		string m_forReadBuf = null;
-		AxisMode m_forAxisBuf = default;
+		BitSet m_forAxisBuf = default;
 		bool m_keyBuf = false;
 
 
@@ -174,12 +175,12 @@ namespace InputManagement
 		{
 			if (!instance.m_axisModes.ContainsKey(axisName))
 			{
-				Debug.LogWarning("GameInput-axisNameが入力軸として登録されていません");
+				Debug.LogError("GameInput-axisNameが入力軸として登録されていません");
 				return false;
 			}
 			if (!instance.m_axisModes[axisName].HasFlag(axisMode))
 			{
-				Debug.LogWarning("GameInput-" + axisName + "では" +
+				Debug.LogError("GameInput-" + axisName + "では" +
 					axisMode.ToString() + "が有効化されていません");
 				return false;
 			}
@@ -215,6 +216,9 @@ namespace InputManagement
 					m_resultAxes.InitializeAdd(tempName, 0.0f);
 					m_resultRawAxes.InitializeAdd(tempName, 0.0f);
 					m_resultButtons.InitializeAdd(tempName, false);
+
+					m_axisBits.Add(tempName, new BitSet(container.usePlayAxisModes[i].HasFlag(AxisMode.Axis),
+						container.usePlayAxisModes[i].HasFlag(AxisMode.AxisRaw), container.usePlayAxisModes[i].HasFlag(AxisMode.Button)));
 				}
 			}
 		}
@@ -227,13 +231,13 @@ namespace InputManagement
 			for (int i = 0; i < m_inputAxes.Count; ++i)
 			{
 				m_forReadBuf = m_inputAxes[i];
-				m_forAxisBuf = m_axisModes[m_forReadBuf];
+				m_forAxisBuf = m_axisBits[m_forReadBuf];
 
-				if (m_forAxisBuf.HasFlag(AxisMode.Axis))
+				if (m_forAxisBuf[0])
 					m_resultAxes.Update(m_forReadBuf, Input.GetAxis(m_forReadBuf));
-				if (m_forAxisBuf.HasFlag(AxisMode.AxisRaw))
+				if (m_forAxisBuf[1])
 					m_resultRawAxes.Update(m_forReadBuf, Input.GetAxisRaw(m_forReadBuf));
-				if (m_forAxisBuf.HasFlag(AxisMode.Button))
+				if (m_forAxisBuf[2])
 					m_resultButtons.Update(m_forReadBuf, Input.GetButton(m_forReadBuf));
 			}
 		}

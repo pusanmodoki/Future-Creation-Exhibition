@@ -14,6 +14,10 @@ namespace AI
 
 			public System.Type thisType { get; private set; } = null;
 			public string guid { get; private set; } = null;
+			public bool isEnableQuitDuringRun { get { return m_isEnableQuitDuringRun; } }
+
+			[SerializeField, Tooltip("true: 実行中でもDecoratorがfalseになるとQuitする")]
+			bool m_isEnableQuitDuringRun = false;
 
 			public abstract bool IsPredicate(AIAgent agent, Blackboard blackboard);
 

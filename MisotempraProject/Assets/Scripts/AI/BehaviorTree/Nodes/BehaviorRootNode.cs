@@ -49,13 +49,13 @@ namespace AI
 						case UpdateResult.Success:
 							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Success);
 
-							m_selectIndex = 0;
 							FindRunNode(agent);
 							return UpdateResult.Run;
 
 						case UpdateResult.Failed:
 							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
-							m_selectIndex = 0;
+							
+							FindRunNode(agent);
 							return UpdateResult.Failed;
 						default:
 							return UpdateResult.Run;
@@ -72,17 +72,19 @@ namespace AI
 
 				bool FindRunNode(AIAgent agent)
 				{
-					int findIndex = m_selectIndex;
 					bool isRunOk = false;
-					do
+
+					for (int i = 0; i < m_childrenNodes.Count; ++i)
 					{
-						findIndex = (findIndex + 1) % childrenNodes.Count;
-
-						isRunOk = childrenNodes[m_selectIndex].isAllTrueDecorators
-						&& childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success;
-
-					} while (!isRunOk || findIndex != m_selectIndex);
-					if (!isRunOk && findIndex == m_selectIndex)
+						isRunOk = childrenNodes[i].isAllTrueDecorators && childrenNodes[i].OnEnable() == EnableResult.Success;
+						if (isRunOk)
+						{
+							m_selectIndex = i;
+							break;
+						}
+					}
+					
+					if (!isRunOk)
 					{
 #if UNITY_EDITOR
 						Debug.Log("実行できるタスクが存在しません: " + agent.gameObject.name);

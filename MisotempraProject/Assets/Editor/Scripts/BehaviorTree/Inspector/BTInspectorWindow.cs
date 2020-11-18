@@ -87,8 +87,10 @@ namespace Editor
 			}
 			void OnDisable()
 			{
-				nodeEditor?.serializedObject?.ApplyModifiedProperties();
-				blackboardEditor?.serializedObject?.ApplyModifiedProperties();
+				if (nodeEditor != null && nodeEditor.target != null)
+					nodeEditor.serializedObject?.ApplyModifiedProperties();
+				if (blackboardEditor != null && blackboardEditor.target != null)
+					blackboardEditor.serializedObject?.ApplyModifiedProperties();
 
 				editorWindow = null;
 				blackboardEditor = null;

@@ -22,10 +22,18 @@ namespace AI
 					{
 						get
 						{
-							bool isResult = true;
 							foreach (var e in decorators)
-								isResult &= e.IsPredicate(aiAgent, blackboard);
-							return isResult;
+								if (!e.IsPredicate(aiAgent, blackboard)) return false;
+							return true;
+						}
+					}
+					public bool isAllTrueDecoratorsWithRun
+					{
+						get
+						{
+							foreach (var e in decorators)
+								if (e.isEnableQuitDuringRun && !e.IsPredicate(aiAgent, blackboard)) return false;
+							return true;
 						}
 					}
 

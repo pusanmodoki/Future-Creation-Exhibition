@@ -32,7 +32,7 @@ namespace AI
 
 					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						if (!isAllTrueDecorators)
+						if (!isAllTrueDecoratorsWithRun)
 						{
 							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
@@ -96,7 +96,7 @@ namespace AI
 
 					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						if (!isAllTrueDecorators)
+						if (!isAllTrueDecoratorsWithRun)
 						{
 							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
@@ -169,7 +169,7 @@ namespace AI
 
 					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						if (!isAllTrueDecorators)
+						if (!isAllTrueDecoratorsWithRun)
 						{
 							childrenNodes[m_selectIndex].OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
@@ -235,7 +235,7 @@ namespace AI
 
 					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						if (!isAllTrueDecorators)
+						if (!isAllTrueDecoratorsWithRun)
 						{
 							childrenNodes[0].OnDisable(UpdateResult.Failed);
 							childrenNodes[1].OnDisable(UpdateResult.Failed);
@@ -322,7 +322,7 @@ namespace AI
 
 					public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 					{
-						if (!isAllTrueDecorators)
+						if (!isAllTrueDecoratorsWithRun)
 						{
 							childrenNodes[0].OnDisable(UpdateResult.Failed);
 							childrenNodes[1].OnDisable(UpdateResult.Failed);

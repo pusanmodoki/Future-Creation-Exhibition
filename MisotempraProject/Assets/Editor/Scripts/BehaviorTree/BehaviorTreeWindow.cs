@@ -57,7 +57,7 @@ namespace Editor
 
 			/// <summary>Open</summary>
 			[MenuItem("Window/Behavior tree Editor")]
-			static void Open()
+			public static void Open()
 			{
 				//インスタンス作成
 				var window = CreateInstance<BehaviorTreeWindow>();
@@ -65,6 +65,17 @@ namespace Editor
 
 				//表示
 				window.Show();
+			}
+
+			public static BehaviorTreeWindow NewOpen()
+			{
+				//インスタンス作成
+				var window = CreateInstance<BehaviorTreeWindow>();
+				window.titleContent = new GUIContent("BTEditor");
+
+				//表示
+				window.Show();
+				return window;
 			}
 
 			void OnEnable()

@@ -24,6 +24,7 @@ public class TestTask : AI.BehaviorTree.BaseTask
 			return UpdateResult.Success;
 		else if (Input.GetKeyDown(KeyCode.A))
 			return UpdateResult.Failed;
+		Debug.Log(thisNode.guid);
 		return UpdateResult.Run;
 	}
 

@@ -22,7 +22,7 @@ namespace Test_Uemura
 	{
 		public override bool IsPredicate(AI.AIAgent agent, Blackboard blackboard)
 		{
-			return true;
+			return Input.GetKey(KeyCode.A);
 		}
 
 	}

@@ -15,13 +15,21 @@ namespace Editor
 			EditorGUILayout.Space();
 			if (GUILayout.Button("Open behavior file"))
 			{
+				bool isOpen = false;
+				string name = serializedObject.FindProperty("m_fileName").FindPropertyRelative("m_fileName").stringValue;
 				foreach (var instance in BehaviorTree.BehaviorTreeWindow.instances)
 				{
-					if (instance.fileName == serializedObject.FindProperty("m_fileName").FindPropertyRelative("m_fileName").stringValue)
+					if (instance.fileName == name)
 					{
 						instance.Show();
 						instance.Repaint();
+						instance.Focus();
 					}
+				}
+				if (!isOpen)
+				{
+					var window = BehaviorTree.BehaviorTreeWindow.NewOpen();
+					window.nodeView.DoLoadCallback(name);
 				}
 			}
 		}

@@ -14,6 +14,7 @@ namespace AI
 			public Rigidbody rigidbody { get { return aiAgent.rigidbody; } }
 			public BehaviorTree behaviorTree { get; private set; } = null;
 			public Blackboard blackboard { get { return behaviorTree.blackboard; } }
+			public Node.TaskNode thisNode { get; private set; } = null;
 			public string subsequentTaskKey { get; private set; } = null;
 
 			public abstract EnableResult OnEnale();
@@ -28,10 +29,11 @@ namespace AI
 			public virtual void OnTriggerStay(Collider other) { }
 			public virtual void OnTriggerExit(Collider other) { }
 
-			public void InitializeBase(BehaviorTree behaviorTree, AIAgent agent)
+			public void InitializeBase(BehaviorTree behaviorTree, AIAgent agent, Node.TaskNode thisNode)
 			{
 				aiAgent = agent;
 				this.behaviorTree = behaviorTree;
+				this.thisNode = thisNode;
 			}
 			public void RegisterSubsequentTask(string callKey)
 			{

@@ -62,7 +62,12 @@ namespace AI
 
 				public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 				{
-					if (!isAllTrueDecorators)
+					if (!isAllTrueDecoratorsWithRun)
+					{
+						int ia = 0;
+						ia = 1;
+					}
+					if (!isAllTrueDecoratorsWithRun)
 						return UpdateResult.Failed;
 					if (m_subsequentTask != null)
 						return m_subsequentTask.Update();
@@ -113,7 +118,7 @@ namespace AI
 
 					var taskInfo = m_taskDataKeyGuid[guid];
 					result.task = (BaseTask)JsonUtility.FromJson(taskInfo.jsonData, taskInfo.classType);
-					result.task.InitializeBase(behaviorTree, result.aiAgent);
+					result.task.InitializeBase(behaviorTree, result.aiAgent, this);
 
 					return result;
 				}

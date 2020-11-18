@@ -22,7 +22,7 @@ public class Enemy : MonoBehaviour
     private EffectDictionary m_effectDictionary = null;
 
     [SerializeField]
-    private Rigidbody m_rigidbody = null;
+    private ProcessingLoad.Physics m_physics = null;
 
     [SerializeField]
     private Transform m_player = null;

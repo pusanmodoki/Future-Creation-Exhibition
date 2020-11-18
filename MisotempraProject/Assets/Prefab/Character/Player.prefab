@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7700058798191308670}
   - component: {fileID: 7700058798191308671}
   - component: {fileID: 7700058798191308608}
-  m_Layer: 9
+  m_Layer: 29
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 7700058798447391384}
   - component: {fileID: 7700058798447391387}
   - component: {fileID: 7700058798447391388}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: object
   m_TagString: Attack
   m_Icon: {fileID: 0}
@@ -438,7 +438,7 @@ GameObject:
   - component: {fileID: 7700058798502893772}
   - component: {fileID: 7700058798502893774}
   - component: {fileID: 7700058798502893773}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5333,7 +5333,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7700058799406233102}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Sword
   m_TagString: Untagged
   m_Icon: {fileID: 0}

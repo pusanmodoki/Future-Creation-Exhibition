@@ -10,6 +10,6 @@ public class ProcessLoadObject : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
-        ProcessingLoadManager.instance.AddProcessingGauge(m_addGauge);
+        ProcessingLoad.ProcessingLoadManager.instance.AddProcessingGauge(m_addGauge);
     }
 }

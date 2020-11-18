@@ -30,7 +30,7 @@ public class DurableArmor : ArmorBase
     private float m_weight = 1.0f;
 
     [SerializeField]
-    private ProcessingLoadPhysics m_physics = null;
+    private ProcessingLoad.Physics m_physics = null;
 
     protected override void Damage(in DamageMessage message)
     {

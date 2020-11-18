@@ -7,13 +7,13 @@ public class ButtonTest : MonoBehaviour
     float plusProcessGauge = 10.0f;
 
     GameObject plGaugeCon = null;
-    ProcessingLoadManager plManagerScr = null;
+    ProcessingLoad.ProcessingLoadManager plManagerScr = null;
 
     // Start is called before the first frame update
     void Start()
     {
         plGaugeCon = GameObject.Find("PLManager");
-        plManagerScr = plGaugeCon.GetComponent<ProcessingLoadManager>();
+        plManagerScr = plGaugeCon.GetComponent<ProcessingLoad.ProcessingLoadManager>();
     }
 
     // Update is called once per frame

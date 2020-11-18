@@ -6,6 +6,7 @@ using UnityEngine;
 public struct BitSet
 {
 	public bool this[int index] { get { return m_bitSet[index]; } set { m_bitSet[index] = value; } }
+	public int length { get { return m_bitSet.Length; } }
 
 	public BitSet(int size)
 	{

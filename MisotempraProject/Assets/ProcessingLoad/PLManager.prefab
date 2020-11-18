@@ -46,4 +46,6 @@ MonoBehaviour:
   processGauge: 0
   processReduceRate: 1
   reduceDelayTimer: 0
+  m_timeLayer:
+    m_guid: 6dac7cfe-fded-4fcd-a90c-978aaf2f6af2
   nowState: 0

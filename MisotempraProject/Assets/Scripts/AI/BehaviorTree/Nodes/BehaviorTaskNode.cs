@@ -63,11 +63,6 @@ namespace AI
 				public override UpdateResult Update(AIAgent agent, Blackboard blackboard)
 				{
 					if (!isAllTrueDecoratorsWithRun)
-					{
-						int ia = 0;
-						ia = 1;
-					}
-					if (!isAllTrueDecoratorsWithRun)
 						return UpdateResult.Failed;
 					if (m_subsequentTask != null)
 						return m_subsequentTask.Update();

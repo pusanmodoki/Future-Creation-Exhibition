@@ -1,4 +1,4 @@
-﻿//作成者 : 植村将太
+//作成者 : 植村将太
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,38 +8,13 @@ using UnityEngine;
 /// </summary>
 public class RandomSEPlayer : SEPlayer
 {
-    List<int> m_indexs = new List<int>();
-	
-    /// <summary>
-    /// [PlaySE]
-    /// 2D SEとして要素を再生(loop不可)
-    /// </summary>
-    public void PlayRandomSE()
-    {
-		//play index
-		int index = 0;
-
-		//全て再生済みでClear
-		if (m_indexs.Count >= base.numSources)
-			m_indexs.Clear();
-
-		//Randomでindex取得, 未再生index->break
-		while (true)
-		{
-			index = Random.Range(0, numSources);
-			if (!m_indexs.Contains(index))
-				break;
-		}
-		//PlaySE成功でindexリストに追加
-        if (PlaySE(index, false))
-			m_indexs.Add(index);
-    }
+	List<int> m_indexs = new List<int>();
 
 	/// <summary>
-	/// [Play3dSE]
-	/// 3D SEとして要素を再生(loop不可)
+	/// [PlaySE]
+	/// SEを再生(loop不可)
 	/// </summary>
-	public void PlayRandom3dSE()
+	public void PlayRandomSE()
 	{
 		//play index
 		int index = 0;
@@ -56,7 +31,7 @@ public class RandomSEPlayer : SEPlayer
 				break;
 		}
 		//PlaySE成功でindexリストに追加
-		if (Play3dSE(index, false))
+		if (PlaySE(index, false))
 			m_indexs.Add(index);
-    }
+	}
 }

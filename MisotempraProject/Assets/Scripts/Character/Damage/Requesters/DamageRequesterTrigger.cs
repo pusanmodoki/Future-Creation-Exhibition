@@ -14,12 +14,12 @@ namespace Damage
 			Transform root = other.transform.root;
 
 			//GetComponent
-			var request = root.GetComponent<DamageReceiver>();
+			var request = root.GetComponent<DamageController>();
 			//取得できなければ終了
 			if (request == null) return;
 
 			//DamageRequest
-			request.Request(transform.root.gameObject, attackInfo);
+			request.receiver.Request(transform.root.gameObject, attackInfo);
 		}
 	}
 }

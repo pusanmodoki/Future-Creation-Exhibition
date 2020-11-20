@@ -1,4 +1,4 @@
-﻿//作成者 : 植村将太
+//作成者 : 植村将太
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,13 +23,13 @@ public class CollisionEnterPlaySE : MonoBehaviour
 	{
 		//当たったらSE再生
 		if (m_hitMask.EqualBitsForGameObject(collision.gameObject))
-			m_sePlayer.Play3dSE(m_playIndex);
+			m_sePlayer.PlaySE(m_playIndex);
 	}
 	/// <summary>[OnTriggerEnter]</summary>
 	void OnTriggerEnter(Collider collision)
 	{
 		//当たったらSE再生
 		if (m_hitMask.EqualBitsForGameObject(collision.gameObject))
-			m_sePlayer.Play3dSE(m_playIndex);
+			m_sePlayer.PlaySE(m_playIndex);
 	}
 }

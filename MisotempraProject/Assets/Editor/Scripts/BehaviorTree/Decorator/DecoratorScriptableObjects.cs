@@ -12,6 +12,20 @@ namespace Editor
 		{
 			public class BaseDecoratorScriptableObject : UnityEngine.ScriptableObject {}
 
+			public class DecoratorScriptableObjectClassNamepractice2_Decorator : BaseDecoratorScriptableObject
+			{
+				public practice2_Decorator decorator { get { return m_decorator; } }
+				[SerializeField]
+				practice2_Decorator m_decorator = null;
+				public void Initialize(practice2_Decorator initialize) { m_decorator = initialize; }
+			}
+			public class DecoratorScriptableObjectClassNamepractice4_decorator : BaseDecoratorScriptableObject
+			{
+				public practice4_decorator decorator { get { return m_decorator; } }
+				[SerializeField]
+				practice4_decorator m_decorator = null;
+				public void Initialize(practice4_decorator initialize) { m_decorator = initialize; }
+			}
 			public class DecoratorScriptableObjectClassNameTestD1 : BaseDecoratorScriptableObject
 			{
 				public Test_Uemura.TestD1 decorator { get { return m_decorator; } }
@@ -39,6 +53,20 @@ namespace Editor
 				public static void CreateEditorAndScriptableObject(AI.BehaviorTree.BaseDecorator decorator, 
 					out UnityEditor.Editor editor, out UnityEngine.ScriptableObject scriptableObject, string decoratorTypeFullName)
 				{
+					if (decoratorTypeFullName == typeof(practice2_Decorator).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNamepractice2_Decorator>();
+						(scriptableObject as DecoratorScriptableObjectClassNamepractice2_Decorator).Initialize(decorator as practice2_Decorator);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNamepractice2_Decorator);
+						return;
+					}
+					if (decoratorTypeFullName == typeof(practice4_decorator).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNamepractice4_decorator>();
+						(scriptableObject as DecoratorScriptableObjectClassNamepractice4_decorator).Initialize(decorator as practice4_decorator);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNamepractice4_decorator);
+						return;
+					}
 					if (decoratorTypeFullName == typeof(Test_Uemura.TestD1).FullName)
 					{
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameTestD1>();

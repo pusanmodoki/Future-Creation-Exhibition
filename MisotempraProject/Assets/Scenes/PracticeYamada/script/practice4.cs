@@ -3,27 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using AI.BehaviorTree;
 using UnityEngine;
-[System.Serializable]
+using UnityEngine.AI;
+[System.Serializable]//必須
 
-public class test1 : AI.BehaviorTree.BaseTask
+public class practice4 : AI.BehaviorTree.BaseTask
 {
+    [SerializeField]
+    string str;
+
     public override void FixedUpdate()
     {
-
     }
 
     public override EnableResult OnEnale()
     {
-        throw new NotImplementedException();
+        return EnableResult.Success;
     }
 
     public override void OnQuit(UpdateResult result)
     {
-
     }
 
     public override UpdateResult Update()
     {
-        throw new NotImplementedException();
+        Debug.Log(str);
+        return UpdateResult.Success;
     }
 }

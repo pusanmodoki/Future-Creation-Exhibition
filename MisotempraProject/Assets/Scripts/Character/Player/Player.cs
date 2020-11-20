@@ -91,7 +91,10 @@ public class Player : MonoBehaviour
 
     public void SetAcceptAttack(int i)
     {
-        m_animator.SetBool("IsAcceptAttack", i != 0);
+        if(m_animator != null)
+        {
+            m_animator.SetBool("IsAcceptAttack", i != 0);
+        }
         m_isAcceptAttack = i != 0;
     }
 
@@ -292,7 +295,10 @@ public class Player : MonoBehaviour
 
             m_state = StateType.Attack;
 
-            m_animator.SetTrigger("Attack");
+            if(m_animator != null)
+            {
+                m_animator.SetTrigger("Attack");
+            }
             m_isAcceptAttack = false;
             m_rigidbody.velocity = Vector3.zero;
         }
@@ -340,10 +346,9 @@ public class Player : MonoBehaviour
         }
     }
     
-    private void Advance(float force)
+
+    private void SetAnimation(in string name)
     {
-        // m_rigidbody.AddForce(transform.forward * force);
-        Vector3 vec = m_rigidbody.velocity + transform.forward * force;
-        m_rigidbody.velocity = vec;
+
     }
 }

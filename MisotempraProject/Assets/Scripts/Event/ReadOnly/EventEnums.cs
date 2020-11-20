@@ -24,10 +24,10 @@ namespace GameEvent
 	{
 		/// <summary>Player</summary>
 		Player = 0x00000001,
-		/// <summary>ルンバ</summary>
-		Helper = 0x00000002,
-		/// <summary>チェイサー</summary>
-		Sentinel = 0x00000004,
+		///// <summary>ルンバ</summary>
+		//Helper = 0x00000002,
+		///// <summary>チェイサー</summary>
+		//Sentinel = 0x00000004,
 	}
 
 	/// <summary>

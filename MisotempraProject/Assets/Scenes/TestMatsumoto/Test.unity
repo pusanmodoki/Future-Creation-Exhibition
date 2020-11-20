@@ -146,7 +146,7 @@ PrefabInstance:
     - target: {fileID: 5324135535106168322, guid: bfb348d272164a349b77c49ecf09abdf,
         type: 3}
       propertyPath: processReduceRate
-      value: 0.38
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5324135535106168323, guid: bfb348d272164a349b77c49ecf09abdf,
         type: 3}

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectFollow : MonoBehaviour
+public class LifeStock : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField]
+    private int m_stock = 3;
+
+
     void Start()
     {
         

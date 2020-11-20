@@ -35,9 +35,9 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Ground
   m_SortingLayers:
   - name: Default
     uniqueID: 0

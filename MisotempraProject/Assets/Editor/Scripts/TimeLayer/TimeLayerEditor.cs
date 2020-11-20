@@ -29,15 +29,8 @@ namespace Editor
 
 				if (TimeLayerWindow.layersKeyGuid.ContainsKey(stringValue))
 					nowValue = TimeLayerWindow.layerIndexesKeyGuid[stringValue];
-
-				Rect popUpRect = new Rect(
-						EditorGUIUtility.labelWidth,
-						position.y,
-						position.width - EditorGUIUtility.labelWidth,
-						EditorGUIUtility.singleLineHeight);
-
-				EditorGUI.LabelField(position, property.displayName);
-				result = EditorGUI.Popup(popUpRect, nowValue, TimeLayerWindow.usePropertyLayerNames);
+				
+				result = EditorGUI.Popup(position, property.displayName, nowValue, TimeLayerWindow.usePropertyLayerNames);
 				guid.stringValue = TimeLayerWindow.layers[TimeLayerWindow.saveLayers[result]].guid;
 			}
 		}

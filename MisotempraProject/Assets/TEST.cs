@@ -21,6 +21,7 @@ public class TEST : MonoBehaviour
 
 		//int a = 0;
 		//a = 0;
+		var i = TimeManagement.TimeManager.instance;
 	}
 
     // Update is called once per frame

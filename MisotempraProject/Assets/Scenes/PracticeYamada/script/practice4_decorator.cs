@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
@@ -13,6 +13,6 @@ public class practice4_decorator : AI.BehaviorTree.BaseDecorator
 
     public override bool IsPredicate(AIAgent agent, Blackboard blackboard)
     {
-        return Input.GetKeyDown(keyCode);
+		return Input.GetKeyDown(keyCode);
     }
 }

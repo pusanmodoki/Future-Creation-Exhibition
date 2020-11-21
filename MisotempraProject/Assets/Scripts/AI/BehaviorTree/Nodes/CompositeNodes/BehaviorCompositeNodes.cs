@@ -86,7 +86,10 @@ namespace AI
 						for (int i = 0; i < childrenNodes.Count; ++i)
 						{
 							if (childrenNodes[i].isAllTrueDecorators && childrenNodes[i].OnEnable() == EnableResult.Success)
+							{
 								m_selectIndex = i;
+								break;
+							}
 						}
 
 						return m_selectIndex >= 0 ? EnableResult.Success : EnableResult.Failed;

@@ -5,56 +5,6 @@ using UnityEngine;
 
 namespace Singleton
 {
-	namespace Detail
-	{
-		public abstract class BaseSingletonMonoBeehavior : MonoBehaviour
-		{
-			public static GameObject attachObject { get; private set; } = null;
-
-			[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-			static void OnBeforeSceneLoad()
-			{
-				if (attachObject == null)
-				{
-					attachObject = new GameObject("Singletons");
-					GameObject.DontDestroyOnLoad(attachObject);
-				}
-			}
-		}
-		public abstract class BaseGenericSingletonMonoBeehavior<T> : BaseSingletonMonoBeehavior 
-			where T : MonoBehaviour
-		{
-			/// <summary>Awakeの代わり</summary>
-			protected abstract void Init();
-			protected void CallInit()
-			{
-				if (!m_isCalledInit)
-				{
-					m_isCalledInit = true;
-					Init();
-				}
-			}
-
-			/// <summary>インスタンスを設定, ある場合削除</summary>
-			virtual protected void Awake()
-			{
-				if (m_instance == null)
-				{
-					m_instance = this as T;
-					CallInit();
-				}
-				else if (!m_isThisInstance)
-					Destroy(this);
-			}
-
-			/// <summary>自分がinstanceか否か</summary>
-			protected bool m_isThisInstance { get { return m_instance == this; } }
-			/// <summary>static instance</summary>
-			protected static T m_instance = null;
-			/// <summary>called init?</summary>
-			bool m_isCalledInit = false;
-		}
-	}
 
 	/// <summary>
 	/// シングルトンのBaseとなるSingletonMonoBehaviour class
@@ -72,8 +22,8 @@ namespace Singleton
 				if (m_instance == null)
 				{
 #if UNITY_EDITOR
-						if (m_instance == null)
-							Debug.LogError("instanceがnullです!!\n原因: アタッチされていない or DefaultExecutionOrderが-1000以下のクラスのAwakeで呼び出し");
+					if (m_instance == null)
+						Debug.LogError("instanceがnullです!!\n原因: アタッチされていない or DefaultExecutionOrderが-1000以下のクラスのAwakeで呼び出し");
 #endif
 				}
 				return m_instance;
@@ -99,17 +49,17 @@ namespace Singleton
 		}
 	}
 
-
 	/// <summary>
 	/// Singletonsオブジェクト(DontDestroy)に自動アタッチされるシングルトンのBaseとなるDontDestroySingletonMonoBehaviour class
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[DefaultExecutionOrder(-1000)]
-	public abstract class DontDestroySingletonMonoBehaviour<T> : Detail.BaseGenericSingletonMonoBeehavior<T>
+	public abstract class DontDestroySingletonMonoBehaviour<T>
+		: Detail.BaseGenericSingletonMonoBeehavior<T>, Detail.IDontDestroyBase
 		where T : MonoBehaviour
 	{
 		/// <summary>static instance (get)</summary>
-		public static T instance 
+		public static T instance
 		{
 			get
 			{
@@ -131,5 +81,78 @@ namespace Singleton
 			}
 			base.Awake();
 		}
+	}
+
+	namespace Detail
+	{
+		[DefaultExecutionOrder(-1000)]
+		public abstract class BaseSingletonMonoBeehavior : MonoBehaviour
+		{
+			public static GameObject attachObject { get; private set; } = null;
+
+			[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+			static void OnBeforeSceneLoad()
+			{
+				if (attachObject == null)
+				{
+					attachObject = new GameObject("Singletons");
+					GameObject.DontDestroyOnLoad(attachObject);
+				}
+
+				foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+				{
+					foreach (var type in assembly.GetTypes())
+					{
+						if (type.IsClass && !type.IsAbstract &&
+							typeof(IDontDestroyBase).IsAssignableFrom(type))
+						{
+							attachObject.AddComponent(type);
+						}
+					}
+				}
+			}
+
+			protected virtual void OnSceneChanged(UnityEngine.SceneManagement.Scene scene,
+				UnityEngine.SceneManagement.LoadSceneMode loadSceneMode) { }
+
+		}
+		 
+		[DefaultExecutionOrder(-1000)]
+		public abstract class BaseGenericSingletonMonoBeehavior<T> : BaseSingletonMonoBeehavior 
+			where T : MonoBehaviour
+		{
+			/// <summary>Awakeの代わり</summary>
+			protected abstract void Init();
+			protected void CallInit()
+			{
+				if (!m_isCalledInit)
+				{
+					m_isCalledInit = true;
+					UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneChanged;
+					Init();
+				}
+			}
+
+			/// <summary>インスタンスを設定, ある場合削除</summary>
+			virtual protected void Awake()
+			{
+				if (m_instance == null)
+				{
+					m_instance = this as T;
+					OnSceneChanged(default, default);
+					CallInit();
+				}
+				else if (!m_isThisInstance)
+					Destroy(this);
+			}
+
+			/// <summary>自分がinstanceか否か</summary>
+			protected bool m_isThisInstance { get { return m_instance == this; } }
+			/// <summary>static instance</summary>
+			protected static T m_instance = null;
+			/// <summary>called init?</summary>
+			bool m_isCalledInit = false;
+		}
+		public interface IDontDestroyBase { }
 	}
 }

@@ -473,7 +473,7 @@ namespace Editor
 					var cast = cashContainersKeyGuid[guid] as RootCashContainer;
 					if (cast != null) childrens = cast.childrenNodesGuid;
 				}
-				if (childrens != null)
+				if (childrens == null)
 				{
 					var cast = cashContainersKeyGuid[guid] as CompositeCashContainer;
 					if (cast != null) childrens = cast.childrenNodesGuid;

@@ -20,6 +20,7 @@ namespace Editor
 			public List<BaseCashContainer> cashContainers { get; private set; } = new List<BaseCashContainer>();
 			public Dictionary<string, BaseCashContainer> cashContainersKeyGuid { get; private set; } = new Dictionary<string, BaseCashContainer>();
 			public Dictionary<Node, BaseCashContainer> cashContainersKeyNode { get; private set; } = new Dictionary<Node, BaseCashContainer>();
+			public Dictionary<string, Node> nodesKeyGuid { get; private set; } = new Dictionary<string, Node>();
 			public BehaviorTreeWindow thisWindow { get; private set; } = null;
 			public string fileName { get { return thisWindow.fileName; } set { thisWindow.fileName = value; } } 
 
@@ -82,6 +83,7 @@ namespace Editor
 
 				cashContainersKeyGuid.Add(cash.guid, cash);
 				cashContainersKeyNode.Add(node, cash);
+				nodesKeyGuid.Add(cash.guid, node);
 			}
 
 			public void DrawSaveCompletedLog() { Debug.Log("Behavior tree (" + fileName + ") Save completed."); }
@@ -178,6 +180,7 @@ namespace Editor
 							string parentGuid = (cashContainersKeyNode[node] as NotRootCashContainer).parentGuid;
 							string deleteGuid = cashContainersKeyNode[node].guid;
 							cashContainersKeyGuid.Remove(cashContainersKeyNode[node].guid);
+							nodesKeyGuid.Remove(cashContainersKeyNode[node].guid);
 							cashContainers.Remove(cashContainersKeyNode[node]);
 							cashContainersKeyNode.Remove(node);
 
@@ -200,7 +203,7 @@ namespace Editor
 							if (composite != null)
 								composite.childrenNodesGuid.Remove(deleteGuid);
 
-							ReloadChildrensTitle(parentGuid);
+							TitleBuild(nodesKeyGuid, cashContainers[0].guid, 0, true);
 						}
 
 						var edge = element as Edge;
@@ -215,7 +218,7 @@ namespace Editor
 								composite.childrenNodesGuid.Remove(cashContainersKeyNode[edge.input.node].guid);
 
 							(cashContainersKeyNode[edge.input.node] as NotRootCashContainer).parentGuid = "";
-							ReloadChildrensTitle(cashContainersKeyNode[edge.output.node].guid);
+							TitleBuild(nodesKeyGuid, cashContainers[0].guid, 0, true);
 						}
 					}
 				}
@@ -401,7 +404,7 @@ namespace Editor
 
 				if (m_reloadGuid != null)
 				{
-					ReloadChildrensTitle(m_reloadGuid);
+					TitleBuild(nodesKeyGuid, cashContainers[0].guid, 0, true);
 					m_reloadGuid = null;
 				}
 			}
@@ -419,8 +422,6 @@ namespace Editor
 
 			public void BuildNodeView(List<BaseCashContainer> loadList)
 			{
-				Dictionary<string, Node> nodesKeyGuid = new Dictionary<string, Node>();
-
 				for (int i = 0; i < loadList.Count; ++i)
 				{
 					Node node = (Node)(System.Activator.CreateInstance(System.Type.GetType(loadList[i].editNodeClassName), this));
@@ -465,6 +466,12 @@ namespace Editor
 			}
 			void TitleBuild(Dictionary<string, Node> nodesKeyGuid, string guid, int index, bool isRoot)
 			{
+				for (int i = 1; i < cashContainers.Count; ++i)
+					nodesKeyGuid[cashContainers[i].guid].title = cashContainers[i].nodeName;
+				TitleBuildRecursive(nodesKeyGuid, guid, index, isRoot);
+			}
+			void TitleBuildRecursive(Dictionary<string, Node> nodesKeyGuid, string guid, int index, bool isRoot)
+			{
 				if (!isRoot)
 					nodesKeyGuid[guid].title = index + ": " + cashContainersKeyGuid[guid].nodeName;
 
@@ -483,7 +490,7 @@ namespace Editor
 
 				for (int i = 0; i < childrens.Count; ++i)
 				{
-					TitleBuild(nodesKeyGuid, childrens[i], i + 1, false);
+					TitleBuildRecursive(nodesKeyGuid, childrens[i], i + 1, false);
 				}
 			}
 			void ReloadChildrensTitle(string guid)

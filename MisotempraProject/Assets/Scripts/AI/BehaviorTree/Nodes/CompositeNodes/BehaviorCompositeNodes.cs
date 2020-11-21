@@ -143,27 +143,48 @@ namespace AI
 
 				public class RandomSelectorNode : Detail.BaseCompositeNode
 				{
-					HashSet<int> m_randomIndexes = new HashSet<int>();
+					List<float> m_probabilitys = new List<float>();
 					int m_selectIndex = 0;
 
 					public override EnableResult OnEnable()
 					{
 						if (childrenNodes.Count == 0) return EnableResult.Failed;
-						m_randomIndexes.Clear();
-						m_selectIndex = 0;
+
 						foreach (var e in services) e.OnEnable();
 
-						for (int i = 0, index = 0; i < childrenNodes.Count; ++i)
+						List<int> indexes = new List<int>();
+						for (int i = 0, cnt = childrenNodes.Count - 1; i < cnt; ++i)
 						{
+							float probability;
 							do
 							{
-								index = Random.Range(0, childrenNodes.Count);
-							} while (!m_randomIndexes.Contains(m_selectIndex));
-							m_randomIndexes.Add(m_selectIndex);
+								probability = Random.value;
+								for (int k = 0; k < m_probabilitys.Count; ++k)
+								{
+									if (probability <= m_probabilitys[k])
+									{
+										m_selectIndex = k;
+										break;
+									}
+								}
+							} while (indexes.Contains(m_selectIndex));
+
+							if (childrenNodes[m_selectIndex].isAllTrueDecorators && childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success)
+								return EnableResult.Success;
+
+							indexes.Add(m_selectIndex);
 						}
 
-						if (childrenNodes[m_selectIndex].isAllTrueDecorators && childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success)
-							return EnableResult.Success;
+						for (int i = 0; i < childrenNodes.Count; ++i)
+							if (!indexes.Contains(i))
+							{
+								m_selectIndex = i;
+
+								if (childrenNodes[m_selectIndex].isAllTrueDecorators && childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success)
+									return EnableResult.Success;
+
+								break;
+							}
 
 						return EnableResult.Failed;
 					}
@@ -205,13 +226,25 @@ namespace AI
 
 					public override void Load(BaseCashContainer container, Blackboard blackboard)
 					{
-						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+						var cast = container as CashContainer.RandomCashContainer;
+						LoadDecoratorAndService(cast);
+
+						float sum = 0.0f;
+						foreach (var probability in cast.probabilitys)
+						{
+							sum += probability;
+							m_probabilitys.Add(sum);
+						}
 					}
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
 						var result = new RandomSelectorNode();
 						result.CloneBase(behaviorTree, this);
 						result.CloneDecoratorAndService(this);
+
+						foreach (var probability in m_probabilitys)
+							result.m_probabilitys.Add(probability);
+
 						return result;
 					}
 				}

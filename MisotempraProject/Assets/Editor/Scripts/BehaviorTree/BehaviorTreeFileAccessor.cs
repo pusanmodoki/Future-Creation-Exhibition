@@ -110,6 +110,7 @@ namespace Editor
 				nodeView.cashContainers.Clear();
 				nodeView.cashContainersKeyGuid.Clear();
 				nodeView.cashContainersKeyNode.Clear();
+				nodeView.nodesKeyGuid.Clear();
 				nodeView.ClearGraph();
 
 				List<BaseCashContainer> loadList = null;

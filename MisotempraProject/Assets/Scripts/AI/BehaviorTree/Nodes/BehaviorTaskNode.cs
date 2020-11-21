@@ -30,12 +30,14 @@ namespace AI
 				static Dictionary<string, TaskInfo> m_taskDataKeyGuid = new Dictionary<string, TaskInfo>();
 
 				BaseTask m_subsequentTask = null;
+				bool m_isCallTaskQuit = false;
 
 				public override EnableResult OnEnable()
 				{
 					if (!isAllTrueDecorators)
 						return EnableResult.Failed;
 
+					m_isCallTaskQuit = false;
 					thisTree.RegisterTask(this);
 					foreach (var e in services) e.OnEnable();
 
@@ -44,19 +46,12 @@ namespace AI
 
 				public override void OnDisable(UpdateResult result)
 				{
-					if (result != UpdateResult.ForceReschedule)
-					{
-						m_subsequentTask?.OnQuit(result);
-						thisTree.UnregisterTask();
-					}
-					else
-					{
-						if (m_subsequentTask == null)
-							task.OnQuit(UpdateResult.ForceReschedule);
-						else
-							m_subsequentTask.OnQuit(UpdateResult.ForceReschedule);
-					}
+					if (m_subsequentTask != null)
+						m_subsequentTask.OnQuit(result);
+					else if (!m_isCallTaskQuit)
+						task.OnQuit(result);
 
+					thisTree.UnregisterTask();
 					m_subsequentTask = null;
 				}
 
@@ -73,12 +68,19 @@ namespace AI
 					if (updateResult != UpdateResult.Run)
 					{
 						task.OnQuit(updateResult);
+						m_isCallTaskQuit = true;
 
 						if (task.subsequentTaskKey != null &&
 							task.behaviorTree.subsequentTasks[task.subsequentTaskKey].OnEnale() == EnableResult.Success)
 						{
 							m_subsequentTask = task.behaviorTree.subsequentTasks[task.subsequentTaskKey];
-							return UpdateResult.Run;
+							if (m_subsequentTask.OnEnale() == EnableResult.Success)
+								return UpdateResult.Run;
+							else
+							{
+								m_subsequentTask = null;
+								return updateResult;
+							}
 						}
 						else return updateResult;
 					}

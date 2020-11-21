@@ -307,7 +307,9 @@ namespace AI
 
 					public override void Load(BaseCashContainer container, Blackboard blackboard)
 					{
-						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+						var cast = container as CashContainer.ParallelCashContainer;
+						LoadDecoratorAndService(cast);
+						parallelFinishMode = cast.finishMode;
 					}
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{
@@ -393,7 +395,9 @@ namespace AI
 
 					public override void Load(BaseCashContainer container, Blackboard blackboard)
 					{
-						LoadDecoratorAndService(container as CashContainer.NotRootCashContainer);
+						var cast = container as CashContainer.ParallelCashContainer;
+						LoadDecoratorAndService(cast);
+						parallelFinishMode = cast.finishMode;
 					}
 					public override BaseNode Clone(AIAgent agent, BehaviorTree behaviorTree)
 					{

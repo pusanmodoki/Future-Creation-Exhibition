@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.BehaviorTree;
@@ -24,6 +24,7 @@ public class practice3 : AI.BehaviorTree.BaseTask
 
     public override void OnQuit(UpdateResult result)
     {
+		Debug.Log("quit: " + str);
     }
 
     public override UpdateResult Update()

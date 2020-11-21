@@ -74,7 +74,6 @@ namespace AI
 			public void ForceReschedule()
 			{
 				nowTask?.OnDisable(UpdateResult.ForceReschedule);
-				nowTask = null;
 
 				rootNode.OnEnable();
 			}

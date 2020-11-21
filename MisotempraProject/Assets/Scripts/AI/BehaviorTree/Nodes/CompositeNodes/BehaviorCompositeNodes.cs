@@ -273,8 +273,8 @@ namespace AI
 					{
 						if (!isAllTrueDecoratorsWithRun)
 						{
-							childrenNodes[0].OnDisable(UpdateResult.Failed);
-							childrenNodes[1].OnDisable(UpdateResult.Failed);
+							if (!m_isEndNodes[0]) childrenNodes[0].OnDisable(UpdateResult.Failed);
+							if (!m_isEndNodes[1]) childrenNodes[1].OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
 						}
 						UpdateResult result;
@@ -343,8 +343,8 @@ namespace AI
 					{
 						if (childrenNodes.Count != 2) return EnableResult.Failed;
 
-						m_isEndNodes[0] = !childrenNodes[0].isAllTrueDecorators && childrenNodes[0].OnEnable() == EnableResult.Success;
-						m_isEndNodes[1] = !childrenNodes[1].isAllTrueDecorators && childrenNodes[1].OnEnable() == EnableResult.Success;
+						m_isEndNodes[0] = !(childrenNodes[0].isAllTrueDecorators && childrenNodes[0].OnEnable() == EnableResult.Success);
+						m_isEndNodes[1] = !(childrenNodes[1].isAllTrueDecorators && childrenNodes[1].OnEnable() == EnableResult.Success);
 						foreach (var e in services) e.OnEnable();
 
 						if ((parallelFinishMode == ParallelFinishMode.Immediate && (!m_isEndNodes[0]))
@@ -360,8 +360,8 @@ namespace AI
 					{
 						if (!isAllTrueDecoratorsWithRun)
 						{
-							childrenNodes[0].OnDisable(UpdateResult.Failed);
-							childrenNodes[1].OnDisable(UpdateResult.Failed);
+							if (!m_isEndNodes[0]) childrenNodes[0].OnDisable(UpdateResult.Failed);
+							if (!m_isEndNodes[1]) childrenNodes[1].OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
 						}
 						UpdateResult result;

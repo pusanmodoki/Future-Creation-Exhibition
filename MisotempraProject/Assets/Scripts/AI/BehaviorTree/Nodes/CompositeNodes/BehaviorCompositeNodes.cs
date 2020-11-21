@@ -285,34 +285,19 @@ namespace AI
 							if (!m_isEndNodes[i])
 							{
 								result = childrenNodes[i].Update(agent, blackboard);
-								switch (result)
+
+								if (result != UpdateResult.Run)
 								{
-									case UpdateResult.Success:
-										childrenNodes[i].OnDisable(UpdateResult.Success);
-										m_isEndNodes[i] = true;
+									childrenNodes[i].OnDisable(result);
+									m_isEndNodes[i] = true;
 
-										if (m_isEndNodes[partner]) return UpdateResult.Success;
+									if (m_isEndNodes[partner]) return result;
 
-										if (parallelFinishMode == ParallelFinishMode.Immediate)
-										{
-											childrenNodes[partner].OnDisable(UpdateResult.Success);
-											return UpdateResult.Success;
-										}
-										break;
-									case UpdateResult.Failed:
-										childrenNodes[i].OnDisable(UpdateResult.Failed);
-										m_isEndNodes[i] = true;
-
-										if (m_isEndNodes[partner]) return UpdateResult.Failed;
-
-										if (parallelFinishMode == ParallelFinishMode.Immediate)
-										{
-											childrenNodes[partner].OnDisable(UpdateResult.Failed);
-											return UpdateResult.Failed;
-										}
-										break;
-									default:
-										break;
+									if (parallelFinishMode == ParallelFinishMode.Immediate)
+									{
+										childrenNodes[partner].OnDisable(result);
+										return result;
+									}
 								}
 							}
 						}
@@ -338,13 +323,26 @@ namespace AI
 				public class SimpleParallelNode : Detail.BaseCompositeNode
 				{
 					bool[] m_isEndNodes = new bool[2] { false, false };
+					TaskNode m_task = null;
+					Detail.BaseCompositeNode m_composite = null;
 
 					public override EnableResult OnEnable()
 					{
 						if (childrenNodes.Count != 2) return EnableResult.Failed;
 
-						m_isEndNodes[0] = !(childrenNodes[0].isAllTrueDecorators && childrenNodes[0].OnEnable() == EnableResult.Success);
-						m_isEndNodes[1] = !(childrenNodes[1].isAllTrueDecorators && childrenNodes[1].OnEnable() == EnableResult.Success);
+						m_task = childrenNodes[0] as TaskNode;
+						if (m_task == null)
+							m_task = childrenNodes[1] as TaskNode;
+
+						m_composite = childrenNodes[0] as Detail.BaseCompositeNode;
+						if (m_composite == null)
+							m_composite = childrenNodes[1] as Detail.BaseCompositeNode;
+
+						if (m_task == null || m_composite == null)
+							return EnableResult.Failed;
+
+						m_isEndNodes[0] = !(m_task.isAllTrueDecorators && m_task.OnEnable() == EnableResult.Success);
+						m_isEndNodes[1] = !(m_composite.isAllTrueDecorators && m_composite.OnEnable() == EnableResult.Success);
 						foreach (var e in services) e.OnEnable();
 
 						if ((parallelFinishMode == ParallelFinishMode.Immediate && (!m_isEndNodes[0]))
@@ -360,8 +358,8 @@ namespace AI
 					{
 						if (!isAllTrueDecoratorsWithRun)
 						{
-							if (!m_isEndNodes[0]) childrenNodes[0].OnDisable(UpdateResult.Failed);
-							if (!m_isEndNodes[1]) childrenNodes[1].OnDisable(UpdateResult.Failed);
+							if (!m_isEndNodes[0]) m_task.OnDisable(UpdateResult.Failed);
+							if (!m_isEndNodes[1]) m_composite.OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
 						}
 						UpdateResult result;
@@ -369,48 +367,27 @@ namespace AI
 
 						if (!m_isEndNodes[0])
 						{
-							result = childrenNodes[0].Update(agent, blackboard);
-							switch (result)
+							result = m_task.Update(agent, blackboard);
+							if (result != UpdateResult.Run)
 							{
-								case UpdateResult.Success:
-									childrenNodes[0].OnDisable(UpdateResult.Success);
-									m_isEndNodes[0] = true;
+								m_task.OnDisable(result);
+								m_isEndNodes[0] = true;
 
-									if (parallelFinishMode == ParallelFinishMode.Immediate)
-									{
-										childrenNodes[1].OnDisable(UpdateResult.Success);
-										return UpdateResult.Success;
-									}
-									break;
-								case UpdateResult.Failed:
-									childrenNodes[0].OnDisable(UpdateResult.Failed);
-									m_isEndNodes[1] = true;
-
-									if (parallelFinishMode == ParallelFinishMode.Immediate)
-									{
-										childrenNodes[0].OnDisable(UpdateResult.Failed);
-										return UpdateResult.Failed;
-									}
-									break;
-								default:
-									break;
+								if (parallelFinishMode == ParallelFinishMode.Immediate)
+								{
+									m_task.OnDisable(result);
+									return result;
+								}
 							}
 						}
 
-						result = childrenNodes[1].Update(agent, blackboard);
+						result = m_composite.Update(agent, blackboard);
 						if (!(parallelFinishMode == ParallelFinishMode.Delayed && m_isEndNodes[0]))
 							return UpdateResult.Run;
-
-						switch (result)
+						else
 						{
-							case UpdateResult.Success:
-								childrenNodes[1].OnDisable(UpdateResult.Success);
-								return UpdateResult.Success;
-							case UpdateResult.Failed:
-								childrenNodes[1].OnDisable(UpdateResult.Failed);
-								return UpdateResult.Failed;
-							default:
-								return UpdateResult.Run;
+							childrenNodes[1].OnDisable(result);
+							return result;
 						}
 					}
 

@@ -22,6 +22,7 @@ public class practice4 : AI.BehaviorTree.BaseTask
 
     public override void OnQuit(UpdateResult result)
     {
+        Debug.Log("quit: " + str);
     }
 
     public override UpdateResult Update()

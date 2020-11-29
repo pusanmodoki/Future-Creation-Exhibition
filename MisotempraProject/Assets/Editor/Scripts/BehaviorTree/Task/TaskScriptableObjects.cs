@@ -12,6 +12,13 @@ namespace Editor
 		{
 			public class BaseTaskScriptableObject : UnityEngine.ScriptableObject {}
 
+			public class TaskScriptableObjectClassNameMoveTo : BaseTaskScriptableObject
+			{
+				public MoveTo task { get { return m_task; } }
+				[SerializeField]
+				MoveTo m_task = null;
+				public void Initialize(MoveTo initialize) { m_task = initialize; }
+			}
 			public class TaskScriptableObjectClassNamepractice3 : BaseTaskScriptableObject
 			{
 				public practice3 task { get { return m_task; } }
@@ -67,6 +74,13 @@ namespace Editor
 				public static void CreateEditorAndScriptableObject(AI.BehaviorTree.BaseTask task, 
 					out UnityEditor.Editor editor, out UnityEngine.ScriptableObject scriptableObject, string taskTypeFullName)
 				{
+					if (taskTypeFullName == typeof(MoveTo).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameMoveTo>();
+						(scriptableObject as TaskScriptableObjectClassNameMoveTo).Initialize(task as MoveTo);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameMoveTo);
+						return;
+					}
 					if (taskTypeFullName == typeof(practice3).FullName)
 					{
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamepractice3>();

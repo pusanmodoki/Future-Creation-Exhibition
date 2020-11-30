@@ -5,7 +5,7 @@ using UnityEngine;
 [DefaultExecutionOrder(-1000)]
 public class ResultManager : Singleton.SingletonMonoBehaviour<ResultManager>
 {
-    [SerializeField]
+    [SerializeField, NonEditable]
     private List<ResultKey> m_resultKeys = new List<ResultKey>();
 
     [SerializeField]

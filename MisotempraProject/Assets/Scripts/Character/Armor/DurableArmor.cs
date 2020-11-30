@@ -32,6 +32,9 @@ public class DurableArmor : ArmorBase
     [SerializeField]
     private ProcessingLoad.Physics m_physics = null;
 
+
+
+
     protected override void Damage(in DamageMessage message)
     {
         switch (message.damageType)

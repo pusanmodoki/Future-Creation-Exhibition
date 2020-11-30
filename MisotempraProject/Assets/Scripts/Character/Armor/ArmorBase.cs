@@ -21,8 +21,22 @@ abstract public class ArmorBase : MonoBehaviour
     [SerializeField]
     protected string m_hitEffectName = "";
 
+    public Damage.DamageController damageController { get; private set; }
+
+
+    private void Start()
+    {
+        damageController = GetComponent<Damage.DamageController>();
+        if (!damageController)
+        {
+            Debug.LogError("not ref damage controller");
+        }
+    }
+
+
     private void Update()
     {
+
         int id = gameObject.GetInstanceID();
         if(DamageMessageManager.messages.ContainsKey(id))
         {
@@ -50,6 +64,10 @@ abstract public class ArmorBase : MonoBehaviour
         StartCoroutine("InvincibleCounter");
     }
 
+    /// <summary>
+    /// 無敵カウント
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator InvincibleCounter()
     {
         m_isInvincible = true;

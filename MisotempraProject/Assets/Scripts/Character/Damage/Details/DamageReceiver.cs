@@ -78,8 +78,9 @@ namespace Damage
 
 		public void Update()
 		{
-			var keys = m_attackIDs.Keys;
-			foreach(var key in keys)
+			// var keys = m_attackIDs.Keys;
+            var keys =  new List<int>(m_attackIDs.Keys);
+            foreach (var key in keys)
 			{
 				m_attackIDs[key] -= Time.deltaTime;
 				if (m_attackIDs[key] <= 0.0f)

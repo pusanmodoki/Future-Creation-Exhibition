@@ -18,6 +18,7 @@ public class DurableArmor : ArmorBase
     [SerializeField, Range(0.0f, 1.0f)]
     private float m_resistEnergy = 0.0f;
 
+
     public enum WeightLevel
     {
         Light,
@@ -25,90 +26,33 @@ public class DurableArmor : ArmorBase
         Heavy
     }
 
-    [Header("Weight")]
-    [SerializeField]
-    private float m_weight = 1.0f;
-
-    [SerializeField]
-    private ProcessingLoad.Physics m_physics = null;
-
-    protected override void Damage(in DamageMessage message)
+    protected override void TakeDamage(in Damage.RequestQueue request)
     {
-        switch (message.damageType)
-        {
-            case DamageMessage.DamageType.Physical:
-                PhysicalDamage(message.damage);
-                break;
-
-            case DamageMessage.DamageType.Energy:
-                EnergyDamage(message.damage);
-                break;
-
-            default:
-                break;
-        }
+        m_durable -= request.attack * (1.0f - Resist(request.details.damageType));
     }
 
     protected override bool DeadCheck()
     {
-        if (m_durable < 0.0f)
+        if (m_durable <= 0.0f)
         {
             m_durable = 0.0f;
-            gameObject.SetActive(false);
             return true;
         }
         return false;
     }
 
-    protected override void KnockBack(in DamageMessage message)
+    protected override void Death()
     {
-        switch (message.attackType)
+        gameObject.SetActive(false);
+    }
+
+    public float Resist(Damage.DamageType type)
+    {
+        if(type == Damage.DamageType.Physical)
         {
-            case DamageMessage.AttackType.Weak:
-                WeakKnockBack(message);
-                break;
-            case DamageMessage.AttackType.Middle:
-                break;
-            case DamageMessage.AttackType.Strong:
-                break;
-
-            default:
-                break;
+            return m_resistPhysical;
         }
+        return m_resistEnergy;
     }
 
-
-    public void EnergyDamage(in float damage)
-    {
-        m_durable -= damage * (1.0f - m_resistEnergy);
-    }
-
-    public void PhysicalDamage(in float damage)
-    {
-        m_durable -= damage * (1.0f - m_resistPhysical);
-    }
-
-    virtual protected void WeakKnockBack(in DamageMessage message)
-    {
-        Vector3 vector = (transform.position - message.point);
-
-
-        vector.y = 0.0f;
-        vector.Normalize();
-
-        vector.y = 5.0f;
-
-        m_physics.AddForce(vector * m_weight);
-    }
-
-
-    virtual protected void MiddleKnockBack()
-    {
-
-    }
-
-    virtual protected void StrongKnockBack()
-    {
-
-    }
 }

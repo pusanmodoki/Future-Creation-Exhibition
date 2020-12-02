@@ -5,13 +5,11 @@ using UnityEngine;
 abstract public class ArmorBase : MonoBehaviour
 {
 
-    [Header("Dead")]
+    [Header("Base Property")]
     [SerializeField]
     protected bool m_isDead = false;
-
     public bool isDead { get { return m_isDead; } }
 
-    [Header("Invincible")]
     [SerializeField]
     protected float m_invincibleTime = 1.0f;
 
@@ -21,38 +19,65 @@ abstract public class ArmorBase : MonoBehaviour
     [SerializeField]
     protected string m_hitEffectName = "";
 
-    private void Update()
+    public Damage.DamageController damageController { get; private set; }
+
+
+    private void Start()
     {
-        int id = gameObject.GetInstanceID();
-        if(DamageMessageManager.messages.ContainsKey(id))
+        damageController = GetComponent<Damage.DamageController>();
+        if (!damageController)
         {
-            DamageMessage message = DamageMessageManager.messages[id];
-
-            Damage(message);
-            KnockBack(message);
-
-            DamageMessageManager.messages.Remove(id);
-            m_isDead = DeadCheck();
-
-            EffectPopManager.messages.Enqueue(new EffectPopManager.Message(m_hitEffectName, EffectPopManager.Message.Command.Play, message.point));
+            Debug.LogError("not ref damage controller");
         }
     }
 
-    protected abstract void Damage(in DamageMessage message);
 
-    protected virtual void KnockBack(in DamageMessage message) { }
+    private void Update()
+    {
+        if(damageController.receiver.requestQueue.Count < 1)
+        {
+            return;
+        }
+
+
+        Damage.RequestQueue request = damageController.receiver.Pop();
+
+        TakeDamage(request);
+        m_isDead = DeadCheck();
+
+        if (!isDead)
+        {
+            KnockBack(request);
+        }
+        else
+        {
+            Death();
+        }
+    }
+
+    protected abstract void TakeDamage(in Damage.RequestQueue request);
+
+    protected virtual void KnockBack(in Damage.RequestQueue request) { }
 
     protected abstract bool DeadCheck();
+
+    protected abstract void Death();
 
     public void OnInvincible()
     {
         m_isInvincible = true;
+        
         StartCoroutine("InvincibleCounter");
     }
 
+    /// <summary>
+    /// 無敵カウント
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator InvincibleCounter()
     {
         m_isInvincible = true;
+
 
         yield return new WaitForSeconds(m_invincibleTime);
 

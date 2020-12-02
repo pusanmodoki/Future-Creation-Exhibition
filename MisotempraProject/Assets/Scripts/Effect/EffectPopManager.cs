@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectPopManager : MonoBehaviour
+public class EffectPopManager : Singleton.SingletonMonoBehaviour<EffectPopManager>
 {
     [SerializeField]
     private List<GameObject> m_effects = new List<GameObject>();
@@ -11,29 +11,9 @@ public class EffectPopManager : MonoBehaviour
 
     public Dictionary<string, GameObject> m_dictionary { get; private set; } = new Dictionary<string, GameObject>();
 
-    public readonly struct Message
-    {
-        public enum Command
-        {
-            Play,
-            Stop,
-            Destroy
-        }
-        public Message(string n, Command c, Vector3 p)
-        {
-            name = n;
-            command = c;
-            position = p;
-        }
-        public string name { get; }
 
-        public Command command { get; }
+    protected override void Init() { }
 
-        public Vector3 position { get; }
-    }
-
-
-    public static Queue<Message> messages { get; private set; } = new Queue<Message>();
 
     private void Start()
     {
@@ -46,25 +26,9 @@ public class EffectPopManager : MonoBehaviour
 
     private void Update()
     {
-        while(messages.Count > 0)
-        {
-            Message message = messages.Dequeue();
-            switch (message.command)
-            {
-                case Message.Command.Play:
-                    PopEffect(message.name, message.position);
-                    break;
-
-                case Message.Command.Stop:
-                    break;
-
-                case Message.Command.Destroy:
-                    break;
-            }
-        }
     }
 
-    private void PopEffect(in string name, in Vector3 pos)
+    public void PopEffect(in string name, in Vector3 pos)
     {
         m_instancedEffects.Enqueue(GameObject.Instantiate(m_dictionary[name], pos, Quaternion.identity));        
     }

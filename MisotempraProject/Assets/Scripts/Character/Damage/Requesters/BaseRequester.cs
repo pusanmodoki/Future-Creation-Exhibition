@@ -30,6 +30,20 @@ namespace Damage
 				else
 					attackInfo = m_controller.attackInfoDictionary[m_attackKey];
 			}
+
+            public bool SetAttackKey(string key)
+            {
+                if (!m_controller.attackInfoDictionary.ContainsKey(key))
+                {
+#if UNITY_EDITOR
+                    Debug.LogError(gameObject.name + "<Requester:Attack infos> keyが見つかりません");
+#endif
+                    return false;
+                }
+                m_attackKey = key;
+                attackInfo = m_controller.attackInfoDictionary[key];
+                return true;
+            }
 		}
 	}
 }

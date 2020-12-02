@@ -8,16 +8,19 @@ namespace Player
     [System.Serializable]
     public class MoveCommand : PlayerCommandBase
     {
-        public Rigidbody rigidbody { get; }
-
-        [SerializeField]
+        [SerializeField, Tooltip("加速度")]
         private float m_acceleration = 1.0f;
-        [SerializeField]
+        [SerializeField, Tooltip("最高速度")]
         private float m_maxSpeed = 10.0f;
-        [SerializeField]
+        [SerializeField, Tooltip("減速度")]
         private float m_deceleration = 1.0f;
-        [SerializeField]
-        private bool m_isInputMove = false;
+        [SerializeField, Range(0.0f, 2.0f)]
+        private float m_limitMove = 1.0f;
+
+
+        public Vector2 force { get; private set; }
+
+        private float speed { get; set; }
 
         private enum AxesName
         {
@@ -25,39 +28,72 @@ namespace Player
             Vertical
         }
 
-        public MoveCommand(PlayerController player) : base(player)
-        {
-            
-        }
 
-
-        public override void OnCommand()
+        protected override bool OnCommand(PlayerController player)
         {
             bool isOnHorizontal = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Horizontal]);
-            bool isOnVertical = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Horizontal]);
+            bool isOnVertical = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Vertical]);
 
             if (!isOnHorizontal && !isOnVertical)
             {
-                m_isInputMove = false;
-                return;
+                return false;
             }
-
-            m_isInputMove = true;
 
             // 進行方向計算
             float horizontal, vertical;
+            player.state = ActionState.Run;
 
             horizontal = InputManagement.GameInput.GetAxis(axesNames[(int)AxesName.Horizontal]);
-            vertical = InputManagement.GameInput.GetAxis(axesNames[(int)AxesName.Horizontal]);
+            vertical = InputManagement.GameInput.GetAxis(axesNames[(int)AxesName.Vertical]);
 
             float rad = Mathf.Atan2(vertical, horizontal);
-            //rad += (m_camera.polar.azimath + 90.0f) * Mathf.Deg2Rad;
+            rad += (player.playerCamera.polar.azimath + 90.0f) * Mathf.Deg2Rad;
 
-            //m_force.x = Mathf.Cos(rad);
-            //m_force.y = Mathf.Sin(rad);
+            Vector2 vec = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
 
-            //Rolling();
+            force = vec;
+
+            // rolling 
+            Vector3 rot = player.transform.eulerAngles;
+            rot.y = -(Mathf.Atan2(force.y, force.x) * Mathf.Rad2Deg - 90);
+            player.transform.eulerAngles = rot;
+
+            return true;
+        }
+
+        public override void FixedUpdate(PlayerController player)
+        {
+            if (isOnCommand)
+            {
+                speed += m_acceleration;
+                if (speed > m_maxSpeed)
+                {
+                    speed = m_maxSpeed;
+                }
+            }
+            else
+            {
+                speed -= m_deceleration;
+                if (speed < 0.0f)
+                {
+                    speed = 0.0f;
+                    player.state = ActionState.Stand;
+                }
+            }
+
+
+            Vector3 velocity = player.playerRigidbody.velocity;
+            Vector2 vec = force;
+
+            // 移動ベクトル
+            vec *= speed * m_limitMove;
+            velocity.x = vec.x;
+            velocity.z = vec.y;
+
+            player.playerRigidbody.velocity = velocity;
 
         }
+
+
     }
 }

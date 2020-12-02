@@ -5,13 +5,11 @@ using UnityEngine;
 abstract public class ArmorBase : MonoBehaviour
 {
 
-    [Header("Dead")]
+    [Header("Base Property")]
     [SerializeField]
     protected bool m_isDead = false;
-
     public bool isDead { get { return m_isDead; } }
 
-    [Header("Invincible")]
     [SerializeField]
     protected float m_invincibleTime = 1.0f;
 
@@ -36,31 +34,39 @@ abstract public class ArmorBase : MonoBehaviour
 
     private void Update()
     {
-
-        int id = gameObject.GetInstanceID();
-        if(DamageMessageManager.messages.ContainsKey(id))
+        if(damageController.receiver.requestQueue.Count < 1)
         {
-            DamageMessage message = DamageMessageManager.messages[id];
+            return;
+        }
 
-            Damage(message);
-            KnockBack(message);
 
-            DamageMessageManager.messages.Remove(id);
-            m_isDead = DeadCheck();
+        Damage.RequestQueue request = damageController.receiver.Pop();
 
-            EffectPopManager.messages.Enqueue(new EffectPopManager.Message(m_hitEffectName, EffectPopManager.Message.Command.Play, message.point));
+        TakeDamage(request);
+        m_isDead = DeadCheck();
+
+        if (!isDead)
+        {
+            KnockBack(request);
+        }
+        else
+        {
+            Death();
         }
     }
 
-    protected abstract void Damage(in DamageMessage message);
+    protected abstract void TakeDamage(in Damage.RequestQueue request);
 
-    protected virtual void KnockBack(in DamageMessage message) { }
+    protected virtual void KnockBack(in Damage.RequestQueue request) { }
 
     protected abstract bool DeadCheck();
+
+    protected abstract void Death();
 
     public void OnInvincible()
     {
         m_isInvincible = true;
+        
         StartCoroutine("InvincibleCounter");
     }
 
@@ -71,6 +77,7 @@ abstract public class ArmorBase : MonoBehaviour
     private IEnumerator InvincibleCounter()
     {
         m_isInvincible = true;
+
 
         yield return new WaitForSeconds(m_invincibleTime);
 

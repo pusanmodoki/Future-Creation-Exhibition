@@ -7,21 +7,41 @@ namespace Player
 {
     public class PlayerController : MonoBehaviour
     {
+        /// <summary>
+        /// プレイヤーからの参照
+        /// </summary>
         public static PlayerController instance { get; private set; } = null;
 
+        /// <summary>
+        /// プレイヤーの状態
+        /// </summary>
         public ActionState state { get { return m_state; } set { m_state = value; } }
 
         public bool isAcceptAttack { get; set; } = true;
 
         private Ray m_jumpDetectRay = new Ray(new Vector3(0.0f, 0.0f, 0.0f), Vector3.down);
 
+        /// <summary>
+        /// メインカメラへの参照
+        /// </summary>
         public PlayerCamera playerCamera { get { return m_camera; } }
 
+        /// <summary>
+        /// プレイヤーアニメーター
+        /// </summary>
         public Animator animator { get; private set; }
 
+        /// <summary>
+        /// 物理
+        /// </summary>
         public Rigidbody playerRigidbody { get; private set; }
 
+        /// <summary>
+        /// DamageController
+        /// </summary>
         public Damage.DamageController damageController { get; private set; }
+
+        public PlayerArmor armor { get; private set; }
 
         /// <summary>
         /// プレイヤーの状態
@@ -51,7 +71,7 @@ namespace Player
         [SerializeField]
         private MoveCommand m_moveCommand = null;
 
-        private void Start()
+        private void Awake()
         {
             if (instance)
             {
@@ -60,7 +80,10 @@ namespace Player
 #endif
             }
             instance = this;
+        }
 
+        private void OnEnable()
+        {
             damageController = GetComponent<Damage.DamageController>();
             if (!damageController)
             {
@@ -82,6 +105,14 @@ namespace Player
             {
 #if UNITY_EDITOR
                 Debug.LogError("RigidBodyが見つかりません。");
+#endif
+            }
+
+            armor = GetComponent<PlayerArmor>();
+            if (!armor)
+            {
+#if UNITY_EDITOR
+                Debug.LogError("PlayerArmorが見つかりません。");
 #endif
             }
         }

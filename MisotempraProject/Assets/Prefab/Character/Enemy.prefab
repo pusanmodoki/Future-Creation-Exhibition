@@ -4901,8 +4901,6 @@ MonoBehaviour:
   m_durable: 100
   m_resistPhysical: 0
   m_resistEnergy: 0
-  m_weight: 1
-  m_physics: {fileID: 0}
 --- !u!114 &2518107924220492223
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -118,5 +118,7 @@ public class CMenuContentTagManager : MonoBehaviour
         m_ExplanationScripts[CMenuAdministrator.m_proTagNo].InActiveAnimation();
         // 模様を初期化 (見えなくする)
         m_PatternScript.Clear();
+
+        m_stateContent = eState.Non;
     }
 }

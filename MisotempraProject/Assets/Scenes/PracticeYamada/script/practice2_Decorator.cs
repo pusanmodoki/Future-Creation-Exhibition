@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI;
@@ -11,8 +11,6 @@ public class practice2_Decorator : AI.BehaviorTree.BaseDecorator
 {
     [SerializeField]
     float m_trueDistance = 1.0f;
-    [SerializeField]
-    bool isNear = false;
 
     public override bool IsPredicate(AIAgent agent, Blackboard blackboard)
     {

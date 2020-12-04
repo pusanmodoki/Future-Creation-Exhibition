@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.BehaviorTree;
@@ -28,9 +28,12 @@ public class test1 : AI.BehaviorTree.BaseTask
 
     public override UpdateResult Update()
     {
-        navMeshAgent.SetDestination(blackboard.gameObjects["Target"].transform.position);
-        
-        //agent.SetDestination(target.transform.position);
-        return UpdateResult.Run;
-    }
+		//navMeshAgent.SetDestination(blackboard.gameObjects["Target"].transform.position);
+
+		//agent.SetDestination(target.transform.position);
+		
+		
+		//return UpdateResult.Run;
+		return UpdateResult.Success;
+	}
 }

@@ -6,13 +6,6 @@ using UnityEngine;
 [System.Serializable]
 public class TestTask : AI.BehaviorTree.BaseTask
 {
-	[SerializeField]
-	int a = 0;
-
-	int b = 0;
-
-	public int c;
-
 	public override EnableResult OnEnale()
 	{
 		return EnableResult.Success;

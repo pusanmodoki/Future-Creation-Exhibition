@@ -22,11 +22,21 @@ namespace AI
 		NavMeshAgent m_navMeshAgent = null;
 		[SerializeField]
 		Rigidbody m_rigidbody = null;
+		[SerializeField]
+		AgentGroup m_group = null;
 
+		public void SetGroup(AgentGroup group)
+		{
+			m_group = group;
+		}
 
 		void Awake()
 		{
 			behaviorTree = new BehaviorTree.BehaviorTree(m_fileName, this, m_blackboardInitialzier);
+		}
+		void Start()
+		{
+			m_group?.RegisterAgent(gameObject);	
 		}
 		void Update()
 		{
@@ -35,6 +45,10 @@ namespace AI
 		void FixedUpdate()
 		{
 			behaviorTree.FixedUpdate();
+		}
+		void OnDestroy()
+		{
+			m_group?.UnregisterAgent(gameObject);
 		}
 
 		void OnCollisionEnter(Collision collision)

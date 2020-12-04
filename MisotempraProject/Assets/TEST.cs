@@ -6,12 +6,7 @@ using AI.BehaviorTree;
 public class TEST : MonoBehaviour
 {
 	[SerializeField]
-	TimeManagement.TimeLayer timeLayer = null;
-	[SerializeField]
-	TagEx tag = null;
-	[SerializeField]
-	TagEx[] tags = null;
-
+	Damage.DamageController m_controller = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +22,10 @@ public class TEST : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Space))
+		{
+			int a = 0;
+			a = 0;
+		}
     }
 }

@@ -6,12 +6,10 @@ using UnityEngine;
 using UnityEngine.AI;
 [System.Serializable]//必須
 
-public class practice3 : AI.BehaviorTree.BaseTask
+public class practice5 : AI.BehaviorTree.BaseTask
 {
     [SerializeField]
-    KeyCode keyCode = KeyCode.None;
-    [SerializeField]
-    string str = null;
+    string str = "";
 
     public override void FixedUpdate()
     {
@@ -25,18 +23,14 @@ public class practice3 : AI.BehaviorTree.BaseTask
     public override void OnQuit(UpdateResult result)
     {
 		Debug.Log("quit: " + str);
-    }
+	}
 
     public override UpdateResult Update()
     {
-        if(Input.GetKeyDown(keyCode))
-        {
-            Debug.Log(str);
-            return UpdateResult.Success;
-        }
-        else
-        {
-            return UpdateResult.Run;
-        }
-    }
+        Debug.Log(str);
+		if (Input.GetKeyDown(KeyCode.Space))
+			return UpdateResult.Success;
+		else
+			return UpdateResult.Run;
+	}
 }

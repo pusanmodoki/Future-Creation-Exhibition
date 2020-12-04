@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GameEvent
 {
@@ -15,7 +16,11 @@ namespace GameEvent
 		/// <summary>Receive event functions</summary>
 		Dictionary<EventType, List<BaseEventFunction>> m_eventFunctions = new Dictionary<EventType, List<BaseEventFunction>>();
 
+
 		protected override void Init()
+		{
+		}
+		protected override void OnSceneChanged(Scene scene, LoadSceneMode loadSceneMode)
 		{
 			//感知クラスの除外リストクリア
 			EventDetection.hitTransformInstanceIDs.Clear();

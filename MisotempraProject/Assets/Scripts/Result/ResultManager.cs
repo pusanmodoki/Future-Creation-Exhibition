@@ -2,24 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[DefaultExecutionOrder(-1000)]
-public class ResultManager : Singleton.SingletonMonoBehaviour<ResultManager>
+public class ResultManager : MonoBehaviour
 {
-    [SerializeField]
+    [SerializeField, NonEditable]
     private List<ResultKey> m_resultKeys = new List<ResultKey>();
 
     [SerializeField]
     private float m_checkTime = 0.05f;
 
     [SerializeField]
-    private GameObject clearProduction = null;
+    private GameObject m_clearProduction = null;
+
+    public static ResultManager instance { get; private set; }
 
     public List<ResultKey> resultKeys { get { return m_resultKeys; } set { m_resultKeys = value; } }
 
-
-    protected override void Init()
+    private void Awake()
     {
+        if (!instance)
+        {
+            instance = this;
+        }
+#if UNITY_EDITOR
+        else
+        {
+            Debug.LogError("2ついじょうあるよ");
+        }
+#endif
 
+        StartCoroutine("ResultCheck");
+    }
+
+    private void OnDestroy()
+    {
+        if(instance) instance = null;
     }
 
     private IEnumerator ResultCheck()
@@ -27,10 +43,7 @@ public class ResultManager : Singleton.SingletonMonoBehaviour<ResultManager>
         bool isLoop = true;
         while (isLoop)
         {
-            for(int i = 0; i < resultKeys.Count; ++i)
-            {
-                if (isLoop = !ClearCheck()) { }
-            }
+            isLoop = !ClearCheck();
 
             yield return new WaitForSeconds(m_checkTime);
         }
@@ -44,4 +57,6 @@ public class ResultManager : Singleton.SingletonMonoBehaviour<ResultManager>
         }
         return true;
     }
+
+    
 }

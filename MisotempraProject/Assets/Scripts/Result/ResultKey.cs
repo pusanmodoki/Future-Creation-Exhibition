@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResultKey : MonoBehaviour
+public abstract class ResultKey : MonoBehaviour
 {
     [SerializeField]
-    private bool m_isAccept = false;
+    protected bool m_isAccept = false;
 
     public bool isAccept { get { return m_isAccept; } set { m_isAccept = value; } }
 

@@ -12,6 +12,13 @@ namespace Editor
 		{
 			public class BaseTaskScriptableObject : UnityEngine.ScriptableObject {}
 
+			public class TaskScriptableObjectClassNameMoveTo : BaseTaskScriptableObject
+			{
+				public MoveTo task { get { return m_task; } }
+				[SerializeField]
+				MoveTo m_task = null;
+				public void Initialize(MoveTo initialize) { m_task = initialize; }
+			}
 			public class TaskScriptableObjectClassNamepractice3 : BaseTaskScriptableObject
 			{
 				public practice3 task { get { return m_task; } }
@@ -26,12 +33,12 @@ namespace Editor
 				practice4 m_task = null;
 				public void Initialize(practice4 initialize) { m_task = initialize; }
 			}
-			public class TaskScriptableObjectClassNamepractice5 : BaseTaskScriptableObject
+			public class TaskScriptableObjectClassNamesubsepuent : BaseTaskScriptableObject
 			{
-				public practice5 task { get { return m_task; } }
+				public subsepuent task { get { return m_task; } }
 				[SerializeField]
-				practice5 m_task = null;
-				public void Initialize(practice5 initialize) { m_task = initialize; }
+				subsepuent m_task = null;
+				public void Initialize(subsepuent initialize) { m_task = initialize; }
 			}
 			public class TaskScriptableObjectClassNametackle : BaseTaskScriptableObject
 			{
@@ -67,6 +74,13 @@ namespace Editor
 				public static void CreateEditorAndScriptableObject(AI.BehaviorTree.BaseTask task, 
 					out UnityEditor.Editor editor, out UnityEngine.ScriptableObject scriptableObject, string taskTypeFullName)
 				{
+					if (taskTypeFullName == typeof(MoveTo).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameMoveTo>();
+						(scriptableObject as TaskScriptableObjectClassNameMoveTo).Initialize(task as MoveTo);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameMoveTo);
+						return;
+					}
 					if (taskTypeFullName == typeof(practice3).FullName)
 					{
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamepractice3>();
@@ -81,11 +95,11 @@ namespace Editor
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNamepractice4);
 						return;
 					}
-					if (taskTypeFullName == typeof(practice5).FullName)
+					if (taskTypeFullName == typeof(subsepuent).FullName)
 					{
-						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamepractice5>();
-						(scriptableObject as TaskScriptableObjectClassNamepractice5).Initialize(task as practice5);
-						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNamepractice5);
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamesubsepuent>();
+						(scriptableObject as TaskScriptableObjectClassNamesubsepuent).Initialize(task as subsepuent);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNamesubsepuent);
 						return;
 					}
 					if (taskTypeFullName == typeof(tackle).FullName)

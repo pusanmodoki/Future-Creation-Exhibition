@@ -12,8 +12,10 @@ GameObject:
   - component: {fileID: 7700058798191308668}
   - component: {fileID: 7700058798191308667}
   - component: {fileID: 7700058798191308670}
-  - component: {fileID: 7700058798191308671}
+  - component: {fileID: 7693820891750139282}
+  - component: {fileID: 3266121961315058613}
   - component: {fileID: 7700058798191308608}
+  - component: {fileID: 1443247626219466589}
   m_Layer: 29
   m_Name: Player
   m_TagString: Untagged
@@ -30,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 7700058798191308666}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 7700058799266153948}
   m_Father: {fileID: 0}
@@ -48,22 +50,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f42fa5697218a41864dbc0009ef108, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_camera: {fileID: 0}
-  m_animator: {fileID: 7700058798191308667}
-  m_rigidbody: {fileID: 7700058798191308670}
   m_state: 1
-  m_acceleration: 1
-  m_maxSpeed: 20
-  m_deceleration: 5
-  m_isInputMove: 0
-  m_limitMove: 1
-  m_jumpForce: 10
-  m_jumpHeight: 5
+  m_camera: {fileID: 0}
+  m_attackCommand:
+  - m_enableStates: 0
+    m_onCommandState: 0
+    m_offCommandState: 0
+    m_axesNames:
+    - Fire1
+    m_scale: 1
+    m_key: 
+  m_jumpCommand:
+    m_enableStates: 0
+    m_onCommandState: 0
+    m_offCommandState: 0
+    m_axesNames:
+    - Jump
+    m_height: 2.5
+    m_maxHeightSeconds: 1
+    m_force: 300
   m_isJump: 1
-  m_horizontal: Horizontal
-  m_vertical: Vertical
-  m_speed: 0
-  m_force: {x: 0, y: 0}
+  m_moveCommand:
+    m_enableStates: 0
+    m_onCommandState: 0
+    m_offCommandState: 0
+    m_axesNames:
+    - Horizontal
+    - Vertical
+    m_acceleration: 1
+    m_maxSpeed: 10
+    m_deceleration: 1
+    m_limitMove: 1
 --- !u!95 &7700058798191308667
 Animator:
   serializedVersion: 3
@@ -97,10 +114,10 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
---- !u!65 &7700058798191308671
-BoxCollider:
+--- !u!136 &7693820891750139282
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -109,9 +126,36 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 3, z: 1}
-  m_Center: {x: 0, y: 1.5, z: 0}
+  m_Radius: 0.5
+  m_Height: 3.1206775
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.4638922, z: 0}
+--- !u!114 &3266121961315058613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7700058798191308666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a1d99ebbf64c3942beb70137a763d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_attackInfos:
+  - m_key: Attack
+    m_attack: 10
+    m_details:
+      damageType: 0
+      attackType: 0
+  m_sender:
+    m_hitLayers:
+      m_layerMask:
+        serializedVersion: 2
+        m_Bits: 2147483647
+    m_excludeTags: []
+  m_receiver:
+    m_drawingRequestQueue: []
 --- !u!114 &7700058798191308608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,6 +171,24 @@ MonoBehaviour:
   m_effects:
   - m_particle: {fileID: 7700058798502893774}
     m_name: Attack
+--- !u!114 &1443247626219466589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7700058798191308666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 940cad438550ce74f9bff695b68f6a5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_isDead: 0
+  m_invincibleTime: 1
+  m_isInvincible: 0
+  m_hitEffectName: 
+  m_maxStock: 3
+  m_stock: 3
 --- !u!1 &7700058798264628929
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,7 +375,8 @@ GameObject:
   - component: {fileID: 7700058798447391385}
   - component: {fileID: 7700058798447391384}
   - component: {fileID: 7700058798447391387}
-  - component: {fileID: 7700058798447391388}
+  - component: {fileID: 8585235913362646181}
+  - component: {fileID: 4294315029131102035}
   m_Layer: 8
   m_Name: object
   m_TagString: Attack
@@ -412,7 +475,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 3
---- !u!114 &7700058798447391388
+--- !u!114 &8585235913362646181
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -421,12 +484,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 7700058798447391382}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 314b8039be97fdd41ad8852551f7a76c, type: 3}
+  m_Script: {fileID: 11500000, guid: 4656ca18bc3f78d41a15d92e6089987f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_attackType: 0
-  m_damageType: 0
-  m_power: 10
+  m_controller: {fileID: 3266121961315058613}
+  m_attackKey: Attack
+--- !u!114 &4294315029131102035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7700058798447391382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfc5a110997f4cc4b9d1801e4111123f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_effectPrefab: {fileID: 7545469941683104372, guid: efd8db7167f54974580d5a5b88d6598b,
+    type: 3}
+  playOnAwake: 1
 --- !u!1 &7700058798502893771
 GameObject:
   m_ObjectHideFlags: 0

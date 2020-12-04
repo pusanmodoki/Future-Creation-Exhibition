@@ -24,6 +24,7 @@ public class TEST : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
 		{
+			m_controller.sender.EnableAction("Test");
 			int a = 0;
 			a = 0;
 		}

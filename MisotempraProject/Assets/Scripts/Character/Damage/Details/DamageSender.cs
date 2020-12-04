@@ -25,16 +25,24 @@ namespace Damage
 
 		public void EnableAction(string key, float scale = 1.0f)
 		{
-			if (m_attackInfoDictionary.ContainsKey(key) && m_attackInfoDictionary[key].id < 0)
+			if (m_attackInfoDictionary.ContainsKey(key))
 			{
 				m_attackInfoDictionary[key].SetID(++m_idCounter);
 				m_attackInfoDictionary[key].SetScale(scale);
 			}
+#if UNITY_EDITOR
+			else
+				Debug.LogError("DamageSender.EnableAction: 実行できませんでした. keyが登録されていません");
+#endif
 		}
 		public void DisableAction(string key)
 		{
 			if (m_attackInfoDictionary.ContainsKey(key))
 				m_attackInfoDictionary[key].SetID(-1);
+#if UNITY_EDITOR
+			else
+				Debug.LogError("DamageSender.DisableAction: 実行できませんでした. keyが登録されていません");
+#endif
 		}
 		public void DisableActionDelay(string key, float delaySeconds)
 		{
@@ -44,6 +52,10 @@ namespace Damage
 					m_disableSeconds.Add(key, 0.0f);
 				m_disableSeconds[key] = delaySeconds;
 			}
+#if UNITY_EDITOR
+			else
+				Debug.LogError("DamageSender.DisableActionDelay: 実行できませんでした. keyが登録されていません");
+#endif
 		}
 		public void DisableActionAll()
 		{

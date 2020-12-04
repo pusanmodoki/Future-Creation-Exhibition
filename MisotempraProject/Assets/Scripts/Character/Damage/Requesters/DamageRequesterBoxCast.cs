@@ -17,7 +17,7 @@ namespace Damage
 		/// <summary>LateUpdate</summary>
 		void LateUpdate()
 		{
-			if (attackInfo == null) return;
+			if (attackInfo == null || attackInfo.id < 0) return;
 
 			//RaycastFlagsがHit
 			if (m_boxCastFlags.isStay)

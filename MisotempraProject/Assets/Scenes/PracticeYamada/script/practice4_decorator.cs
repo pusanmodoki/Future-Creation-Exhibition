@@ -9,7 +9,7 @@ using UnityEngine;
 public class practice4_decorator : AI.BehaviorTree.BaseDecorator
 {
     [SerializeField]
-    KeyCode keyCode;
+    KeyCode keyCode = KeyCode.None;
 
     public override bool IsPredicate(AIAgent agent, Blackboard blackboard)
     {

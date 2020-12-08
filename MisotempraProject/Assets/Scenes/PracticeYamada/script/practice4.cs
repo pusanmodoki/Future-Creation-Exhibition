@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.BehaviorTree;
@@ -9,7 +9,7 @@ using UnityEngine.AI;
 public class practice4 : AI.BehaviorTree.BaseTask
 {
     [SerializeField]
-    string str;
+    string str = "";
 
     public override void FixedUpdate()
     {
@@ -22,8 +22,8 @@ public class practice4 : AI.BehaviorTree.BaseTask
 
     public override void OnQuit(UpdateResult result)
     {
-        Debug.Log("quit: " + str);
-    }
+		Debug.Log("quit: " + str);
+	}
 
     public override UpdateResult Update()
     {

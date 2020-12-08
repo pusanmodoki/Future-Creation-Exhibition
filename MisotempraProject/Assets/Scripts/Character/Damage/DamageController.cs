@@ -9,7 +9,7 @@ namespace Damage
 	public class DamageController : MonoBehaviour
 	{
 		public DamageSender sender { get { return m_sender; } }
-		public DamageRequestPool receiver { get { return m_receiver; } }
+		public DamageReceiver receiver { get { return m_receiver; } }
 		public ReadOnlyCollection<AttackInfo> attackInfos { get; private set; } = null;
 		public ReadOnlyDictionary<string, AttackInfo> attackInfoDictionary { get; private set; } = null;
 
@@ -18,7 +18,7 @@ namespace Damage
 		[SerializeField]
 		DamageSender m_sender = new DamageSender();
 		[SerializeField]
-        DamageRequestPool m_receiver = new DamageRequestPool();
+        DamageReceiver m_receiver = new DamageReceiver();
 
 		Dictionary<string, AttackInfo> m_attackInfoDictionary = new Dictionary<string, AttackInfo>();
 
@@ -26,6 +26,7 @@ namespace Damage
 		{
 			foreach (var e in m_attackInfos)
 			{
+				e.Awake();
 				if (!m_attackInfoDictionary.ContainsKey(e.key))
 					m_attackInfoDictionary.Add(e.key, e);
 				else

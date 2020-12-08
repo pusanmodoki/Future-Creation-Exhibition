@@ -24,7 +24,8 @@ namespace AI
 			public Blackboard blackboard { get; private set; } = null;
 			public string fileName { get; private set; } = "";
 			public bool isLoaded { get { return m_masterDatum.ContainsKey(fileName); } }
-			public Node.TaskNode nowTask { get; private set; }
+			public Node.TaskNode nowTask { get; private set; } = null;
+			public Node.TaskNode oldTask { get; private set; } = null;
 
 			static Dictionary<string, BehaviorTree> m_masterDatum = new Dictionary<string, BehaviorTree>();
 
@@ -34,7 +35,7 @@ namespace AI
 			Dictionary<string, BaseTask> m_subsequentTasks = new Dictionary<string, BaseTask>();
 			List<CashContainer.Detail.SubsequentTaskInfomations> m_subsequentTaskInfos = null;
 
-			public void RegisterTask(Node.TaskNode node) { nowTask = node; }
+			public void RegisterTask(Node.TaskNode node) { oldTask = nowTask; nowTask = node; }
 			public void UnregisterTask() { nowTask = null; }
 
 			public BehaviorTree()

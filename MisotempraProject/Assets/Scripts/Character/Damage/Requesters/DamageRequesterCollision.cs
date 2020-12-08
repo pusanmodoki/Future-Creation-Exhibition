@@ -9,7 +9,7 @@ namespace Damage
 		/// <summary>OnCollisionEnter</summary>
 		void OnCollisionEnter(Collision collision)
 		{
-			if (attackInfo == null) return;
+			if (attackInfo == null || attackInfo.id < 0) return;
 			//Rootオブジェクト取得
 			Transform root = collision.transform.root;
 

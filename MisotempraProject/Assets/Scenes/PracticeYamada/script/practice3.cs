@@ -9,9 +9,9 @@ using UnityEngine.AI;
 public class practice3 : AI.BehaviorTree.BaseTask
 {
     [SerializeField]
-    KeyCode keyCode;
+    KeyCode keyCode = KeyCode.None;
     [SerializeField]
-    string str;
+    string str = null;
 
     public override void FixedUpdate()
     {

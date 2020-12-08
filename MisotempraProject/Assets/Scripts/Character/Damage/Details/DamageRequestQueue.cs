@@ -43,14 +43,12 @@ namespace Damage
 			m_attack = attack;
 			m_details = details;
 			m_attackID = attackID;
-			isEnabled = true;
 		}
 		public RequestQueue(RequestQueue copy)
 		{
 			m_attackObject = copy.attackObject;
 			m_attack = copy.attack;
 			m_details = copy.details;
-			isEnabled = copy.isEnabled;
 			m_attackID = copy.m_attackID;
 		}
 
@@ -58,7 +56,6 @@ namespace Damage
 		public float attack { get { return m_attack; } }
 		public Details details { get { return m_details; } }
 		public int attackID { get { return m_attackID; } }
-		public bool isEnabled { get; private set; }
 
 		/// <summary>攻撃するオブジェクト</summary>
 		[SerializeField, Tooltip("攻撃するオブジェクト"), NonEditable]
@@ -80,6 +77,7 @@ namespace Damage
 		public string key { get { return m_key; } }
 		public float attackScale { get; private set; } = 1.0f;
 		public int id { get; private set; } = -1;
+		public bool isEnableAction { get { return id >= 0; } }
 
 		public AttackInfo(string key, float attack, RequestQueue.Details details)
 		{
@@ -94,6 +92,11 @@ namespace Damage
 		public void SetScale(float scale)
 		{
 			attackScale = scale;
+		}
+		public void Awake()
+		{
+			attackScale = 1.0f;
+			id = -1;
 		}
 
 		[SerializeField, Tooltip("Key")]

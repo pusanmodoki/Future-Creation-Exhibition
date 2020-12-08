@@ -9,7 +9,7 @@ namespace Damage
 		/// <summary>OnTriggerEnter</summary>
 		void OnTriggerEnter(Collider other)
 		{
-			if (attackInfo == null) return;
+			if (attackInfo == null || attackInfo.id < 0) return;
 			//Rootオブジェクト取得
 			Transform root = other.transform.root;
 

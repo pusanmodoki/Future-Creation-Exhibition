@@ -364,7 +364,7 @@ namespace AI
 							if (!m_isEndNodes[1]) m_composite.OnDisable(UpdateResult.Failed);
 							return UpdateResult.Failed;
 						}
-						UpdateResult result;
+						UpdateResult result = UpdateResult.Failed;
 						foreach (var e in services) e.Update(agent, blackboard);
 
 						if (!m_isEndNodes[0])
@@ -383,12 +383,18 @@ namespace AI
 							}
 						}
 
+						if (m_isEndNodes[1]) return result;
+
 						result = m_composite.Update(agent, blackboard);
+						if (result != UpdateResult.Run)
+							m_isEndNodes[1] = true;
+
 						if (!(parallelFinishMode == ParallelFinishMode.Delayed && m_isEndNodes[0]))
 							return UpdateResult.Run;
 						else
 						{
-							childrenNodes[1].OnDisable(result);
+							if (m_isEndNodes[1])
+								childrenNodes[1].OnDisable(result);
 							return result;
 						}
 					}

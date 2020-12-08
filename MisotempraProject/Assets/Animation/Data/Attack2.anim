@@ -336,8 +336,8 @@ AnimationClip:
     intParameter: 5
     messageOptions: 0
   - time: 0.6666667
-    functionName: SetState
-    data: 
+    functionName: DiableAction
+    data: PlayerAttack
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1

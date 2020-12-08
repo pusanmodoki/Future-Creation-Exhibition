@@ -52,7 +52,7 @@ namespace Damage
 				e.SetID(-1);
 		}
 
-		public void DoRequest(DamageReceiver receiver, string key)
+		public void DoRequest(DamageRequestPool receiver, string key)
 		{
 			if (m_attackInfoDictionary.ContainsKey(key) && m_attackInfoDictionary[key].id >= 0
 				&& !m_excludeTags.Contains(receiver.gameObject.tag)

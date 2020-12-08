@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CMenuContent2 : MonoBehaviour
+public class CMenuContent_Basic : CAnimationController
 {
-    //-------------------------------------------------------------------------
-    //
-    [SerializeField] private List<CMenuContent_Basic> m_BasicScripts;   // 通常
-    [SerializeField] private List<CMenuContent_Model> m_ModelScripts;   // モデル
 
     //-------------------------------------------------------------------------
     //
@@ -23,7 +19,7 @@ public class CMenuContent2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        base.Start();
     }
 
     // Update is called once per frame
@@ -50,14 +46,7 @@ public class CMenuContent2 : MonoBehaviour
     /// </summary>
     private void Active()
     {
-        // 通常
-        for (int i = 0; i < m_BasicScripts.Count; i++)
-            m_BasicScripts[i].ActiveAnimation();
-
-        // モデル付き
-        for (int i = 0; i < m_ModelScripts.Count; i++)
-            m_ModelScripts[i].ActiveAnimation();
-
+        base.ChangeBoolAnimation(true, "Active");
         m_state = eState.Max;
     }
 
@@ -66,14 +55,7 @@ public class CMenuContent2 : MonoBehaviour
     /// </summary>
     private void InActive()
     {
-        // 通常
-        for (int i = 0; i < m_BasicScripts.Count; i++)
-            m_BasicScripts[i].InActiveAnimation();
-
-        // モデル付き
-        for (int i = 0; i < m_ModelScripts.Count; i++)
-            m_ModelScripts[i].InActiveAnimation();
-
+        base.ChangeBoolAnimation(false, "Active");
         m_state = eState.Max;
     }
 

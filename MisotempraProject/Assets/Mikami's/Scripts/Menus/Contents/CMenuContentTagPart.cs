@@ -8,6 +8,7 @@ public class CMenuContentTagPart : CAnimationController
     //----------------------------------------------------
     // contentsの中身
     [SerializeField] private CMoveFont m_MoveFontScript;
+    [SerializeField] private CMenuContent2 m_ContentScript;
 
     //----------------------------------------------------
     // 状態遷移
@@ -24,7 +25,6 @@ public class CMenuContentTagPart : CAnimationController
     //----------------------------------------------------
     // 自分の配置されている番号
     public int m_proButtonNo { set; get; }
-
     private bool m_stateFontAnimation = false;
 
     //--------------------------------------------------------------
@@ -68,7 +68,7 @@ public class CMenuContentTagPart : CAnimationController
         {
             if (base.JudgeAnimation("Base Layer.MenuContent_Active"))
             {
-                FontAnimation();
+                FontAnimation();                
                 m_stateFontAnimation = false;
             }
         }
@@ -124,6 +124,12 @@ public class CMenuContentTagPart : CAnimationController
     private void InActive()
     {
         base.ChangeBoolAnimation(false, "Active");
+
+        //// Content非表示
+        //for (int i = 0; i < m_Contents.Count; i++)
+        //    m_Contents[i].InActiveAnimation();
+        m_ContentScript.InActiveAnimation();
+
         m_statePart = eState.Max;
     }
 
@@ -173,6 +179,27 @@ public class CMenuContentTagPart : CAnimationController
         m_MoveFontScript.m_proState = true;
     }
 
+    /// <summary>
+    /// コンテンツ開始
+    /// </summary>
+    public void ActiveContent()
+    {
+        // Content表示
+        //        for (int i = 0; i < m_Contents.Count; i++)
+        //            m_Contents[i].ActiveAnimation();
+        m_ContentScript.ActiveAnimation();
+    }
+
+    /// <summary>
+    /// コンテンツ開始
+    /// </summary>
+    public void InActiveContent()
+    {
+        // Content表示
+        //        for (int i = 0; i < m_Contents.Count; i++)
+        //            m_Contents[i].InActiveAnimation();
+        m_ContentScript.InActiveAnimation();
+    }
     //----------------------------------------------------
     /// <summary>
     /// Buttonをクリックした時

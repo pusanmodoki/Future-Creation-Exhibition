@@ -2,15 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CMenuContent2 : MonoBehaviour
+public class CMenuContent_Model : CAnimationController
 {
-    //-------------------------------------------------------------------------
-    //
-    [SerializeField] private List<CMenuContent_Basic> m_BasicScripts;   // 通常
-    [SerializeField] private List<CMenuContent_Model> m_ModelScripts;   // モデル
 
     //-------------------------------------------------------------------------
-    //
+    // 状態遷移
     private enum eState
     {
         Non,
@@ -19,11 +15,23 @@ public class CMenuContent2 : MonoBehaviour
         Max,
     }
     private eState m_state = eState.Non;
+
+    //-------------------------------------------------------------------------
+    //
+    [SerializeField] private string m_ObjName = "";     // 検索名
+    private GameObject m_Obj = null;                    // 対応オブジェクト
+
+    //-------------------------------------------------------------------------
+    // 
+
+
     //-------------------------------------------------------------------------
     // Start is called before the first frame update
     void Start()
     {
+        base.Start();
 
+        SearchObject();
     }
 
     // Update is called once per frame
@@ -50,14 +58,7 @@ public class CMenuContent2 : MonoBehaviour
     /// </summary>
     private void Active()
     {
-        // 通常
-        for (int i = 0; i < m_BasicScripts.Count; i++)
-            m_BasicScripts[i].ActiveAnimation();
-
-        // モデル付き
-        for (int i = 0; i < m_ModelScripts.Count; i++)
-            m_ModelScripts[i].ActiveAnimation();
-
+        base.ChangeBoolAnimation(true, "Active");
         m_state = eState.Max;
     }
 
@@ -66,15 +67,28 @@ public class CMenuContent2 : MonoBehaviour
     /// </summary>
     private void InActive()
     {
-        // 通常
-        for (int i = 0; i < m_BasicScripts.Count; i++)
-            m_BasicScripts[i].InActiveAnimation();
-
-        // モデル付き
-        for (int i = 0; i < m_ModelScripts.Count; i++)
-            m_ModelScripts[i].InActiveAnimation();
-
+        base.ChangeBoolAnimation(false, "Active");
         m_state = eState.Max;
+    }
+
+    /// <summary>
+    /// 指定オブジェクトを探す関数
+    /// </summary>
+    private void SearchObject()
+    {
+        //-----------------------------------------------------------
+        // 検索
+        GameObject n_SearchObj = GameObject.Find(m_ObjName);
+        // 検索に引っかからない場合
+        if (n_SearchObj == null)
+            return;
+        // 生成
+        m_Obj = Instantiate(n_SearchObj, new Vector3(0f, 0f, 0f), new Quaternion(0f, 0f, 0f, 1f));
+
+        m_Obj.transform.name = m_Obj.transform.name + "+Clone";
+        //-----------------------------------------------------------
+        // 子供にする
+        m_Obj.transform.parent = this.gameObject.transform;
     }
 
     //---------------------------------------------------------------

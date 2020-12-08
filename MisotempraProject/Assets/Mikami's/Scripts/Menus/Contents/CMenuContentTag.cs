@@ -112,9 +112,13 @@ public class CMenuContentTag : MonoBehaviour
         if (m_oldContentNo != CMenuAdministrator.m_proContentNo)
         {
             if (m_oldContentNo != CMenuAdministrator.m_errorCode)
+            {
                 m_PartScripts[m_oldContentNo].UnSelectAnimation();
+                m_PartScripts[m_oldContentNo].InActiveContent();
+            }
 
             m_PartScripts[CMenuAdministrator.m_proContentNo].SelectAnimation();
+            m_PartScripts[CMenuAdministrator.m_proContentNo].ActiveContent();
 
             m_oldContentNo = CMenuAdministrator.m_proContentNo;
         }

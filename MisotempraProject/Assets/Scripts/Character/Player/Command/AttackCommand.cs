@@ -31,11 +31,11 @@ namespace Player
             {
                 player.animator.SetTrigger("Attack");
 
-                player.isAcceptAttack = false;
-                player.playerRigidbody.velocity = Vector3.zero;
+                //player.isAcceptAttack = false;
+                //player.playerRigidbody.velocity = Vector3.zero;
 
-                player.SetAcceptAttack(0);
-                // m_attackCollision.SetActive(true);
+                //player.SetAcceptAttack(0);
+                //// m_attackCollision.SetActive(true);
                 player.damageController.sender.EnableAction(m_key, m_attackInfos[m_attackCounter].scale);
                 ++m_attackCounter;
                 if (m_attackCounter >= m_attackInfos.Count)

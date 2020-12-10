@@ -29,8 +29,6 @@ public class ResultManager : MonoBehaviour
             Debug.LogError("2ついじょうあるよ");
         }
 #endif
-
-        StartCoroutine("ResultCheck");
     }
 
     private void OnDestroy()
@@ -38,15 +36,21 @@ public class ResultManager : MonoBehaviour
         if(instance) instance = null;
     }
 
-    private IEnumerator ResultCheck()
+    private void Update()
     {
-        bool isLoop = true;
-        while (isLoop)
-        {
-            isLoop = !ClearCheck();
+        //bool isLoop = true;
+        //while (isLoop)
+        //{
+            bool isClear = ClearCheck();
 
-            yield return new WaitForSeconds(m_checkTime);
-        }
+            if (isClear)
+            {
+                //isLoop = !isClear;
+                m_clearProduction.SetActive(true);
+            }
+
+        //    yield return new WaitForSeconds(m_checkTime);
+        //}
     }
 
     private bool ClearCheck()
@@ -57,6 +61,4 @@ public class ResultManager : MonoBehaviour
         }
         return true;
     }
-
-    
 }

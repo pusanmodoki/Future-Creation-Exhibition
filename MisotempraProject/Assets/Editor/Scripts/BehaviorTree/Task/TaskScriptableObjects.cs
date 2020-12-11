@@ -19,6 +19,13 @@ namespace Editor
 				MoveTo m_task = null;
 				public void Initialize(MoveTo initialize) { m_task = initialize; }
 			}
+			public class TaskScriptableObjectClassNamedeath : BaseTaskScriptableObject
+			{
+				public death task { get { return m_task; } }
+				[SerializeField]
+				death m_task = null;
+				public void Initialize(death initialize) { m_task = initialize; }
+			}
 			public class TaskScriptableObjectClassNamepractice3 : BaseTaskScriptableObject
 			{
 				public practice3 task { get { return m_task; } }
@@ -86,6 +93,13 @@ namespace Editor
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameMoveTo>();
 						(scriptableObject as TaskScriptableObjectClassNameMoveTo).Initialize(task as MoveTo);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameMoveTo);
+						return;
+					}
+					if (taskTypeFullName == typeof(death).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamedeath>();
+						(scriptableObject as TaskScriptableObjectClassNamedeath).Initialize(task as death);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNamedeath);
 						return;
 					}
 					if (taskTypeFullName == typeof(practice3).FullName)

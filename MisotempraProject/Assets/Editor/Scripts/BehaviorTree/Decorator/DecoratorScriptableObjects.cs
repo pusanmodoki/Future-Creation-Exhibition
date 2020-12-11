@@ -12,6 +12,13 @@ namespace Editor
 		{
 			public class BaseDecoratorScriptableObject : UnityEngine.ScriptableObject {}
 
+			public class DecoratorScriptableObjectClassNameDeath_Decorator : BaseDecoratorScriptableObject
+			{
+				public Death_Decorator decorator { get { return m_decorator; } }
+				[SerializeField]
+				Death_Decorator m_decorator = null;
+				public void Initialize(Death_Decorator initialize) { m_decorator = initialize; }
+			}
 			public class DecoratorScriptableObjectClassNamepractice2_Decorator : BaseDecoratorScriptableObject
 			{
 				public practice2_Decorator decorator { get { return m_decorator; } }
@@ -53,6 +60,13 @@ namespace Editor
 				public static void CreateEditorAndScriptableObject(AI.BehaviorTree.BaseDecorator decorator, 
 					out UnityEditor.Editor editor, out UnityEngine.ScriptableObject scriptableObject, string decoratorTypeFullName)
 				{
+					if (decoratorTypeFullName == typeof(Death_Decorator).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameDeath_Decorator>();
+						(scriptableObject as DecoratorScriptableObjectClassNameDeath_Decorator).Initialize(decorator as Death_Decorator);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameDeath_Decorator);
+						return;
+					}
 					if (decoratorTypeFullName == typeof(practice2_Decorator).FullName)
 					{
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNamepractice2_Decorator>();

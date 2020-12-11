@@ -19,7 +19,7 @@ public class wark : AI.BehaviorTree.BaseTask
     {
         navMeshAgent.isStopped = false;
         rigidbody.isKinematic = true;
-        flag = UpdateResult.Run;
+        flag = UpdateResult.Success;
         Debug.Log("wark init");
         return EnableResult.Success;
     }
@@ -33,13 +33,7 @@ public class wark : AI.BehaviorTree.BaseTask
 
     public override UpdateResult Update()
     {
-        navMeshAgent.SetDestination(blackboard.gameObjects["target"].transform.position);
+        navMeshAgent.SetDestination(blackboard.transforms["PlayerTransform"].position);
         return flag;
-    }
-
-    public override void OnTriggerEnter(Collider other)
-    {
-        flag = UpdateResult.Failed;
-        Debug.Log("wark OnTriggerEnter");
     }
 }

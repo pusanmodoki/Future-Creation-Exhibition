@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using AI.BehaviorTree;
@@ -6,11 +6,12 @@ using UnityEngine;
 using UnityEngine.AI;
 [System.Serializable]//必須
 
-public class practice4 : AI.BehaviorTree.BaseTask
-{
-    [SerializeField]
-    string str = "";
 
+//敵死亡処理
+
+
+public class death : AI.BehaviorTree.BaseTask
+{
     public override void FixedUpdate()
     {
     }
@@ -22,12 +23,11 @@ public class practice4 : AI.BehaviorTree.BaseTask
 
     public override void OnQuit(UpdateResult result)
     {
-		//Debug.Log("quit: " + str);
-	}
+        Debug.Log("death");
+    }
 
     public override UpdateResult Update()
     {
-        Debug.Log(str);
         return UpdateResult.Success;
     }
 }

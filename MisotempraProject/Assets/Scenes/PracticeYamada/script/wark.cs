@@ -19,7 +19,7 @@ public class wark : AI.BehaviorTree.BaseTask
     {
         navMeshAgent.isStopped = false;
         rigidbody.isKinematic = true;
-        flag = UpdateResult.Success;
+        flag = UpdateResult.Run;
         Debug.Log("wark init");
         return EnableResult.Success;
     }
@@ -34,6 +34,8 @@ public class wark : AI.BehaviorTree.BaseTask
     public override UpdateResult Update()
     {
         navMeshAgent.SetDestination(blackboard.transforms["PlayerTransform"].position);
+        if ((blackboard.transforms["PlayerTransform"].position - rigidbody.transform.position).sqrMagnitude <= 3)
+            flag = UpdateResult.Success;
         return flag;
     }
 }

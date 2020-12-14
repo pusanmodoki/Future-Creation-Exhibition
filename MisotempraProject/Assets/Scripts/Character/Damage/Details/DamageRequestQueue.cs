@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace Damage
@@ -74,6 +75,7 @@ namespace Damage
 	{
 		public float attack { get { return m_attack; } }
 		public RequestQueue.Details details { get { return m_details; } }
+		public ReadOnlyCollection<GameObject> attackColliders { get; private set; }
 		public string key { get { return m_key; } }
 		public float attackScale { get; private set; } = 1.0f;
 		public int id { get; private set; } = -1;
@@ -97,6 +99,7 @@ namespace Damage
 		{
 			attackScale = 1.0f;
 			id = -1;
+			attackColliders = new ReadOnlyCollection<GameObject>(m_attackColliders);
 		}
 
 		[SerializeField, Tooltip("Key")]
@@ -106,5 +109,7 @@ namespace Damage
 		float m_attack;
 		[SerializeField, Tooltip("Details")]
 		RequestQueue.Details m_details;
+		[SerializeField]
+		List<GameObject> m_attackColliders;
 	}
 }

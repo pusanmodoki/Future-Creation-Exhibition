@@ -55,7 +55,7 @@ namespace Damage
             m_sender.EnableAction(key, scale);
         }
 
-        public void DiableAction(string key)
+        public void DisableAction(string key)
         {
             m_sender.DisableAction(key);
         }

@@ -6,18 +6,18 @@ using UnityEngine;
 
 public class Enemy_Ini : AI.BehaviorTree.BaseBlackboardInitializer
 {
-
     [SerializeField]
-    string m_animationAttackKey = null;
-    int m_animationID;
+    Animator animator = null;
+    [SerializeField]
+    Transform m_obj;
 
-    public override void InitializeAllInstance(Blackboard blackboard)//
+    public override void InitializeAllInstance(Blackboard blackboard)
     {
-        throw new NotImplementedException();
+        blackboard.transforms["PlayerTransform"] = m_obj;
     }
 
     public override void InitializeFirstInstance(Blackboard blackboard)//最初のインスタンス
     {
-        throw new NotImplementedException();
+        blackboard.components["Animator"] = animator;
     }
 }

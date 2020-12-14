@@ -22,6 +22,7 @@ namespace AI
 			public abstract void FixedUpdate();
 			public abstract void OnQuit(UpdateResult result);
 
+			public virtual void OnCreate() { }
 			public virtual void OnCollisionEnter(Collision collision) { }
 			public virtual void OnCollisionStay(Collision collision) { }
 			public virtual void OnCollisionExit(Collision collision) { }

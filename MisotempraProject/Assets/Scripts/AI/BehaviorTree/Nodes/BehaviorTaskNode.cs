@@ -116,6 +116,7 @@ namespace AI
 					var taskInfo = m_taskDataKeyGuid[guid];
 					result.task = (BaseTask)JsonUtility.FromJson(taskInfo.jsonData, taskInfo.classType);
 					result.task.InitializeBase(behaviorTree, result.aiAgent, this);
+					result.task.OnCreate();
 
 					return result;
 				}

@@ -58,7 +58,7 @@ namespace Player
 
         [Header("Attack Info")]
         [SerializeField]
-        private List<AttackCommand> m_attackCommand = new List<AttackCommand>();
+        private AttackCommand m_attackCommand = null;
 
         [Header("Jump Info")]
         [SerializeField]
@@ -92,7 +92,7 @@ namespace Player
 #endif
             }
 
-            animator = GetComponent<Animator>();
+            animator = GetComponentInChildren<Animator>();
             if (!animator)
             {
 #if UNITY_EDITOR
@@ -128,7 +128,7 @@ namespace Player
                         // Jump();
                         //AttackInput();
 
-                        m_attackCommand[0].Command(this);
+                        m_attackCommand.Command(this);
 
                         m_jumpCommand.Command(this);
                         break;
@@ -138,7 +138,7 @@ namespace Player
                         m_moveCommand.Command(this);
                         // Jump();
                         //AttackInput();
-                        m_attackCommand[0].Command(this);
+                        m_attackCommand.Command(this);
                         m_jumpCommand.Command(this);
                         break;
                     }
@@ -151,7 +151,7 @@ namespace Player
 
                 case ActionState.Attack:
                     {
-                        m_attackCommand[0].Command(this);
+                        m_attackCommand.Command(this);
                         break;
                     }
                 default:
@@ -255,6 +255,11 @@ namespace Player
             m_state = (ActionState)state;
         }
 
+        public void SetAnimationState(in AnimationState state)
+        {
+            animator.SetInteger("State", (int)state);
+        }
+
         private void OnDestroy()
         {
             instance = null;
@@ -269,6 +274,12 @@ namespace Player
         Run = 1 << 1,
         Attack = 1 << 2,
         Airial = 1 << 3
+    }
+
+    public enum AnimationState
+    {
+        Stand = 0,
+        Run
     }
 }
 

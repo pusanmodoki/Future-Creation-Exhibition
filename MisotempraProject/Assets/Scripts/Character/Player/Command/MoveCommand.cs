@@ -36,8 +36,18 @@ namespace Player
 
             if (!isOnHorizontal && !isOnVertical)
             {
+                if(InputManagement.GameInput.GetButtonUp(axesNames[(int)AxesName.Horizontal]) ||
+                    InputManagement.GameInput.GetButtonUp(axesNames[(int)AxesName.Vertical]))
+                {
+                    player.animator.SetTrigger("RunStop");
+                }
+                else
+                {
+                    player.SetAnimationState(AnimationState.Stand);
+                }
                 return false;
             }
+
 
             // 進行方向計算
             float horizontal, vertical;
@@ -51,12 +61,24 @@ namespace Player
 
             Vector2 vec = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
 
+            Vector2 vecNormal = vec.normalized;
+            Vector2 forceNormal = force.normalized;
+
+            float dot = vecNormal.x * forceNormal.x + vecNormal.y * forceNormal.y;
+            
+            if(Mathf.Rad2Deg * Mathf.Acos(dot) > 60.0f)
+            {
+                speed *= -0.5f;
+            }
+
             force = vec;
 
             // rolling 
             Vector3 rot = player.transform.eulerAngles;
             rot.y = -(Mathf.Atan2(force.y, force.x) * Mathf.Rad2Deg - 90);
             player.transform.eulerAngles = rot;
+
+            player.SetAnimationState(AnimationState.Run);
 
             return true;
         }
@@ -77,7 +99,6 @@ namespace Player
                 if (speed < 0.0f)
                 {
                     speed = 0.0f;
-                    player.state = ActionState.Stand;
                 }
             }
 

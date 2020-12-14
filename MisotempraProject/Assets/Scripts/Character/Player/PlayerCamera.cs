@@ -17,16 +17,13 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 m_offset = new Vector3(0.0f, 2.0f, 0.0f);
 
     [SerializeField]
+    private float m_rayOffset = 0.1f;
+
+    [SerializeField]
     private float m_maxZenith = 120.0f;
 
     [SerializeField]
     private float m_minZenith = 20.0f;
-
-    [SerializeField]
-    private GameObject m_followObject = null;
-
-    [SerializeField]
-    private GameObject m_lookObject = null;
 
     private Vector2 force;
 
@@ -60,6 +57,9 @@ public class PlayerCamera : MonoBehaviour
     }
 
     [SerializeField]
+    private Polar m_startPolar = new Polar();
+
+    [SerializeField, NonEditable]
     private Polar m_polar = new Polar(15.0f, 90.0f, 0.0f);
 
     public Polar polar { get { return m_polar; } }
@@ -67,6 +67,7 @@ public class PlayerCamera : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        m_polar = m_startPolar;
     }
 
     private void Update()
@@ -81,6 +82,8 @@ public class PlayerCamera : MonoBehaviour
     void LateUpdate()
     {
         InputMove();
+
+        RayCollision();
 
         ConvertRectangular();
     }
@@ -113,7 +116,24 @@ public class PlayerCamera : MonoBehaviour
         Vector3 polarPos = m_polar.ToRectangular;
         transform.position = pos + polarPos + m_offset;
 
-        transform.LookAt(m_player.transform);
+        transform.LookAt(m_player.transform.position + m_offset);
+    }
+
+    void RayCollision()
+    {
+        Ray ray = new Ray(m_player.transform.position + m_offset, m_polar.ToRectangular.normalized);
+
+        RaycastHit hit;
+        
+        if (Physics.Raycast(ray, out hit, m_startPolar.radius, LayerMask.NameToLayer("Ground"))) 
+        {
+            m_polar.radius = hit.distance - m_rayOffset;
+        }
+        else
+        {
+            m_polar.radius = m_startPolar.radius;
+        }
 
     }
+
 }

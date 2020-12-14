@@ -39,6 +39,8 @@ public class Enemy : MonoBehaviour
 
     private bool m_isCheck = true;
 
+    public bool isDead { get { return m_state == State.Dead;} }
+
     private void Awake()
     {
         TimeManagement.TimeLayer.InitLayer(ref m_timeLayer);
@@ -47,15 +49,6 @@ public class Enemy : MonoBehaviour
     private void OnEnable()
     {
         StartCoroutine("CheckArmorState");
-    }
-
-    private void Update()
-    {
-        
-    }
-
-    private void FixedUpdate()
-    {
     }
 
     private IEnumerator CheckArmorState()

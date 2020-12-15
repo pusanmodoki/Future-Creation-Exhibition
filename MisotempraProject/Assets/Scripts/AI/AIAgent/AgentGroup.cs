@@ -57,7 +57,7 @@ namespace AI
 		void OnDestroy()
 		{
 			//Managerから削除
-			AgentGroupManager.instance.Remove(this);
+			AgentGroupManager.instance?.Remove(this);
 		}
 
 		/// <summary>

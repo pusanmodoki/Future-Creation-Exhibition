@@ -5,7 +5,7 @@ using UnityEditor.Callbacks;
 using System.IO;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree
@@ -36,7 +36,7 @@ namespace Editor
 					"using System.Collections;\n" +
 					"using UnityEngine;\n\n" +
 					"/// <summary>MisoTempra editor</summary>\n" +
-					"namespace Editor\n" +
+					"namespace LocalEditor\n" +
 					"{\n" +
 					"\t/// <summary>Behavior tree editor</summary>\n" +
 					"\tnamespace BehaviorTree\n" +

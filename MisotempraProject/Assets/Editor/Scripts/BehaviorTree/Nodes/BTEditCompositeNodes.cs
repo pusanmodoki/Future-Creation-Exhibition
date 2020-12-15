@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree

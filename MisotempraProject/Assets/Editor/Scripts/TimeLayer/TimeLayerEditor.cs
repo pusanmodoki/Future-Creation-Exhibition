@@ -7,7 +7,7 @@ using TimeManagement;
 using TimeManagement.Detail;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	namespace TimeLayer
 	{

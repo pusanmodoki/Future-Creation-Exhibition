@@ -13,11 +13,11 @@ public class Enemy_Ini : AI.BehaviorTree.BaseBlackboardInitializer
 
     public override void InitializeAllInstance(Blackboard blackboard)
     {
-        blackboard.transforms["PlayerTransform"] = m_obj;
+        blackboard.SetValue("PlayerTransform", m_obj);
     }
 
     public override void InitializeFirstInstance(Blackboard blackboard)//最初のインスタンス
     {
-        blackboard.components["Animator"] = animator;
+        blackboard.SetValue("Animator", animator);
     }
 }

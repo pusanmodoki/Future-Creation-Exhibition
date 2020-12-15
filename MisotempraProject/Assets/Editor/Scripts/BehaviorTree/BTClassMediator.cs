@@ -7,7 +7,7 @@ using CashContainer = AI.BehaviorTree.CashContainer;
 using Composite = AI.BehaviorTree.Node.Composite;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree

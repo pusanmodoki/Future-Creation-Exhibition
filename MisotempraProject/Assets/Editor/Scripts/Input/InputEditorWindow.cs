@@ -6,7 +6,7 @@ using System.IO;
 using InputManagement;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Input editor</summary>
 	namespace Input

@@ -11,7 +11,7 @@ namespace WakaTe
         //シーンの中で、一番最初のオブジェクト
         public override void InitializeFirstInstance(AI.BehaviorTree.Blackboard blackboard)
         {
-            blackboard.gameObjects["Target"] = m_obj;
+            blackboard.SetValue("Target", m_obj);
         }
 
         //毎回生成されるたび呼ばれる

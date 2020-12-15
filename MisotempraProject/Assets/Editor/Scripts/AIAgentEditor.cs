@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	[CustomEditor(typeof(AI.AIAgent))]
 	public class AIAgentEditor : UnityEditor.Editor

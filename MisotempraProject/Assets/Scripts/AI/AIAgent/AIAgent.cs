@@ -13,7 +13,9 @@ namespace AI
 		public BehaviorTree.BehaviorTree behaviorTree { get; private set; } = null;
 		public NavMeshAgent navMeshAgent { get { return m_navMeshAgent; } }
 		public new Rigidbody rigidbody { get { return m_rigidbody; } }
-		public AIStatus aiStatus { get; private set; } = null;
+		public AgentGroup group { get { return m_group; } }
+		public AIStatus status { get { return m_status; } } 
+		public AIVision vision { get { return m_vision; } }
 
 		[SerializeField]
 		BehaviorTree.Detail.BehaviorFileName m_fileName = null;
@@ -25,14 +27,14 @@ namespace AI
 		Rigidbody m_rigidbody = null;
 		[SerializeField]
 		AgentGroup m_group = null;
+		[SerializeField]
+		AIStatus m_status = null;
+		[SerializeField]
+		AIVision m_vision = null;
 
 		public void SetGroup(AgentGroup group)
 		{
 			m_group = group;
-		}
-		public void SetAIStatus(AIStatus aiStatus)
-		{
-			this.aiStatus = aiStatus;
 		}
 
 		void Awake()

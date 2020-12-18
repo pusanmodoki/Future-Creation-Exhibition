@@ -16,11 +16,14 @@ namespace Player
         private float m_deceleration = 1.0f;
         [SerializeField, Range(0.0f, 2.0f)]
         private float m_limitMove = 1.0f;
-
+        [SerializeField]
+        private float m_airialLimit = 0.2f;
 
         public Vector2 force { get; private set; }
 
         private float speed { get; set; }
+
+        public Vector2 velocity { get; private set; }
 
         private enum AxesName
         {
@@ -31,27 +34,18 @@ namespace Player
 
         protected override bool OnCommand(PlayerController player)
         {
-            bool isOnHorizontal = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Horizontal]);
-            bool isOnVertical = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Vertical]);
-
-            if (!isOnHorizontal && !isOnVertical)
+            if (!InputCheck())
             {
-                if(InputManagement.GameInput.GetButtonUp(axesNames[(int)AxesName.Horizontal]) ||
-                    InputManagement.GameInput.GetButtonUp(axesNames[(int)AxesName.Vertical]))
-                {
-                    player.animator.SetTrigger("RunStop");
-                }
-                else
-                {
-                    player.SetAnimationState(AnimationState.Stand);
-                }
                 return false;
             }
 
-
             // 進行方向計算
             float horizontal, vertical;
-            player.state = ActionState.Run;
+
+            if(player.state != ActionState.Airial)
+            {
+                player.state = ActionState.Run;
+            }
 
             horizontal = InputManagement.GameInput.GetAxis(axesNames[(int)AxesName.Horizontal]);
             vertical = InputManagement.GameInput.GetAxis(axesNames[(int)AxesName.Vertical]);
@@ -61,30 +55,35 @@ namespace Player
 
             Vector2 vec = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
 
+
+            // 進行方向が大きく変わった時
+
             Vector2 vecNormal = vec.normalized;
             Vector2 forceNormal = force.normalized;
 
             float dot = vecNormal.x * forceNormal.x + vecNormal.y * forceNormal.y;
             
-            if(Mathf.Rad2Deg * Mathf.Acos(dot) > 60.0f)
+            if(Mathf.Abs(Mathf.Rad2Deg * Mathf.Acos(dot)) > 60.0f)
             {
-                speed *= -0.5f;
+                player.animator.SetTrigger("Turn");
+                speed = 0.0f;
             }
 
             force = vec;
+
 
             // rolling 
             Vector3 rot = player.transform.eulerAngles;
             rot.y = -(Mathf.Atan2(force.y, force.x) * Mathf.Rad2Deg - 90);
             player.transform.eulerAngles = rot;
 
-            player.SetAnimationState(AnimationState.Run);
-
             return true;
         }
 
         public override void FixedUpdate(PlayerController player)
         {
+            Vector2 vec = force;
+
             if (isOnCommand)
             {
                 speed += m_acceleration;
@@ -104,8 +103,8 @@ namespace Player
 
 
             Vector3 velocity = player.playerRigidbody.velocity;
-            Vector2 vec = force;
-
+            // Vector2 vec = force;
+            
             // 移動ベクトル
             vec *= speed * m_limitMove;
             velocity.x = vec.x;
@@ -115,6 +114,28 @@ namespace Player
 
         }
 
+
+        private bool InputCheck()
+        {
+            bool isOnHorizontal = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Horizontal]);
+            bool isOnVertical = InputManagement.GameInput.GetButton(axesNames[(int)AxesName.Vertical]);
+
+            // 入力検知と状態更新
+            if (!isOnHorizontal && !isOnVertical)
+            {
+                if (InputManagement.GameInput.GetButtonUp(axesNames[(int)AxesName.Horizontal]) ||
+                    InputManagement.GameInput.GetButtonUp(axesNames[(int)AxesName.Vertical]))
+                {
+                    PlayerController.instance.state = ActionState.Stand;
+                }
+                //else
+                //{
+                //    PlayerController.instance.SetAnimationState(AnimationState.Stand);
+                //}
+                return false;
+            }
+            return true;
+        }
 
     }
 }

@@ -9,7 +9,12 @@ ModelImporter:
   - first:
       74: -6990600795631027499
     second: ObjObject|ObjObjectAction.001
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: palette.002
+    second: {fileID: 2100000, guid: 6a0a9d480b063474792511cb0cc95993, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

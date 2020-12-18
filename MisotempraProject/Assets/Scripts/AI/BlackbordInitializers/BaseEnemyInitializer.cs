@@ -17,7 +17,7 @@ namespace AI
 
 				public override void InitializeAllInstance(Blackboard blackboard)
 				{
-					blackboard.transforms["PlayerTransform"] = GameObject.Find("Player").transform;
+					blackboard.transforms[m_playerTransformKey] = GameObject.Find(m_playerObjectName).transform;
 				}
 
 				public override void InitializeFirstInstance(Blackboard blackboard)

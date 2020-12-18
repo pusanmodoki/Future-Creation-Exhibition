@@ -15,12 +15,6 @@ public class CMenuContent_Basic : CAnimationController
         Max,
     }
     private eState m_state = eState.Non;
-    //-------------------------------------------------------------------------
-    // Start is called before the first frame update
-    void Start()
-    {
-        base.Start();
-    }
 
     // Update is called once per frame
     void Update()

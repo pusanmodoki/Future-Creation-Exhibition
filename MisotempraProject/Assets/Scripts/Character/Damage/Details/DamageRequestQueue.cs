@@ -103,13 +103,13 @@ namespace Damage
 		}
 
 		[SerializeField, Tooltip("Key")]
-		string m_key;
+		string m_key =  "";
 		/// <summary>攻撃力</summary>
 		[SerializeField, Tooltip("攻撃力")]
-		float m_attack;
+		float m_attack = 0.0f;
 		[SerializeField, Tooltip("Details")]
-		RequestQueue.Details m_details;
+		RequestQueue.Details m_details = new RequestQueue.Details();
 		[SerializeField]
-		List<GameObject> m_attackColliders;
+		List<GameObject> m_attackColliders = new List<GameObject>();
 	}
 }

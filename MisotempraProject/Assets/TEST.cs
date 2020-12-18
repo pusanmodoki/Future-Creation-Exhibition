@@ -5,10 +5,10 @@ using AI.BehaviorTree;
 
 public class TEST : MonoBehaviour
 {
-	[SerializeField]
-	TypeName m_typeName = default;
-	[SerializeField]
-	Damage.DamageController m_controller = null;
+	//[SerializeField]
+	//TypeName m_typeName = default;
+	//[SerializeField]
+	//Damage.DamageController m_controller = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +18,7 @@ public class TEST : MonoBehaviour
 
 		//int a = 0;
 		//a = 0;
-		var i = TimeManagement.TimeManager.instance;
+		//var i = TimeManagement.TimeManager.instance;
 	}
 
     // Update is called once per frame
@@ -26,9 +26,7 @@ public class TEST : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
 		{
-			m_controller.sender.EnableAction("Test");
-			int a = 0;
-			a = 0;
+			//m_controller.sender.EnableAction("Test");
 		}
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class CTitleGameStart : MonoBehaviour
 {
     //-------------------------------------------------------------
-    [SerializeField] private CMenuContentTagPart m_CotentScript;
+    [SerializeField] private CMenuContentTagPart m_CotentScript = null;
 
 
     //-------------------------------------------------------------

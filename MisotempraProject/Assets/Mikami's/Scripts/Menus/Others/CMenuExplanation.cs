@@ -6,7 +6,7 @@ public class CMenuExplanation : CAnimationController
 {
     //-----------------------------------------------------------------
     //
-    [SerializeField] private CMoveFont m_MoveFontScript;
+    [SerializeField] private CMoveFont m_MoveFontScript = null;
 
     //-----------------------------------------------------------------
     //
@@ -19,12 +19,6 @@ public class CMenuExplanation : CAnimationController
         Max,
     }
     private eState m_stateExplanation = eState.Non;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        base.Start();
-    }
 
     // Update is called once per frame
     void Update()

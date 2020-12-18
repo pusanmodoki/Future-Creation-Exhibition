@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class CMoveFont : MonoBehaviour
 {
     // フォントに書き込み文字列
-    [SerializeField] private string m_inputFont;
-    [SerializeField] private Text m_text;
+    [SerializeField] private string m_inputFont = "";
+    [SerializeField] private Text m_text = null;
 
     //-------------------------------------------------------------
     protected bool m_flgState = false;

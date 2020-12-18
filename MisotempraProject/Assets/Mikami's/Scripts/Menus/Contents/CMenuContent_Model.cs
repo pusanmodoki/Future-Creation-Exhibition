@@ -27,7 +27,7 @@ public class CMenuContent_Model : CAnimationController
 
     //-------------------------------------------------------------------------
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
         base.Start();
 

@@ -5,12 +5,12 @@ using UnityEngine;
 public class CMenuTagManager : MonoBehaviour
 {
     //------------------------------------------------------------
-    [SerializeField] private GameObject m_objTag;
+    [SerializeField] private GameObject m_objTag = null;
 
     //------------------------------------------------------------
-    [SerializeField] private CMenuHeader m_HeaderScript;
-    [SerializeField] private CMenuPattern m_PatternScript;
-    [SerializeField] private List<CMenuTag2> m_TagScripts;
+    [SerializeField] private CMenuHeader m_HeaderScript = null;
+    [SerializeField] private CMenuPattern m_PatternScript = null;
+    [SerializeField] private List<CMenuTag2> m_TagScripts = new List<CMenuTag2>();
 
     //------------------------------------------------------------
     // 状態遷移

@@ -14,8 +14,8 @@ public class CTitleRogo : CAnimationController
         Max,
     }
     private eState m_stateRogo = eState.Non;
-    // Start is called before the first frame update
-    void Start()
+	// Start is called before the first frame update
+	public override void Start()
     {
         base.Start();    }
 

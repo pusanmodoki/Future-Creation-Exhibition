@@ -7,8 +7,8 @@ public class CMenuContentTagPart : CAnimationController
 {
     //----------------------------------------------------
     // contentsの中身
-    [SerializeField] private CMoveFont m_MoveFontScript;
-    [SerializeField] private CMenuContent2 m_ContentScript;
+    [SerializeField] private CMoveFont m_MoveFontScript = null;
+    [SerializeField] private CMenuContent2 m_ContentScript = null;
 
     //----------------------------------------------------
     // 状態遷移
@@ -28,12 +28,12 @@ public class CMenuContentTagPart : CAnimationController
     private bool m_stateFontAnimation = false;
 
     //--------------------------------------------------------------
-    [SerializeField] private Image m_imgBackGround;
+    [SerializeField] private Image m_imgBackGround = null;
     [SerializeField] private Color32 m_colBackGround = new Color32(255, 255, 255, 255);
     [SerializeField] private Color32 m_colHitBackGround = new Color32(255, 255, 255, 255);
 
-    // Start is called before the first frame update
-    void Start()
+	// Start is called before the first frame update
+	public override void Start()
     {
         m_proButtonNo = 0;
         base.Start();

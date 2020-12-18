@@ -5,8 +5,8 @@ using UnityEngine;
 public class CMenuContentTagManager : MonoBehaviour
 {
     //-----------------------------------------------------------------
-    [SerializeField] private CMenuPattern m_PatternScript;
-    [SerializeField] private List<CMenuContentTag> m_ContentScripts;
+    [SerializeField] private CMenuPattern m_PatternScript = null;
+    [SerializeField] private List<CMenuContentTag> m_ContentScripts = new List<CMenuContentTag>();
     private List<CMenuExplanation> m_ExplanationScripts = new List<CMenuExplanation>();
 
     //-----------------------------------------------------------------

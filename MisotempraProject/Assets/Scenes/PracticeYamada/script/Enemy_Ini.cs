@@ -9,7 +9,7 @@ public class Enemy_Ini : AI.BehaviorTree.BaseBlackboardInitializer
     [SerializeField]
     Animator animator = null;
     [SerializeField]
-    Transform m_obj;
+    Transform m_obj = null;
 
     public override void InitializeAllInstance(Blackboard blackboard)
     {

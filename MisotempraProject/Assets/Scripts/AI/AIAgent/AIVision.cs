@@ -235,6 +235,7 @@ namespace AI
 #if UNITY_EDITOR
 		public void DExecuteVision()
 		{
+			m_loseSightTimer.Start();
 			ExecuteVision();
 		}
 #endif

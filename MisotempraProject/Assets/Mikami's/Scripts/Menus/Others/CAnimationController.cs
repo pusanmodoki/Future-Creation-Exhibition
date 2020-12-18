@@ -6,7 +6,7 @@ public class CAnimationController : MonoBehaviour
 {
     private Animator m_animator;
     // Start is called before the first frame update
-    public void Start()
+    public virtual void Start()
     {
         SecureAnimator();
     }
@@ -50,14 +50,14 @@ public class CAnimationController : MonoBehaviour
     /// <return>( bool型 )</return>
     public bool JudgeAnimation(string chipName)
     {
-        if (m_animator.GetCurrentAnimatorStateInfo(0).nameHash == Animator.StringToHash(chipName))
+        if (m_animator.GetCurrentAnimatorStateInfo(0).fullPathHash == Animator.StringToHash(chipName))
             if (m_animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
                 return true;
         return false;
     }
     public bool JudgeAnimation(Animator animator,string chipName)
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).nameHash == Animator.StringToHash(chipName))
+        if (animator.GetCurrentAnimatorStateInfo(0).fullPathHash == Animator.StringToHash(chipName))
             if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
                 return true;
         return false;

@@ -7,9 +7,9 @@ using UnityEngine;
 public class CMenuSupervision : MonoBehaviour
 {
     //--------------------------------------------------------------------
-    [SerializeField] private CMenuTagManager m_TagManagerScript;
-    [SerializeField] private CMenuContentTagManager m_ContentManagerScript;
-    [SerializeField] private CMenuBackGround m_BackGroundScript;
+    [SerializeField] private CMenuTagManager m_TagManagerScript = null;
+    [SerializeField] private CMenuContentTagManager m_ContentManagerScript = null;
+    [SerializeField] private CMenuBackGround m_BackGroundScript = null;
 
     //--------------------------------------------------------------------
     [SerializeField] private KeyCode m_menuOpenKeyCode = KeyCode.Q;

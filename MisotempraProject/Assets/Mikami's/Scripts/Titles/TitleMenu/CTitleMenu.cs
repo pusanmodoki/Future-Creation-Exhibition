@@ -5,7 +5,7 @@ using UnityEngine;
 public class CTitleMenu : MonoBehaviour
 {
     //---------------------------------------------------------------------------
-    [SerializeField] private List<CMenuContentTagPart> m_ContentScripts;
+    [SerializeField] private List<CMenuContentTagPart> m_ContentScripts = null;
 
     //---------------------------------------------------------------------------
     // 各buttonの役割

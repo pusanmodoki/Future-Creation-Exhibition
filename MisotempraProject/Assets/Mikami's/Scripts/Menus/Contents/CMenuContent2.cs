@@ -6,8 +6,8 @@ public class CMenuContent2 : MonoBehaviour
 {
     //-------------------------------------------------------------------------
     //
-    [SerializeField] private List<CMenuContent_Basic> m_BasicScripts;   // 通常
-    [SerializeField] private List<CMenuContent_Model> m_ModelScripts;   // モデル
+    [SerializeField] private List<CMenuContent_Basic> m_BasicScripts = null;   // 通常
+    [SerializeField] private List<CMenuContent_Model> m_ModelScripts = null;   // モデル
 
     //-------------------------------------------------------------------------
     //

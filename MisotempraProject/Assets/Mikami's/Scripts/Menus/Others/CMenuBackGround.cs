@@ -5,8 +5,8 @@ using UnityEngine;
 public class CMenuBackGround : CAnimationController
 {
     //-----------------------------------------------------------
-    [SerializeField] private List<GameObject> m_objUpBars;
-    [SerializeField] private List<GameObject> m_objDownBars;
+    [SerializeField] private List<GameObject> m_objUpBars = new List<GameObject>();
+    [SerializeField] private List<GameObject> m_objDownBars = new List<GameObject>();
 
     //-----------------------------------------------------------
     private enum eState
@@ -21,7 +21,7 @@ public class CMenuBackGround : CAnimationController
     //-----------------------------------------------------------
     private int m_BarNo = 0;
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
         base.Start();
 

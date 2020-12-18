@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class CMenuTag2 : CAnimationController
 {
     //-----------------------------------------------------
-    [SerializeField] private CMoveFont m_MoveFontScript;
+    [SerializeField] private CMoveFont m_MoveFontScript = null;
 
     //-----------------------------------------------------
-    [SerializeField] private Image m_imgBackGround;
+    [SerializeField] private Image m_imgBackGround = null;
 
-    [SerializeField] private Color32 m_colBackGround;
-    [SerializeField] private Color32 m_colHitBackGround;
+    [SerializeField] private Color32 m_colBackGround = default;
+    [SerializeField] private Color32 m_colHitBackGround = default;
     //-----------------------------------------------------
     // 状態遷移
     private enum eState
@@ -32,7 +32,7 @@ public class CMenuTag2 : CAnimationController
 
     private bool m_flgFontActive = false;
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
         base.Start();
         // errorコード

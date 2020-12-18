@@ -5,9 +5,9 @@ using UnityEngine;
 public class CTitleSupervision : MonoBehaviour
 {
     //---------------------------------------------------------------
-    [SerializeField] private CTitleRogo m_RogoScript;
-    [SerializeField] private CTitleGameStart m_GameStartScript;
-    [SerializeField] private CTitleMenu m_MenuScript;
+    [SerializeField] private CTitleRogo m_RogoScript = null;
+    [SerializeField] private CTitleGameStart m_GameStartScript = null;
+    [SerializeField] private CTitleMenu m_MenuScript = null;
 
     //---------------------------------------------------------------
     private enum eState

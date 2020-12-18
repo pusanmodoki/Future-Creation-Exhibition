@@ -7,6 +7,11 @@ public struct TypeName
 {
 	public string typeName { get { return m_typeName; } }
 
+	public TypeName(string typeName)
+	{
+		m_typeName = typeName;
+	}
+
 	[SerializeField]
 	string m_typeName;
 

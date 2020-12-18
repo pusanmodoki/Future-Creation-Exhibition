@@ -18,7 +18,7 @@ namespace Damage
 		public Transform transform { get; private set; } = null;
 
 		/// <summary>リクエストを貯めるキュー</summary>
-		public List<RequestQueue> m_requestQueue { get { return m_drawingRequestQueue; } }
+		List<RequestQueue> m_requestQueue { get { return m_drawingRequestQueue; } }
 		
 		/// <summary>ダメージリクエストを描画</summary>
 		[SerializeField, Tooltip("ダメージリクエストを描画"), NonEditable]

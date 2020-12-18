@@ -17,6 +17,15 @@ namespace AI
 		[SerializeField]
 		float m_hp = 0.0f;
 
+		void Update()
+		{
+			while (m_damageController.receiver.requestQueue.Count > 0)
+			{
+				var pop = m_damageController.receiver.Pop();
+				Damage(pop.attack);
+			}
+		}
+
 		/// <summary>
 		/// [Damage]
 		/// HP - attack

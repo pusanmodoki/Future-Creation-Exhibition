@@ -89,6 +89,13 @@ namespace LocalEditor
 				TestTask m_task = null;
 				public void Initialize(TestTask initialize) { m_task = initialize; }
 			}
+			public class TaskScriptableObjectClassNameDeath : BaseTaskScriptableObject
+			{
+				public AI.BehaviorTree.Task.Death task { get { return m_task; } }
+				[SerializeField]
+				AI.BehaviorTree.Task.Death m_task = null;
+				public void Initialize(AI.BehaviorTree.Task.Death initialize) { m_task = initialize; }
+			}
 			public class TaskScriptableObjectClassNameMoveTo0 : BaseTaskScriptableObject
 			{
 				public AI.BehaviorTree.Task.MoveTo task { get { return m_task; } }
@@ -198,6 +205,13 @@ namespace LocalEditor
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameTestTask>();
 						(scriptableObject as TaskScriptableObjectClassNameTestTask).Initialize(task as TestTask);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameTestTask);
+						return;
+					}
+					if (taskTypeFullName == typeof(AI.BehaviorTree.Task.Death).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameDeath>();
+						(scriptableObject as TaskScriptableObjectClassNameDeath).Initialize(task as AI.BehaviorTree.Task.Death);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameDeath);
 						return;
 					}
 					if (taskTypeFullName == typeof(AI.BehaviorTree.Task.MoveTo).FullName)

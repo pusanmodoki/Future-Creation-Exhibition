@@ -61,6 +61,13 @@ namespace LocalEditor
 				AI.BehaviorTree.Decorator.DiscoverPlayer m_decorator = null;
 				public void Initialize(AI.BehaviorTree.Decorator.DiscoverPlayer initialize) { m_decorator = initialize; }
 			}
+			public class DecoratorScriptableObjectClassNameIsDeath : BaseDecoratorScriptableObject
+			{
+				public AI.BehaviorTree.Decorator.IsDeath decorator { get { return m_decorator; } }
+				[SerializeField]
+				AI.BehaviorTree.Decorator.IsDeath m_decorator = null;
+				public void Initialize(AI.BehaviorTree.Decorator.IsDeath initialize) { m_decorator = initialize; }
+			}
 			public class DecoratorScriptableObjectClassNameToPlayerDistance : BaseDecoratorScriptableObject
 			{
 				public AI.BehaviorTree.Decorator.ToPlayerDistance decorator { get { return m_decorator; } }
@@ -121,6 +128,13 @@ namespace LocalEditor
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameDiscoverPlayer>();
 						(scriptableObject as DecoratorScriptableObjectClassNameDiscoverPlayer).Initialize(decorator as AI.BehaviorTree.Decorator.DiscoverPlayer);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameDiscoverPlayer);
+						return;
+					}
+					if (decoratorTypeFullName == typeof(AI.BehaviorTree.Decorator.IsDeath).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameIsDeath>();
+						(scriptableObject as DecoratorScriptableObjectClassNameIsDeath).Initialize(decorator as AI.BehaviorTree.Decorator.IsDeath);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameIsDeath);
 						return;
 					}
 					if (decoratorTypeFullName == typeof(AI.BehaviorTree.Decorator.ToPlayerDistance).FullName)

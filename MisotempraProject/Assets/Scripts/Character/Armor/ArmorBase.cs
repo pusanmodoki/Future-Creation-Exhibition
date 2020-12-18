@@ -42,6 +42,8 @@ abstract public class ArmorBase : MonoBehaviour
 
         Damage.RequestQueue request = damageController.receiver.Pop();
 
+        EffectPopManager.instance.PopEffect(m_hitEffectName, transform.position);
+
         TakeDamage(request);
         m_isDead = DeadCheck();
 

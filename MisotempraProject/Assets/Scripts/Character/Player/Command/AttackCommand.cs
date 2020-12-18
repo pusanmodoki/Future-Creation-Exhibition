@@ -30,6 +30,7 @@ namespace Player
             if (InputManagement.GameInput.GetButtonDown(axesNames[0]) && player.isAcceptAttack)
             {
                 player.animator.SetTrigger("Attack");
+                player.state = ActionState.Attack;
 
                 //player.isAcceptAttack = false;
                 //player.playerRigidbody.velocity = Vector3.zero;

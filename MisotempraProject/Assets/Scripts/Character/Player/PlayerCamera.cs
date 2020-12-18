@@ -125,7 +125,7 @@ public class PlayerCamera : MonoBehaviour
 
         RaycastHit hit;
         
-        if (Physics.Raycast(ray, out hit, m_startPolar.radius, LayerMask.NameToLayer("Ground"))) 
+        if (Physics.Raycast(ray, out hit, m_startPolar.radius, 1 << LayerMask.NameToLayer("Ground"))) 
         {
             m_polar.radius = hit.distance - m_rayOffset;
         }

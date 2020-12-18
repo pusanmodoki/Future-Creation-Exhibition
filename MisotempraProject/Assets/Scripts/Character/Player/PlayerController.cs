@@ -19,12 +19,10 @@ namespace Player
 
         public bool isAcceptAttack { get; set; } = true;
 
-        private Ray m_jumpDetectRay = new Ray(new Vector3(0.0f, 0.0f, 0.0f), Vector3.down);
-
         /// <summary>
         /// メインカメラへの参照
         /// </summary>
-        public PlayerCamera playerCamera { get { return m_camera; } }
+        public PlayerCamera playerCamera { get; private set; }
 
         /// <summary>
         /// プレイヤーアニメーター
@@ -43,6 +41,7 @@ namespace Player
 
         public PlayerArmor armor { get; private set; }
 
+
         /// <summary>
         /// プレイヤーの状態
         /// </summary>
@@ -50,11 +49,8 @@ namespace Player
         [SerializeField]
         private ActionState m_state = ActionState.None;
 
-        /// <summary>
-        /// 参照
-        /// </summary>
         [SerializeField]
-        private PlayerCamera m_camera = null;
+        private OriginalPhysics.LandingDetect landingDetect = new OriginalPhysics.LandingDetect();
 
         [Header("Attack Info")]
         [SerializeField]
@@ -63,9 +59,6 @@ namespace Player
         [Header("Jump Info")]
         [SerializeField]
         private JumpCommand m_jumpCommand = null;
-
-        [SerializeField]
-        private bool m_isJump = true;
 
         [Header("Move Info")]
         [SerializeField]
@@ -115,6 +108,8 @@ namespace Player
                 Debug.LogError("PlayerArmorが見つかりません。");
 #endif
             }
+
+            playerCamera = Camera.main.GetComponent<PlayerCamera>();
         }
 
         // Update is called once per frame
@@ -136,8 +131,6 @@ namespace Player
                 case ActionState.Run:
                     {
                         m_moveCommand.Command(this);
-                        // Jump();
-                        //AttackInput();
                         m_attackCommand.Command(this);
                         m_jumpCommand.Command(this);
                         break;
@@ -196,6 +189,19 @@ namespace Player
             // 移動
 
             JumpDetect();
+
+            switch (state)
+            {
+                case ActionState.Airial:
+                    animator.SetInteger("State", (int)AnimationState.Airial);
+                    break;
+                case ActionState.Stand:
+                    animator.SetInteger("State", (int)AnimationState.Stand);
+                    break;
+                case ActionState.Run:
+                    animator.SetInteger("State", (int)AnimationState.Run);
+                    break;
+            }
         }
 
         /// <summary>
@@ -224,12 +230,14 @@ namespace Player
 
         private void JumpDetect()
         {
-            Vector3 vec = transform.position;
-            vec.y += 0.2f;
-            m_jumpDetectRay.origin = vec;
-            m_isJump = Physics.Raycast(m_jumpDetectRay, 0.3f);
-            if (m_isJump) { state = ActionState.Stand; }
-            else { state = ActionState.Airial; }
+            if (!landingDetect.IsLanding(gameObject))
+            {
+                state = ActionState.Airial;
+            }
+            else if (state == ActionState.Airial) 
+            {
+                state = ActionState.Stand;
+            }
         }
 
         private void Advance(float value)
@@ -279,7 +287,8 @@ namespace Player
     public enum AnimationState
     {
         Stand = 0,
-        Run
+        Run,
+        Airial
     }
 }
 

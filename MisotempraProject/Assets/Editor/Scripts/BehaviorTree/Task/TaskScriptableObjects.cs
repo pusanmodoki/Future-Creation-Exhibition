@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>MisoTempra editor</summary>
-namespace LocalEditor
+namespace Editor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree
@@ -12,26 +12,12 @@ namespace LocalEditor
 		{
 			public class BaseTaskScriptableObject : UnityEngine.ScriptableObject {}
 
-			public class TaskScriptableObjectClassNameAttack : BaseTaskScriptableObject
-			{
-				public Attack task { get { return m_task; } }
-				[SerializeField]
-				Attack m_task = null;
-				public void Initialize(Attack initialize) { m_task = initialize; }
-			}
 			public class TaskScriptableObjectClassNameMoveTo : BaseTaskScriptableObject
 			{
 				public MoveTo task { get { return m_task; } }
 				[SerializeField]
 				MoveTo m_task = null;
 				public void Initialize(MoveTo initialize) { m_task = initialize; }
-			}
-			public class TaskScriptableObjectClassNamedeath : BaseTaskScriptableObject
-			{
-				public death task { get { return m_task; } }
-				[SerializeField]
-				death m_task = null;
-				public void Initialize(death initialize) { m_task = initialize; }
 			}
 			public class TaskScriptableObjectClassNamepractice3 : BaseTaskScriptableObject
 			{
@@ -89,45 +75,17 @@ namespace LocalEditor
 				TestTask m_task = null;
 				public void Initialize(TestTask initialize) { m_task = initialize; }
 			}
-			public class TaskScriptableObjectClassNamePatrolMove : BaseTaskScriptableObject
-			{
-				public AI.BehaviorTree.Task.PatrolMove task { get { return m_task; } }
-				[SerializeField]
-				AI.BehaviorTree.Task.PatrolMove m_task = null;
-				public void Initialize(AI.BehaviorTree.Task.PatrolMove initialize) { m_task = initialize; }
-			}
-			public class TaskScriptableObjectClassNameToPatrolPoint : BaseTaskScriptableObject
-			{
-				public AI.BehaviorTree.Task.ToPatrolPoint task { get { return m_task; } }
-				[SerializeField]
-				AI.BehaviorTree.Task.ToPatrolPoint m_task = null;
-				public void Initialize(AI.BehaviorTree.Task.ToPatrolPoint initialize) { m_task = initialize; }
-			}
 
 			public static class TaskScriptableObjectClassMediator
 			{
 				public static void CreateEditorAndScriptableObject(AI.BehaviorTree.BaseTask task, 
 					out UnityEditor.Editor editor, out UnityEngine.ScriptableObject scriptableObject, string taskTypeFullName)
 				{
-					if (taskTypeFullName == typeof(Attack).FullName)
-					{
-						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameAttack>();
-						(scriptableObject as TaskScriptableObjectClassNameAttack).Initialize(task as Attack);
-						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameAttack);
-						return;
-					}
 					if (taskTypeFullName == typeof(MoveTo).FullName)
 					{
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameMoveTo>();
 						(scriptableObject as TaskScriptableObjectClassNameMoveTo).Initialize(task as MoveTo);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameMoveTo);
-						return;
-					}
-					if (taskTypeFullName == typeof(death).FullName)
-					{
-						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamedeath>();
-						(scriptableObject as TaskScriptableObjectClassNamedeath).Initialize(task as death);
-						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNamedeath);
 						return;
 					}
 					if (taskTypeFullName == typeof(practice3).FullName)
@@ -184,20 +142,6 @@ namespace LocalEditor
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameTestTask>();
 						(scriptableObject as TaskScriptableObjectClassNameTestTask).Initialize(task as TestTask);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameTestTask);
-						return;
-					}
-					if (taskTypeFullName == typeof(AI.BehaviorTree.Task.PatrolMove).FullName)
-					{
-						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNamePatrolMove>();
-						(scriptableObject as TaskScriptableObjectClassNamePatrolMove).Initialize(task as AI.BehaviorTree.Task.PatrolMove);
-						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNamePatrolMove);
-						return;
-					}
-					if (taskTypeFullName == typeof(AI.BehaviorTree.Task.ToPatrolPoint).FullName)
-					{
-						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<TaskScriptableObjectClassNameToPatrolPoint>();
-						(scriptableObject as TaskScriptableObjectClassNameToPatrolPoint).Initialize(task as AI.BehaviorTree.Task.ToPatrolPoint);
-						editor = UnityEditor.Editor.CreateEditor(scriptableObject as TaskScriptableObjectClassNameToPatrolPoint);
 						return;
 					}
 					scriptableObject = null;

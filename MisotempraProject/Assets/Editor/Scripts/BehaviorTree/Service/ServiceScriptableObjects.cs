@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>MisoTempra editor</summary>
-namespace LocalEditor
+namespace Editor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree

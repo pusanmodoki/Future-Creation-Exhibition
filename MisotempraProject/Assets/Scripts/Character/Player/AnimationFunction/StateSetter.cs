@@ -10,5 +10,6 @@ namespace Player
         {
             PlayerController.instance.SetState(state);
         }
+
     }
 }

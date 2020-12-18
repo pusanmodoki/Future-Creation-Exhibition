@@ -18,11 +18,16 @@ namespace AI
 				[SerializeField]
 				bool isNear = false;
 
+				Transform m_player = null;
+
+				public override void OnCreate(AIAgent agent, Blackboard blackboard)
+				{
+					m_player = blackboard.transforms[m_targetTransformBlackboardKey];
+				}
+
 				public override bool IsPredicate(AIAgent agent, Blackboard blackboard)
 				{
-					return m_targetTransformBlackboardKey != null && m_targetTransformBlackboardKey.Length > 0 ?
-						(blackboard.transforms[m_targetTransformBlackboardKey].position
-						- agent.transform.position).sqrMagnitude > (m_trueDistance * m_trueDistance) ^ isNear : false;
+					return (m_player.position - agent.transform.position).sqrMagnitude > (m_trueDistance * m_trueDistance) ^ isNear;
 				}
 			}
 		}

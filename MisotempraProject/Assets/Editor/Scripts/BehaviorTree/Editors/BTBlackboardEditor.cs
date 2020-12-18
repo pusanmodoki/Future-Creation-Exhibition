@@ -31,7 +31,6 @@ namespace LocalEditor
 				"object"
 			};
 
-
 			SerializedProperty m_classeNameIndexes = null;
 			SerializedProperty m_keys = null;
 			SerializedProperty m_memos = null;
@@ -97,12 +96,14 @@ namespace LocalEditor
 
 					bool isKeyEmpty = keyString.Length == 0;
 					bool isExists = m_keyNamesDictionary[keyString].Count > 1;
+					bool isDefaultKey = AI.BehaviorTree.Blackboard.cDefaultKeys.Contains(keyString);
 					GUIStyle style = EditorStyles.foldout;
 
 					keysTemp.Add(key);
 					title += isKeyEmpty ?
 						"Key name empty!!!" : isExists ?
-						"Key name duplicate!!!" : keyString;
+						"Key name duplicate!!!" : isDefaultKey ?
+						"Key reserved!!!" : keyString;
 
 					if (isKeyEmpty | isExists)
 					{

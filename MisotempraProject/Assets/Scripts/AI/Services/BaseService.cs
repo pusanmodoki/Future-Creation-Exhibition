@@ -19,7 +19,7 @@ namespace AI
 			Timer m_timer = new Timer();
 
 			public abstract void ServiceFunction(AIAgent agent, Blackboard blackboard);
-			public virtual void OnCreate() { }
+			public virtual void OnCreate(AIAgent agent, Blackboard blackboard) { }
 
 			public void LoadBase(CashContainer.Detail.ServiceInfomations infomations, System.Type thisType)
 			{

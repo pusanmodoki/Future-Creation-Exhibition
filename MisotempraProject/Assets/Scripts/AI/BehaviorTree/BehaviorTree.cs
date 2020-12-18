@@ -36,25 +36,25 @@ namespace AI
 			List<CashContainer.Detail.SubsequentTaskInfomations> m_subsequentTaskInfos = null;
 
 			public void RegisterTask(Node.TaskNode node) { oldTask = nowTask; nowTask = node; }
-			public void UnregisterTask() { nowTask = null; }
+			//public void UnregisterTask() { nowTask = null; }
 
 			public BehaviorTree()
 			{
 				nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes);
 				subsequentTasks = new ReadOnlyDictionary<string, BaseTask>(m_subsequentTasks);
 			}
-			public BehaviorTree(string fileName, AIAgent aiAgent, BaseBlackboardInitializer blackboardInitialzier)
+			public BehaviorTree(string fileName, AIAgent aiAgent, AIStatus status, BaseBlackboardInitializer blackboardInitialzier)
 			{
 				nodes = new ReadOnlyCollection<Node.Detail.BaseNode>(m_nodes);
 				subsequentTasks = new ReadOnlyDictionary<string, BaseTask>(m_subsequentTasks);
 				this.aiAgent = aiAgent;
 				if (m_masterDatum.ContainsKey(fileName))
-					LoadMasterData(m_masterDatum[fileName], aiAgent, blackboardInitialzier);
+					LoadMasterData(m_masterDatum[fileName], aiAgent, status, blackboardInitialzier);
 				else
 				{
 					LoadBehaviorTree(fileName);
 					if (m_masterDatum.ContainsKey(fileName))
-						LoadMasterData(m_masterDatum[fileName], aiAgent, blackboardInitialzier);
+						LoadMasterData(m_masterDatum[fileName], aiAgent, status, blackboardInitialzier);
 				}
 			}
 
@@ -134,9 +134,11 @@ namespace AI
 				}
 			}
 
-			public void LoadMasterData(BehaviorTree masterData, AIAgent aiAgent, BaseBlackboardInitializer blackboardInitialzier)
+			public void LoadMasterData(BehaviorTree masterData, AIAgent aiAgent, AIStatus status, BaseBlackboardInitializer blackboardInitialzier)
 			{
 				blackboard = new Blackboard(masterData.blackboard);
+				status?.AwakeAgent(blackboard);
+
 				if (blackboard.isFirstInstance)
 					blackboardInitialzier?.InitializeFirstInstance(blackboard);
 				blackboardInitialzier?.InitializeAllInstance(blackboard);
@@ -163,9 +165,6 @@ namespace AI
 				}
 
 				rootNode = m_nodes[0] as Node.RootNode;
-
-				if (rootNode.OnEnable() == EnableResult.Failed)
-					throw new System.InvalidOperationException("Behavior tree data copy failed.");
 			}
 		}
 	}

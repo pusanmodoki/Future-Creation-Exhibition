@@ -69,7 +69,7 @@ namespace AI
 							m_services.Add((BaseService)JsonUtility.FromJson(
 								BaseService.jsonData[service.guid], service.thisType));
 							m_services.Back().CloneBase(service);
-							m_services.Back().OnCreate();
+							m_services.Back().OnCreate(aiAgent, thisTree.blackboard);
 						}
 
 						foreach (var decorator in node.decorators)
@@ -77,7 +77,7 @@ namespace AI
 							m_decorators.Add((BaseDecorator)JsonUtility.FromJson(
 								BaseDecorator.jsonData[decorator.guid], decorator.thisType));
 							m_decorators.Back().CloneBase(decorator);
-							m_decorators.Back().OnCreate();
+							m_decorators.Back().OnCreate(aiAgent, thisTree.blackboard);
 						}
 					}
 				}

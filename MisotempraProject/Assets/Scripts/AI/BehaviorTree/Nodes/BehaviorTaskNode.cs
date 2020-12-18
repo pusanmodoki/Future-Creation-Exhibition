@@ -51,7 +51,7 @@ namespace AI
 					else if (!m_isCallTaskQuit)
 						task.OnQuit(result);
 
-					thisTree.UnregisterTask();
+				//	thisTree.UnregisterTask();
 					m_subsequentTask = null;
 				}
 

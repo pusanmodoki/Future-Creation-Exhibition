@@ -175,17 +175,6 @@ namespace AI
 							indexes.Add(m_selectIndex);
 						}
 
-						for (int i = 0; i < childrenNodes.Count; ++i)
-							if (!indexes.Contains(i))
-							{
-								m_selectIndex = i;
-
-								if (childrenNodes[m_selectIndex].isAllTrueDecorators && childrenNodes[m_selectIndex].OnEnable() == EnableResult.Success)
-									return EnableResult.Success;
-
-								break;
-							}
-
 						return EnableResult.Failed;
 					}
 

@@ -139,7 +139,7 @@ namespace AI
 						foreach (var e in m_blackboard.keys)
 						{
 							if (e.Length == 0) return false;
-							else if (names.Contains(e)) return false;
+							else if (names.Contains(e) || Blackboard.cDefaultKeys.Contains(e)) return false;
 							names.Add(e);
 						}
 						return true;

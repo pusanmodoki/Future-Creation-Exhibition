@@ -81,9 +81,8 @@ namespace LocalEditor
 				{
 					UpdateSelects(false);
 					UpdateThisSelect(fileName.stringValue);
-					if (m_selectName != null && m_selectName.Length > 0)
-						m_isInit = true;
-					else return;
+					m_isInit = true;
+					return;
 				}
 
 				m_selectIndex = EditorGUI.Popup(position, "Behavior file", m_selectIndex, m_selects);

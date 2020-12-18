@@ -12,8 +12,8 @@ namespace AI
 			public AIAgent aiAgent { get; private set; } = null;
 			public UnityEngine.AI.NavMeshAgent navMeshAgent { get { return aiAgent.navMeshAgent; } }
 			public Rigidbody rigidbody { get { return aiAgent.rigidbody; } }
-			public BehaviorTree behaviorTree { get { return aiAgent.behaviorTree; } }
-			public Blackboard blackboard { get { return aiAgent.behaviorTree.blackboard; } }
+			public BehaviorTree behaviorTree { get; private set; } = null;
+			public Blackboard blackboard { get { return behaviorTree.blackboard; } }
 			public Node.TaskNode thisNode { get; private set; } = null;
 			public string subsequentTaskKey { get; private set; } = null;
 
@@ -33,6 +33,7 @@ namespace AI
 			public void InitializeBase(BehaviorTree behaviorTree, AIAgent agent, Node.TaskNode thisNode)
 			{
 				aiAgent = agent;
+				this.behaviorTree = behaviorTree;
 				this.thisNode = thisNode;
 			}
 			public void RegisterSubsequentTask(string callKey)

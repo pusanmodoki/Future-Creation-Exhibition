@@ -122,6 +122,7 @@ namespace AI
 			targetTransformRoot = targetTransform.root;
 			//視界角度を変換
 			m_angleToCosine = Mathf.Cos(m_angle * 0.5f * Mathf.Deg2Rad);
+			m_loseSightTimer.Start();
 		}
 		/// <summary>[OnValidate]</summary>
 		void OnValidate()

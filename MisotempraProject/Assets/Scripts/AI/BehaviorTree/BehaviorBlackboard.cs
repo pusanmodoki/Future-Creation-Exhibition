@@ -20,7 +20,7 @@ namespace AI
 			}
 			public class KeyList<T>
 			{
-				public T this[string key] { get { return m_this.GetValue<T>(key.GetHashCode()); } set { m_this.SetValue(key.GetHashCode(), value); } }
+				public T this[string key] { get { return m_this.GetValue<T>(key); } set { m_this.SetValue(key, value); } }
 				public T this[int key] { get { return m_this.GetValue<T>(key); } set { m_this.SetValue(key, value); } }
 
 				public KeyList(Blackboard board) { m_this = board; }
@@ -42,7 +42,12 @@ namespace AI
 					this.classIndex = classIndex;
 				}
 			}
-			
+			public static readonly List<string> cDefaultKeys = new List<string>
+			{
+				"Animator",
+				"DamageController"
+			};
+
 			/// <summary>キーリスト</summary>
 			public AllKeyList allKeys { get; private set; }
 			/// <summary>gameobjects</summary>
@@ -63,6 +68,14 @@ namespace AI
 			public T GetValue<T>(string key)
 			{
 				int hash = key.GetHashCode();
+
+#if UNITY_EDITOR
+				var type = typeof(T);
+				Debug.Assert(m_keys.ContainsKey(hash), "Blackboard->keyが登録されていません key: " + key);
+				Debug.Assert(CastCheck<T>(hash, type), "Blackboard->キャストに失敗しました。 " +
+					"\nkey: " + key + "generic type: " + type.FullName + "cast type:" + cKeyClassNames[m_keys[hash].classIndex]);
+#endif
+
 				return GetValue<T>(hash);
 			}
 			/// <summary>値を取得する</summary>
@@ -77,9 +90,17 @@ namespace AI
 				return m_keys.ContainsKey(key) ? (T)m_keys[key].obj: default;
 			}
 			/// <summary>値を設定する</summary>
-			public void SetValue(string key, object value)
+			public void SetValue<T>(string key, T value)
 			{
 				int hash = key.GetHashCode();
+
+#if UNITY_EDITOR
+				var type = typeof(T);
+				Debug.Assert(m_keys.ContainsKey(hash), "Blackboard->keyが登録されていません key: " + key);
+				Debug.Assert(CastCheck<T>(hash, type), "Blackboard->キャストに失敗しました。 " +
+					"\nkey: " + key + "generic type: " + type.FullName + "cast type:" + cKeyClassNames[m_keys[hash].classIndex]);
+#endif
+
 				SetValue(hash, value);
 			}
 			/// <summary>値を設定する</summary>
@@ -114,22 +135,23 @@ namespace AI
 				typeof(int).FullName, typeof(float).FullName,
 				typeof(double).FullName, typeof(object).FullName,
 			};
-
-
-			const int m_cIndexGameObject = 0;
-			const int m_cIndexTransform = 1;
-			const int m_cIndexComponent = 2;
-			const int m_cIndexAIAgent = 3;
-			const int m_cIndexQuaternion = 4;
-			const int m_cIndexVector2 = 5;
-			const int m_cIndexVector3 = 6;
-			const int m_cIndexVector4 = 7;
-			const int m_cIndexString = 8;
-			const int m_cIndexEnum = 9;
-			const int m_cIndexInt = 10;
-			const int m_cIndexFloat = 11;
-			const int m_cIndexDouble = 12;
-			const int m_cIndexObject = 13;
+			public enum ClassIndexes : int
+			{
+				GameObject,
+				Transform,
+				Component,
+				AIAgent,
+				Quaternion,
+				Vector2,
+				Vector3,
+				Vector4,
+				String,
+				Enum,
+				Int,
+				Float,
+				Double,
+				Object
+			}
 
 			static Dictionary<string, List<Blackboard>> m_instances = new Dictionary<string, List<Blackboard>>();
 			Dictionary<int, KeyContent> m_keys = new Dictionary<int, KeyContent>();
@@ -188,6 +210,10 @@ namespace AI
 
 				NewPropertys();
 			}
+			public void RegisterKey<T>(string key, T obj, string memo, ClassIndexes classIndex)
+			{
+				m_keys.Add(key.GetHashCode(), new KeyContent(obj, memo, false, (int)classIndex));
+			}
 			public void OnDestroy()
 			{
 				if (m_instances != null && m_instances.ContainsKey(instanceKey))
@@ -196,7 +222,8 @@ namespace AI
 
 			bool CastCheck<T>(int key, System.Type tType) 
 			{
-				return cKeyClassTypes[m_keys[key].classIndex] == tType
+				return m_keys[key].classIndex == (int)ClassIndexes.Object
+					|| cKeyClassTypes[m_keys[key].classIndex] == tType
 					|| tType.IsSubclassOf(cKeyClassTypes[m_keys[key].classIndex]);
 			}
 
@@ -212,46 +239,46 @@ namespace AI
 			{
 				switch (index)
 				{
-					case m_cIndexGameObject:
+					case (int)ClassIndexes.GameObject:
 						m_keys.Add(key, new KeyContent(null, memo, isShared, index));
 						break;
-					case m_cIndexTransform:
+					case (int)ClassIndexes.Transform:
 						m_keys.Add(key, new KeyContent(null, memo, isShared, index));
 						break;
-					case m_cIndexComponent:
+					case (int)ClassIndexes.Component:
 						m_keys.Add(key, new KeyContent(null, memo, isShared, index));
 						break;
-					case m_cIndexAIAgent:
+					case (int)ClassIndexes.AIAgent:
 						m_keys.Add(key, new KeyContent(null, memo, isShared, index));
 						break;
-					case m_cIndexQuaternion:
+					case (int)ClassIndexes.Quaternion:
 						m_keys.Add(key, new KeyContent(Quaternion.identity, memo, isShared, index));
 						break;
-					case m_cIndexVector2:
+					case (int)ClassIndexes.Vector2:
 						m_keys.Add(key, new KeyContent(Vector2.zero, memo, isShared, index));
 						break;
-					case m_cIndexVector3:
+					case (int)ClassIndexes.Vector3:
 						m_keys.Add(key, new KeyContent(Vector3.zero, memo, isShared, index));
 						break;
-					case m_cIndexVector4:
+					case (int)ClassIndexes.Vector4:
 						m_keys.Add(key, new KeyContent(Vector4.zero, memo, isShared, index));
 						break;
-					case m_cIndexString:
+					case (int)ClassIndexes.String:
 						m_keys.Add(key, new KeyContent("", memo, isShared, index));
 						break;
-					case m_cIndexEnum:
+					case (int)ClassIndexes.Enum:
 						m_keys.Add(key, new KeyContent(null, memo, isShared, index));
 						break;
-					case m_cIndexInt:
+					case (int)ClassIndexes.Int:
 						m_keys.Add(key, new KeyContent(0, memo, isShared, index));
 						break;
-					case m_cIndexFloat:
+					case (int)ClassIndexes.Float:
 						m_keys.Add(key, new KeyContent(0.0f, memo, isShared, index));
 						break;
-					case m_cIndexDouble:
+					case (int)ClassIndexes.Double:
 						m_keys.Add(key, new KeyContent(0, memo, isShared, index));
 						break;
-					case m_cIndexObject:
+					case (int)ClassIndexes.Object:
 						m_keys.Add(key, new KeyContent(null, memo, isShared, index));
 						break;
 					default:

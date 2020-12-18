@@ -16,7 +16,7 @@ namespace AI
 		Animator m_animator = null;
 		[SerializeField]
 		float m_hp = 0.0f;
-		
+
 		/// <summary>
 		/// [Damage]
 		/// HP - attack
@@ -45,6 +45,12 @@ namespace AI
 		public void DisabledAttack(string attackKey)
 		{
 			m_damageController.DisableAction(attackKey);
+		}
+
+		public void AwakeAgent(BehaviorTree.Blackboard blackboard)
+		{
+			blackboard.RegisterKey(BehaviorTree.Blackboard.cDefaultKeys[0], m_animator, "This animator", BehaviorTree.Blackboard.ClassIndexes.Component);
+			blackboard.RegisterKey(BehaviorTree.Blackboard.cDefaultKeys[1], m_damageController, "This damage controller", BehaviorTree.Blackboard.ClassIndexes.Component);
 		}
 	}
 }

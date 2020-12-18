@@ -32,6 +32,7 @@ namespace AI
 
 						m_animationID = Animator.StringToHash(m_animationAttackKey);
 						(blackboard.GetValue<Animator>("Animator")).SetTrigger(m_animationID);
+						(blackboard.GetValue<Damage.DamageController>("DamageController")).EnableAction("Attack01", 1.0f);
 
 						aiAgent.SwitchMoveRigidbody();
 						m_keyHash = ("EndAttackAnimation").GetHashCode();
@@ -53,6 +54,7 @@ namespace AI
 						if (blackboard.GetValue<int>(m_keyHash) == 1)
 						{
 							blackboard.SetValue<int>(m_keyHash, 0);
+							(blackboard.GetValue<Damage.DamageController>("DamageController")).DisableAction("Attack01");
 							return UpdateResult.Success;
 						}
 						return UpdateResult.Run;

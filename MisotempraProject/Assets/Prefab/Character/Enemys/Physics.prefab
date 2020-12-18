@@ -162,7 +162,7 @@ MonoBehaviour:
   m_isLoopSE: 0
   m_dIsDiscover: 0
   m_dIsDrawGizmos: 1
-  m_dLoseSightTimer: 11.417005
+  m_dLoseSightTimer: 20.809704
 --- !u!114 &4270203692364747118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,7 +175,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a1d99ebbf64c3942beb70137a763d64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_attackInfos: []
+  m_attackInfos:
+  - m_key: Attack01
+    m_attack: 5
+    m_details:
+      damageType: 0
+      attackType: 1
+    m_attackColliders:
+    - {fileID: 5537706469410144445}
+    - {fileID: 945157867403365522}
   m_sender:
     m_hitLayers:
       m_layerMask:

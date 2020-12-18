@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree
@@ -12,6 +12,13 @@ namespace Editor
 		{
 			public class BaseDecoratorScriptableObject : UnityEngine.ScriptableObject {}
 
+			public class DecoratorScriptableObjectClassNameDeath_Decorator : BaseDecoratorScriptableObject
+			{
+				public Death_Decorator decorator { get { return m_decorator; } }
+				[SerializeField]
+				Death_Decorator m_decorator = null;
+				public void Initialize(Death_Decorator initialize) { m_decorator = initialize; }
+			}
 			public class DecoratorScriptableObjectClassNamepractice2_Decorator : BaseDecoratorScriptableObject
 			{
 				public practice2_Decorator decorator { get { return m_decorator; } }
@@ -40,6 +47,20 @@ namespace Editor
 				Test_Uemura.TestD2 m_decorator = null;
 				public void Initialize(Test_Uemura.TestD2 initialize) { m_decorator = initialize; }
 			}
+			public class DecoratorScriptableObjectClassNameAlreadyPatrol : BaseDecoratorScriptableObject
+			{
+				public AI.BehaviorTree.Decorator.AlreadyPatrol decorator { get { return m_decorator; } }
+				[SerializeField]
+				AI.BehaviorTree.Decorator.AlreadyPatrol m_decorator = null;
+				public void Initialize(AI.BehaviorTree.Decorator.AlreadyPatrol initialize) { m_decorator = initialize; }
+			}
+			public class DecoratorScriptableObjectClassNameDiscoverPlayer : BaseDecoratorScriptableObject
+			{
+				public AI.BehaviorTree.Decorator.DiscoverPlayer decorator { get { return m_decorator; } }
+				[SerializeField]
+				AI.BehaviorTree.Decorator.DiscoverPlayer m_decorator = null;
+				public void Initialize(AI.BehaviorTree.Decorator.DiscoverPlayer initialize) { m_decorator = initialize; }
+			}
 			public class DecoratorScriptableObjectClassNameToPlayerDistance : BaseDecoratorScriptableObject
 			{
 				public AI.BehaviorTree.Decorator.ToPlayerDistance decorator { get { return m_decorator; } }
@@ -53,6 +74,13 @@ namespace Editor
 				public static void CreateEditorAndScriptableObject(AI.BehaviorTree.BaseDecorator decorator, 
 					out UnityEditor.Editor editor, out UnityEngine.ScriptableObject scriptableObject, string decoratorTypeFullName)
 				{
+					if (decoratorTypeFullName == typeof(Death_Decorator).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameDeath_Decorator>();
+						(scriptableObject as DecoratorScriptableObjectClassNameDeath_Decorator).Initialize(decorator as Death_Decorator);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameDeath_Decorator);
+						return;
+					}
 					if (decoratorTypeFullName == typeof(practice2_Decorator).FullName)
 					{
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNamepractice2_Decorator>();
@@ -79,6 +107,20 @@ namespace Editor
 						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameTestD2>();
 						(scriptableObject as DecoratorScriptableObjectClassNameTestD2).Initialize(decorator as Test_Uemura.TestD2);
 						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameTestD2);
+						return;
+					}
+					if (decoratorTypeFullName == typeof(AI.BehaviorTree.Decorator.AlreadyPatrol).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameAlreadyPatrol>();
+						(scriptableObject as DecoratorScriptableObjectClassNameAlreadyPatrol).Initialize(decorator as AI.BehaviorTree.Decorator.AlreadyPatrol);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameAlreadyPatrol);
+						return;
+					}
+					if (decoratorTypeFullName == typeof(AI.BehaviorTree.Decorator.DiscoverPlayer).FullName)
+					{
+						scriptableObject = UnityEngine.ScriptableObject.CreateInstance<DecoratorScriptableObjectClassNameDiscoverPlayer>();
+						(scriptableObject as DecoratorScriptableObjectClassNameDiscoverPlayer).Initialize(decorator as AI.BehaviorTree.Decorator.DiscoverPlayer);
+						editor = UnityEditor.Editor.CreateEditor(scriptableObject as DecoratorScriptableObjectClassNameDiscoverPlayer);
 						return;
 					}
 					if (decoratorTypeFullName == typeof(AI.BehaviorTree.Decorator.ToPlayerDistance).FullName)

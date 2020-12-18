@@ -8,10 +8,19 @@ using UnityEngine.AI;
 
 public class MoveTo : AI.BehaviorTree.BaseTask
 {
-    [SerializeField]
+	[SerializeField]
+	string m_targetTransformBlackboardKey = "";
+
+	[SerializeField]
     float distance = 1.0f;//判定距離
 
-    public override void FixedUpdate()
+	Transform m_playerTransform = null;
+
+	public override void OnCreate()
+	{
+		m_playerTransform = blackboard.GetValue<Transform>(m_targetTransformBlackboardKey);
+	}
+	public override void FixedUpdate()
     {
     }
 
@@ -28,9 +37,9 @@ public class MoveTo : AI.BehaviorTree.BaseTask
 
     public override UpdateResult Update()
     {
-        navMeshAgent.SetDestination(blackboard.transforms["PlayerTransform"].position);
+        navMeshAgent.SetDestination(m_playerTransform.position);
         //Debug.Log((blackboard.transforms["PlayerTransform"].position - rigidbody.transform.position).sqrMagnitude);
-        if ((blackboard.transforms["PlayerTransform"].position - rigidbody.transform.position).sqrMagnitude < (distance /** distance*/))
+        if ((m_playerTransform.position - rigidbody.transform.position).sqrMagnitude < (distance /** distance*/))
         {
             //Debug.Log("a");
             navMeshAgent.isStopped = true;

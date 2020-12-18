@@ -5,7 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Node view(Graph view)</summary>
 	namespace NodeView

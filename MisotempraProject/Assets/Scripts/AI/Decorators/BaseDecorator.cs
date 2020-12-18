@@ -20,6 +20,7 @@ namespace AI
 			bool m_isEnableQuitDuringRun = false;
 
 			public abstract bool IsPredicate(AIAgent agent, Blackboard blackboard);
+			public virtual void OnCreate() { }
 
 			public void LoadBase(CashContainer.Detail.DecoratorInfomations infomations, System.Type thisType)
 			{

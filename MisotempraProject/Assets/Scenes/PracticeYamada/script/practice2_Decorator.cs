@@ -14,6 +14,7 @@ public class practice2_Decorator : AI.BehaviorTree.BaseDecorator
 
     public override bool IsPredicate(AIAgent agent, Blackboard blackboard)
     {
-        return (blackboard.transforms["PlayerTransform"].position - agent.transform.position).sqrMagnitude < (m_trueDistance * m_trueDistance);
+        return (blackboard.GetValue<Transform>("PlayerTransform").position 
+			- agent.transform.position).sqrMagnitude < (m_trueDistance * m_trueDistance);
     }
 }

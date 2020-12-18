@@ -5,12 +5,12 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
-using Editor.BehaviorTree.SubWindow;
+using LocalEditor.BehaviorTree.SubWindow;
 using AI.BehaviorTree.CashContainer;
 using AI.BehaviorTree.CashContainer.Detail;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Behavior tree editor</summary>
 	namespace BehaviorTree

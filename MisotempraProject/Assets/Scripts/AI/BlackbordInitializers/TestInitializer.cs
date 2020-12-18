@@ -11,6 +11,6 @@ public class TestInitializer : AI.BehaviorTree.BaseBlackboardInitializer
 
 	public override void InitializeFirstInstance(Blackboard blackboard)
 	{
-		blackboard.transforms["PlayerTransform"] = GameObject.Find("Player").transform;
+		blackboard.SetValue("PlayerTransform", GameObject.Find("Player").transform);
 	}
 }

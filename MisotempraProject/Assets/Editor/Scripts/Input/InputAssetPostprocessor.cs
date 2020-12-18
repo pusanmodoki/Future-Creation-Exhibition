@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	/// <summary>Input editor</summary>
 	namespace Input

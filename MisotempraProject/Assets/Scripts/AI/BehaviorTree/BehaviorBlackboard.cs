@@ -12,26 +12,18 @@ namespace AI
 		{
 			public class AllKeyList
 			{
-				public object this[string key] { get { return m_this.m_keys[key.GetHashCode()].obj; } set { m_this.m_keys[key.GetHashCode()].obj = value; } }
-				public object this[int key] { get { return m_this.m_keys[key].obj; } set { m_this.m_keys[key].obj = value; } }
+				public KeyContent this[string key] { get { return m_this.m_keys[key.GetHashCode()]; } }
+				public KeyContent this[int key] { get { return m_this.m_keys[key]; } }
 				public AllKeyList(Blackboard board) { m_this = board; }
 
 				Blackboard m_this;
 			}
-			public class KeyListStruct<T> where T : struct
+			public class KeyList<T>
 			{
-				public T this[string key] { get { return (T)m_this.m_keys[key.GetHashCode()].obj; } set { m_this.m_keys[key.GetHashCode()].obj = value; } }
-				public T this[int key] { get { return (T)m_this.m_keys[key].obj; } set { m_this.m_keys[key].obj = value; } }
-				public KeyListStruct(Blackboard board) { m_this = board; }
+				public T this[string key] { get { return m_this.GetValue<T>(key.GetHashCode()); } set { m_this.SetValue(key.GetHashCode(), value); } }
+				public T this[int key] { get { return m_this.GetValue<T>(key); } set { m_this.SetValue(key, value); } }
 
-				Blackboard m_this;
-			}
-			public class KeyListClass<T> where T : class
-			{
-				public T this[string key] { get { return m_this.m_keys[key.GetHashCode()].obj as T; } set { m_this.m_keys[key.GetHashCode()].obj = value; } }
-				public T this[int key] { get { return m_this.m_keys[key].obj as T; } set { m_this.m_keys[key].obj = value; } }
-
-				public KeyListClass(Blackboard board) { m_this = board; }
+				public KeyList(Blackboard board) { m_this = board; }
 
 				Blackboard m_this;
 			}
@@ -50,67 +42,97 @@ namespace AI
 					this.classIndex = classIndex;
 				}
 			}
-			public struct Memo
-			{
-				public string this[string key] { get { return m_this.m_keys[key.GetHashCode()].memo; } }
-				public string this[int key] { get { return m_this.m_keys[key].memo; } }
-
-				public Memo(Blackboard board) { m_this = board; }
-				Blackboard m_this;
-			}
-			public struct IsShared
-			{
-				public bool this[string key] { get { return m_this.m_keys[key.GetHashCode()].isShared; } }
-				public bool this[int key] { get { return m_this.m_keys[key].isShared; } }
-
-				public IsShared(Blackboard board) { m_this = board; }
-				Blackboard m_this;
-			}
-
-			public static readonly string[] cKeyClassNames = new string[14]
-			{
-				typeof(GameObject).FullName,
-				typeof(Transform).FullName,
-				typeof(Component).FullName,
-				typeof(AI.AIAgent).FullName,
-				typeof(Quaternion).FullName,
-				typeof(Vector2).FullName,
-				typeof(Vector3).FullName,
-				typeof(Vector4).FullName,
-				typeof(string).FullName,
-				typeof(System.Enum).FullName,
-				typeof(int).FullName,
-				typeof(float).FullName,
-				typeof(double).FullName,
-				typeof(object).FullName,
-			};
-
+			
+			/// <summary>キーリスト</summary>
 			public AllKeyList allKeys { get; private set; }
-			public KeyListClass<GameObject> gameObjects { get; private set; }
-			public KeyListClass<Transform> transforms { get; private set; }
-			public KeyListClass<Component> components { get; private set; }
-			public KeyListClass<AI.AIAgent> aiAgents { get; private set; }
-			public KeyListStruct<Quaternion> quaternions { get; private set; }
-			public KeyListStruct<Vector2> vectors2 { get; private set; }
-			public KeyListStruct<Vector3> vectors3 { get; private set; }
-			public KeyListStruct<Vector4> vectors4 { get; private set; }
-			public KeyListClass<string> strings { get; private set; }
-			public KeyListClass<System.Enum> enums { get; private set; }
-			public KeyListStruct<int> ints { get; private set; }
-			public KeyListStruct<float> floats { get; private set; }
-			public KeyListStruct<double> doubles { get; private set; }
-			public KeyListClass<object> objects { get; private set; }
-			public Memo memos { get; private set; }
-			public IsShared isShareds { get; private set; }
+			/// <summary>gameobjects</summary>
+			public KeyList<GameObject> gameObjects { get; private set; }
+			/// <summary>transforms</summary>
+			public KeyList<Transform> transforms { get; private set; }
+			/// <summary>components</summary>
+			public KeyList<Component> components { get; private set; }
+			/// <summary>ファイル名</summary>
 			public string instanceKey { get; private set; }
+			/// <summary>同じファイル名で一番最初に生成された場合true</summary>
 			public bool isFirstInstance { get; private set; }
 
-			public static int GetIntKey(string key) { return key.GetHashCode(); }
-			public void OnDestroy()
+			/// <summary>keyをhash変換する, 計算負荷軽減用</summary>
+			public static int GetHashCode(string key) { return key.GetHashCode(); }
+
+			/// <summary>値を取得する</summary>
+			public T GetValue<T>(string key)
 			{
-				if (m_instances != null && m_instances.ContainsKey(instanceKey))
-					m_instances[instanceKey].Remove(this);
+				int hash = key.GetHashCode();
+				return GetValue<T>(hash);
 			}
+			/// <summary>値を取得する</summary>
+			public T GetValue<T>(int key)
+			{
+#if UNITY_EDITOR
+				var type = typeof(T);
+				Debug.Assert(m_keys.ContainsKey(key), "Blackboard->keyが登録されていません key: " + key);
+				Debug.Assert(CastCheck<T>(key, type), "Blackboard->キャストに失敗しました。 " +
+					"\nkey: " + key + "generic type: " + type.FullName + "cast type:" + cKeyClassNames[m_keys[key].classIndex]);
+#endif
+				return m_keys.ContainsKey(key) ? (T)m_keys[key].obj: default;
+			}
+			/// <summary>値を設定する</summary>
+			public void SetValue(string key, object value)
+			{
+				int hash = key.GetHashCode();
+				SetValue(hash, value);
+			}
+			/// <summary>値を設定する</summary>
+			public void SetValue<T>(int key, T value)
+			{
+#if UNITY_EDITOR
+				var type = typeof(T);
+				Debug.Assert(m_keys.ContainsKey(key), "Blackboard->keyが登録されていません key: " + key);
+				Debug.Assert(CastCheck<T>(key, type), "Blackboard->キャストに失敗しました。 " +
+					"\nkey: " + key + "generic type: " + type.FullName + "cast type:" + cKeyClassNames[m_keys[key].classIndex]);
+#endif
+				m_keys[key].obj = value;
+			}
+
+			public static readonly System.Type[] cKeyClassTypes = new System.Type[14]
+			{
+				typeof(GameObject), typeof(Transform),
+				typeof(Component), typeof(AI.AIAgent),
+				typeof(Quaternion), typeof(Vector2),
+				typeof(Vector3), typeof(Vector4),
+				typeof(string), typeof(System.Enum),
+				typeof(int), typeof(float),
+				typeof(double), typeof(object),
+			};
+			public static readonly string[] cKeyClassNames = new string[14]
+			{
+				typeof(GameObject).FullName, typeof(Transform).FullName,
+				typeof(Component).FullName, typeof(AI.AIAgent).FullName,
+				typeof(Quaternion).FullName, typeof(Vector2).FullName,
+				typeof(Vector3).FullName, typeof(Vector4).FullName,
+				typeof(string).FullName, typeof(System.Enum).FullName,
+				typeof(int).FullName, typeof(float).FullName,
+				typeof(double).FullName, typeof(object).FullName,
+			};
+
+
+			const int m_cIndexGameObject = 0;
+			const int m_cIndexTransform = 1;
+			const int m_cIndexComponent = 2;
+			const int m_cIndexAIAgent = 3;
+			const int m_cIndexQuaternion = 4;
+			const int m_cIndexVector2 = 5;
+			const int m_cIndexVector3 = 6;
+			const int m_cIndexVector4 = 7;
+			const int m_cIndexString = 8;
+			const int m_cIndexEnum = 9;
+			const int m_cIndexInt = 10;
+			const int m_cIndexFloat = 11;
+			const int m_cIndexDouble = 12;
+			const int m_cIndexObject = 13;
+
+			static Dictionary<string, List<Blackboard>> m_instances = new Dictionary<string, List<Blackboard>>();
+			Dictionary<int, KeyContent> m_keys = new Dictionary<int, KeyContent>();
 
 			private Blackboard() { }
 			public Blackboard(string instanceKey, List<int> classNameIndexes, List<string> keys,
@@ -166,44 +188,24 @@ namespace AI
 
 				NewPropertys();
 			}
+			public void OnDestroy()
+			{
+				if (m_instances != null && m_instances.ContainsKey(instanceKey))
+					m_instances[instanceKey].Remove(this);
+			}
 
-			const int m_cIndexGameObject = 0;
-			const int m_cIndexTransform = 1;
-			const int m_cIndexComponent = 2;
-			const int m_cIndexAIAgent = 3;
-			const int m_cIndexQuaternion = 4;
-			const int m_cIndexVector2 = 5;
-			const int m_cIndexVector3 = 6;
-			const int m_cIndexVector4 = 7;
-			const int m_cIndexString = 8;
-			const int m_cIndexEnum = 9;
-			const int m_cIndexInt = 10;
-			const int m_cIndexFloat = 11;
-			const int m_cIndexDouble = 12;
-			const int m_cIndexObject = 13;
-
-			static Dictionary<string, List<Blackboard>> m_instances = new Dictionary<string, List<Blackboard>>();
-			Dictionary<int, KeyContent> m_keys = new Dictionary<int, KeyContent>();
+			bool CastCheck<T>(int key, System.Type tType) 
+			{
+				return cKeyClassTypes[m_keys[key].classIndex] == tType
+					|| tType.IsSubclassOf(cKeyClassTypes[m_keys[key].classIndex]);
+			}
 
 			void NewPropertys()
 			{
 				allKeys = new AllKeyList(this);
-				gameObjects = new KeyListClass<GameObject>(this);
-				transforms = new KeyListClass<Transform>(this);
-				components = new KeyListClass<Component>(this);
-				aiAgents = new KeyListClass<AIAgent>(this);
-				quaternions = new KeyListStruct<Quaternion>(this);
-				vectors2 = new KeyListStruct<Vector2>(this);
-				vectors3 = new KeyListStruct<Vector3>(this);
-				vectors4 = new KeyListStruct<Vector4>(this);
-				strings = new KeyListClass<string>(this);
-				enums = new KeyListClass<System.Enum>(this);
-				ints = new KeyListStruct<int>(this);
-				floats = new KeyListStruct<float>(this);
-				doubles = new KeyListStruct<double>(this);
-				objects = new KeyListClass<object>(this);
-				memos = new Memo(this);
-				isShareds = new IsShared(this);
+				gameObjects = new KeyList<GameObject>(this);
+				transforms = new KeyList<Transform>(this);
+				components = new KeyList<Component>(this);
 			}
 
 			void NewClass(int index, int key, string memo, bool isShared)

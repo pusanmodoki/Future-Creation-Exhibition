@@ -6,6 +6,8 @@ using AI.BehaviorTree;
 public class TEST : MonoBehaviour
 {
 	[SerializeField]
+	TypeName m_typeName = default;
+	[SerializeField]
 	Damage.DamageController m_controller = null;
     // Start is called before the first frame update
     void Start()

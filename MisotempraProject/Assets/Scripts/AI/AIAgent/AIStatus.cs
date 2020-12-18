@@ -13,17 +13,10 @@ namespace AI
 		[SerializeField]
 		Damage.DamageController m_damageController = null;
 		[SerializeField]
-		AIAgent m_aiAgent = null;
-		[SerializeField]
 		Animator m_animator = null;
 		[SerializeField]
 		float m_hp = 0.0f;
-
-		void Awake()
-		{
-			m_aiAgent.SetAIStatus(this);	
-		}
-
+		
 		/// <summary>
 		/// [Damage]
 		/// HP - attack

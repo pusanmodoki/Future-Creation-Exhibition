@@ -9,7 +9,7 @@ using TimeManagement.Detail;
 using FileAccess;
 
 /// <summary>MisoTempra editor</summary>
-namespace Editor
+namespace LocalEditor
 {
 	namespace TimeLayer
 	{

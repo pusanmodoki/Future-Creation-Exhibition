@@ -8,10 +8,15 @@ using UnityEngine;
 
 public class tackle : AI.BehaviorTree.BaseTask
 {
-    bool tackleFlag;
-    UpdateResult flag;
+	bool tackleFlag = false;
+    UpdateResult flag = UpdateResult.Run;
+	GameObject target = null;
 
-    public override void FixedUpdate()
+	public override void OnCreate()
+	{
+		target = blackboard.GetValue<GameObject>("target");
+	}
+	public override void FixedUpdate()
     {
     }
 
@@ -35,7 +40,7 @@ public class tackle : AI.BehaviorTree.BaseTask
         if (tackleFlag)
         {
             Debug.Log("tackle");
-            Vector3 pos = blackboard.gameObjects["target"].transform.position - rigidbody.transform.position;
+            Vector3 pos = target.transform.position - rigidbody.transform.position;
             pos.Normalize();
             rigidbody.AddForce(pos * 10, ForceMode.Impulse);
             tackleFlag = false;

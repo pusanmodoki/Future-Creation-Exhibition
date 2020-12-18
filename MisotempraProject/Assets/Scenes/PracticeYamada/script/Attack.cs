@@ -34,7 +34,7 @@ public class Attack : AI.BehaviorTree.BaseTask
 
     public override UpdateResult Update()
     {
-        (blackboard.components["Animator"] as Animator).SetTrigger(m_animationID);
+        (blackboard.GetValue<Animator>("Animator")).SetTrigger(m_animationID);
         return UpdateResult.Success;
     }
 }

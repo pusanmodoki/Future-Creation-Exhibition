@@ -19,6 +19,8 @@ namespace Singleton
 		{
 			get
 			{
+				if (isDestroy) return null;
+
 				if (m_instance == null)
 				{
 #if UNITY_EDITOR
@@ -34,6 +36,8 @@ namespace Singleton
 		{
 			get
 			{
+				if (isDestroy) return null;
+
 				if (m_instance == null)
 				{
 					m_instance = FindObjectOfType<T>();
@@ -47,6 +51,7 @@ namespace Singleton
 				return m_instance;
 			}
 		}
+
 	}
 
 	/// <summary>
@@ -63,6 +68,8 @@ namespace Singleton
 		{
 			get
 			{
+				if (isDestroy) return null;
+
 				if (m_instance == null)
 				{
 					m_instance = attachObject.AddComponent<T>();
@@ -145,6 +152,12 @@ namespace Singleton
 				else if (!m_isThisInstance)
 					Destroy(this);
 			}
+			virtual protected void OnDestroy()
+			{
+				isDestroy = true;
+			}
+
+			public static bool isDestroy { get; private set; } = false;
 
 			/// <summary>自分がinstanceか否か</summary>
 			protected bool m_isThisInstance { get { return m_instance == this; } }

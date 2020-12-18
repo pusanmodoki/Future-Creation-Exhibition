@@ -33,8 +33,10 @@ public class wark : AI.BehaviorTree.BaseTask
 
     public override UpdateResult Update()
     {
-        navMeshAgent.SetDestination(blackboard.transforms["PlayerTransform"].position);
-        if ((blackboard.transforms["PlayerTransform"].position - rigidbody.transform.position).sqrMagnitude <= 3)
+		var playerTransform = blackboard.GetValue<Transform>("PlayerTransform");
+
+		navMeshAgent.SetDestination(playerTransform.position);
+        if ((playerTransform.position - rigidbody.transform.position).sqrMagnitude <= 3)
             flag = UpdateResult.Success;
         return flag;
     }

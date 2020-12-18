@@ -82,7 +82,22 @@ namespace Player
 
         public override void FixedUpdate(PlayerController player)
         {
+            Vector3 velocity = player.playerRigidbody.velocity;
+
             Vector2 vec = force;
+
+            if (player.state == ActionState.Attack)
+            {
+                speed = 0.0f;
+                vec *= speed * m_limitMove;
+                velocity.x = vec.x;
+                velocity.z = vec.y;
+
+                player.playerRigidbody.velocity = velocity;
+
+                return;
+            }
+
 
             if (isOnCommand)
             {
@@ -102,7 +117,6 @@ namespace Player
             }
 
 
-            Vector3 velocity = player.playerRigidbody.velocity;
             // Vector2 vec = force;
             
             // 移動ベクトル
@@ -111,6 +125,7 @@ namespace Player
             velocity.z = vec.y;
 
             player.playerRigidbody.velocity = velocity;
+
 
         }
 

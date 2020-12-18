@@ -41,6 +41,8 @@ namespace Player
 
         public PlayerArmor armor { get; private set; }
 
+        public AttackCommand attackCommand { get { return m_attackCommand; } }
+
 
         /// <summary>
         /// プレイヤーの状態
@@ -156,35 +158,7 @@ namespace Player
 
         private void FixedUpdate()
         {
-            switch (m_state)
-            {
-                case ActionState.Stand:
-                    {
-                        m_moveCommand.FixedUpdate(this);
-
-                        break;
-                    }
-                case ActionState.Run:
-                    {
-                        m_moveCommand.FixedUpdate(this);
-
-                        break;
-                    }
-                case ActionState.Attack:
-                    {
-                        break;
-                    }
-                case ActionState.Airial:
-                    {
-                        m_moveCommand.FixedUpdate(this);
-
-                        break;
-                    }
-                default:
-                    {
-                        break;
-                    }
-            }
+            m_moveCommand.FixedUpdate(this);
 
             // 移動
 
@@ -202,6 +176,8 @@ namespace Player
                     animator.SetInteger("State", (int)AnimationState.Run);
                     break;
             }
+
+
         }
 
         /// <summary>

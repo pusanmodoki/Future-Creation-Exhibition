@@ -19,7 +19,7 @@ public class Enemy : MonoBehaviour
     private ArmorBase m_armor = null;
 
     [SerializeField]
-    private EffectDictionary m_effectDictionary = null;
+    private Effect.EffectDictionary m_effectDictionary = null;
 
     [SerializeField]
     private ProcessingLoad.Physics m_physics = null;

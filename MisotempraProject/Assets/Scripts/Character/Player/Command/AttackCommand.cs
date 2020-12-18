@@ -8,17 +8,9 @@ namespace Player
     [System.Serializable]
     public class AttackCommand : PlayerCommandBase
     {
-        [System.Serializable]
-        public struct AttackInfo
-        {
-            public float scale { get { return m_scale; } }
-
-            [SerializeField]
-            private float m_scale; 
-        }
-
         [SerializeField]
-        private List<AttackInfo> m_attackInfos = new List<AttackInfo>();
+        private List<float> m_attackScales = new List<float>();
+
 
         [SerializeField]
         private string m_key = "";
@@ -37,9 +29,9 @@ namespace Player
 
                 //player.SetAcceptAttack(0);
                 //// m_attackCollision.SetActive(true);
-                player.damageController.sender.EnableAction(m_key, m_attackInfos[m_attackCounter].scale);
+                player.damageController.sender.EnableAction(m_key, m_attackScales[m_attackCounter]);
                 ++m_attackCounter;
-                if (m_attackCounter >= m_attackInfos.Count)
+                if (m_attackCounter >= m_attackScales.Count)
                 {
                     m_attackCounter = 0;
                 }
@@ -47,6 +39,11 @@ namespace Player
             }
 
             return false;
+        }
+
+        public void CountReset()
+        {
+            m_attackCounter = 0;
         }
 
     }

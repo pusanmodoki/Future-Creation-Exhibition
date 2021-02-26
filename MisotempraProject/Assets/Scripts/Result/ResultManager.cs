@@ -7,11 +7,12 @@ public class ResultManager : MonoBehaviour
     [SerializeField, NonEditable]
     private List<ResultKey> m_resultKeys = new List<ResultKey>();
 
-    [SerializeField]
-    private float m_checkTime = 0.05f;
 
     [SerializeField]
     private GameObject m_clearProduction = null;
+
+    [SerializeField]
+    private GameObject m_gameOverProduction = null;
 
     public static ResultManager instance { get; private set; }
 
@@ -38,19 +39,18 @@ public class ResultManager : MonoBehaviour
 
     private void Update()
     {
-        //bool isLoop = true;
-        //while (isLoop)
-        //{
-            bool isClear = ClearCheck();
-
-            if (isClear)
-            {
-                //isLoop = !isClear;
-                m_clearProduction.SetActive(true);
-            }
-
-        //    yield return new WaitForSeconds(m_checkTime);
-        //}
+        bool isClear = ClearCheck();
+        if (isClear)
+        {
+            Player.PlayerController.instance.isControll = false;
+            m_clearProduction.SetActive(true);
+        }
+        bool isGameOver = GameOverCheck();
+        if (isGameOver)
+        {
+            Player.PlayerController.instance.isControll = false;
+            m_gameOverProduction.SetActive(true);
+        }
     }
 
     private bool ClearCheck()
@@ -59,6 +59,16 @@ public class ResultManager : MonoBehaviour
         {
             if (!resultKeys[i].isAccept) return false;
         }
+
         return true;
+    }
+
+    private bool GameOverCheck()
+    {
+        if (Player.PlayerController.instance.armor.stock <= 0)
+        {
+            return true;
+        }
+        return false;
     }
 }

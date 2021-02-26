@@ -69,6 +69,7 @@ Transform:
   m_Children:
   - {fileID: 870104042146619040}
   - {fileID: 4453615614284976412}
+  - {fileID: 143502603937508038}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -167.85, z: 0}
@@ -162,7 +163,7 @@ MonoBehaviour:
   m_isLoopSE: 0
   m_dIsDiscover: 0
   m_dIsDrawGizmos: 1
-  m_dLoseSightTimer: 20.809704
+  m_dLoseSightTimer: 0
 --- !u!114 &4270203692364747118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +245,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4453615614284976412}
   - component: {fileID: 54679697779780094}
-  m_Layer: 31
+  m_Layer: 30
   m_Name: ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -279,6 +280,50 @@ CapsuleCollider:
   m_Height: 1.1843792
   m_Direction: 1
   m_Center: {x: 0, y: -0.09218928, z: 0}
+--- !u!1 &3956127605658346076
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 143502603937508038}
+  - component: {fileID: 8380141766821107882}
+  m_Layer: 11
+  m_Name: DamageCollision
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &143502603937508038
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3956127605658346076}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 835842662739803974}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8380141766821107882
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3956127605658346076}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.7351514, z: 1}
+  m_Center: {x: 0, y: 0.7902276, z: -0}
 --- !u!65 &8693945960438926324
 BoxCollider:
   m_ObjectHideFlags: 0

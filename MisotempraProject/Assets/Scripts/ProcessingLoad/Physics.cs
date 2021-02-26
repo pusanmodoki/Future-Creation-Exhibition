@@ -36,6 +36,7 @@ namespace ProcessingLoad
         public Vector3 velocity { get { return m_velocity; } }
         public float gravity { get { return m_gravity; } }
 
+        public Vector3 newVelocity { get; set; }
 
         private void Awake()
         {
@@ -66,6 +67,13 @@ namespace ProcessingLoad
 
         private void UpdateVelocity()
         {
+            if(newVelocity.magnitude != 0)
+            {
+                float vely = m_velocity.y;
+                m_velocity = newVelocity;
+                m_velocity.y = vely;
+                newVelocity = Vector3.zero;
+            }
             AddForceToVelocity();
             AddGravity();           // 重力
             Decelerate();           // 減速

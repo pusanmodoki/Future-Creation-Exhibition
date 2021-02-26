@@ -65,6 +65,8 @@ public class CFadeController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Init(eFade.FadeOut);
+        FadeIn();
     }
 
     // Update is called once per frame

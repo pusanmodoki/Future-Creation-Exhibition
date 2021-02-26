@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/TestMatsumoto/Test.unity
     guid: 90bb921123334654e947c1c68225f692
   - enabled: 1
+    path: Assets/Scenes/Title/Title.unity
+    guid: e4d414b57cf47a54e91db12f7b694f05
+  - enabled: 1
     path: Assets/Scenes/MainGame/Stage/Proto/Template.unity
     guid: 7eabe08d6155abc48a4398b39ff59157
   m_configObjects: {}

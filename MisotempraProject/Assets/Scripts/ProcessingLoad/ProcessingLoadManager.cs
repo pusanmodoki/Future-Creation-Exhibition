@@ -125,27 +125,15 @@ namespace ProcessingLoad
             //plSlider.value = m_processGauge / 100;
             //plPercentText.text = (int)m_processGauge + "%";
 
-            //switch (m_nowState)
-            //{
-            //    case GaugeState.Freeze:
-            //        plPercentText.color = white;
-            //        gaugeFillImage.color = white;
-            //        break;
-            //    case GaugeState.Warning:
-            //        plPercentText.color = red;
-            //        gaugeFillImage.color = red;
-            //        break;
-            //    case GaugeState.Caution:
-            //        plPercentText.color = orange;
-            //        gaugeFillImage.color = orange;
-            //        m_timeLayer.SetTimeScale(0.2f);
-            //        break;
-            //    case GaugeState.Stable:
-            //        plPercentText.color = green;
-            //        gaugeFillImage.color = green;
-            //        m_timeLayer.SetTimeScale(1.0f);
-            //        break;
-            //}
+            switch (m_nowState)
+            {
+                case GaugeState.Caution:
+                    m_timeLayer.SetTimeScale(0.2f);
+                    break;
+                case GaugeState.Stable:
+                    m_timeLayer.SetTimeScale(1.0f);
+                    break;
+            }
         }
     }
 

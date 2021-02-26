@@ -34,7 +34,6 @@ public class HitEffectTrigger : MonoBehaviour
         if (isEnableTrigger)
         {
             instancedEffectObject.Add(Instantiate(m_effectPrefab, transform.position, Quaternion.identity));
-            isEnableTrigger = false;
         }
     }
 
@@ -44,11 +43,20 @@ public class HitEffectTrigger : MonoBehaviour
 
         while (isLoop)
         {
-            foreach (var particle in instancedEffectObject)
+            for (int i = 0; i < instancedEffectObject.Count; ++i)
             {
-                if (!particle.isPlaying)
+                if (!instancedEffectObject[i].isPlaying)
                 {
-                    GameObject.Destroy(particle.gameObject);
+                    GameObject.Destroy(instancedEffectObject[i].gameObject);
+                    instancedEffectObject[i] = null;
+                }
+            }
+            for (int i = 0; i < instancedEffectObject.Count; ++i)
+            {
+                if(instancedEffectObject[i] == null)
+                {
+                    instancedEffectObject.RemoveAt(i);
+                    --i;
                 }
             }
 

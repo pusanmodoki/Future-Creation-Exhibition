@@ -81,7 +81,11 @@ public class PlayerCamera : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        InputMove();
+
+        if (Player.PlayerController.instance.isControll)
+        {
+            InputMove();
+        }
 
         RayCollision();
 

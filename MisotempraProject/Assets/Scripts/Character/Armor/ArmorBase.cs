@@ -16,10 +16,22 @@ abstract public class ArmorBase : MonoBehaviour
     [SerializeField]
     protected bool m_isInvincible = false;
 
-    [SerializeField]
-    protected string m_hitEffectName = "";
-
     public Damage.DamageController damageController { get; private set; }
+
+    private bool m_enableKnockBack = false;
+
+    public bool enableKnockBack
+    {
+        get
+        {
+            bool result = m_enableKnockBack;
+            if (result)
+            {
+                m_enableKnockBack = false;
+            }
+            return result;
+        }
+    }
 
 
     private void Start()
@@ -29,8 +41,10 @@ abstract public class ArmorBase : MonoBehaviour
         {
             Debug.LogError("not ref damage controller");
         }
+        Init();
     }
 
+    protected virtual void Init() { }
 
     private void Update()
     {
@@ -42,14 +56,13 @@ abstract public class ArmorBase : MonoBehaviour
 
         Damage.RequestQueue request = damageController.receiver.Pop();
 
-        EffectPopManager.instance.PopEffect(m_hitEffectName, transform.position);
-
         TakeDamage(request);
         m_isDead = DeadCheck();
 
         if (!isDead)
         {
             KnockBack(request);
+            m_enableKnockBack = true;
         }
         else
         {

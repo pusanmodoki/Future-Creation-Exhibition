@@ -53,6 +53,10 @@ public class LifeUI : MonoBehaviour
     private void CountUpdate()
     {
         displayLifeCount = player.armor.stock;
+        for(int i = displayLifeCount; i < player.armor.maxStock; ++i)
+        {
+            transform.GetChild(i).gameObject.SetActive(false);
+        }
     }
 
     public void AddLifeIcon(LifeIcon icon)

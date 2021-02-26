@@ -66,6 +66,8 @@ namespace Player
         [SerializeField]
         private MoveCommand m_moveCommand = null;
 
+        public bool isControll { get; set; } = true;
+
         private void Awake()
         {
             if (instance)
@@ -117,6 +119,8 @@ namespace Player
         // Update is called once per frame
         void Update()
         {
+            if (!isControll) { return; }
+
             switch (m_state)
             {
                 case ActionState.Stand:
@@ -166,6 +170,7 @@ namespace Player
 
             switch (state)
             {
+
                 case ActionState.Airial:
                     animator.SetInteger("State", (int)AnimationState.Airial);
                     break;

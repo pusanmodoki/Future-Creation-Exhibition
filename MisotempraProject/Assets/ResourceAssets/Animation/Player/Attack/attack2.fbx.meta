@@ -66,8 +66,22 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.0591133
+        functionName: EnableAttackCollision
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.12315271
         functionName: EndAttackTrail
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.12315271
+        functionName: DisableAttackCollision
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

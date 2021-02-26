@@ -16,8 +16,6 @@ namespace Player
         private float m_deceleration = 1.0f;
         [SerializeField, Range(0.0f, 2.0f)]
         private float m_limitMove = 1.0f;
-        [SerializeField]
-        private float m_airialLimit = 0.2f;
 
         public Vector2 force { get; private set; }
 
